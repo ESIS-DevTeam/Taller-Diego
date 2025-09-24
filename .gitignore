@@ -1,0 +1,6 @@
+.qodo/
+__pycache__/
+venv/
+.qodo
+.env
+node_modules/
