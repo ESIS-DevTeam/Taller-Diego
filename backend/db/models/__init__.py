@@ -1,0 +1,1 @@
+from db.models.producto import Producto
