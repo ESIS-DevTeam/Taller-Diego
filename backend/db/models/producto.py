@@ -17,3 +17,10 @@ class Producto(Base):
     img = Column(String, nullable=True)
 
     ventas = relationship("VentaProducto", back_populates="producto")
+
+    tipo = Column(String(50))
+    
+    __mapper_args__ = {
+        'polymorphic_identity': 'producto',
+        'polymorphic_on': tipo
+    }
