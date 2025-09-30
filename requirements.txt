@@ -4,4 +4,4 @@ uvicorn
 pydantic-settings
 sqlalchemy
 python-multipart
-psycopg2
+psycopg2-binary
