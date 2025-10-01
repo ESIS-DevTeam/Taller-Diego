@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from db.models import Venta
 from datetime import datetime
+from sqlalchemy import Date, cast
 
 class VentaRepository:
     def __init__(self, db: Session):
@@ -28,4 +29,6 @@ class VentaRepository:
         return False
 
     def get_by_fecha(self, fecha: datetime):
-        return self.db.query(Venta).filter(Venta.fecha == fecha).all()
+        return self.db.query(Venta).filter(
+            cast(Venta.fecha, Date) == fecha.date()
+        ).all()
