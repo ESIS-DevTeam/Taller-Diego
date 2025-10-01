@@ -2,7 +2,8 @@ from pydantic import BaseModel
 class ProductoBase(BaseModel):
     nombre: str
     descripcion: str
-    precio: float
+    precioCompra: float
+    precioVenta: float
     marca: str
     categoria: str
     stock: int
