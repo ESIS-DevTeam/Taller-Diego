@@ -5,7 +5,7 @@ from schemas.venta_schema import VentaCreate, VentaResponse
 from services.venta_service import VentaService
 from datetime import datetime
 
-router = APIRouter(prefix="/ventas", tags=["ventas"])
+router = APIRouter(tags=["Ventas"])
 
 def get_db():
     db = SessionLocal()
