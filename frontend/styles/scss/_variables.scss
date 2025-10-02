@@ -1,0 +1,42 @@
+@use 'sass:map';
+
+$colors: (
+  "primary":   #1A242F,
+  "secondary": #EBF5FF,
+  "error":     #8B2727,
+  "success":   #2E7D32,
+  "warning":   #F9A825,
+);
+
+@function color($name) {
+  @return map.get($colors, $name);
+}
+
+
+
+$font-base: 'Istok Web', sans-serif;
+$font-color: #A41212;
+$font-size-base:16px;
+$font-size-xl:24px;
+
+
+$spacings: (
+  "xs": 0.25rem,
+  "sm": 0.5rem,
+  "md": 1rem,
+  "lg": 2rem,
+  "xl": 4rem
+);
+
+
+$breakpoints: (
+  "sm": 576px,
+  "md": 768px,
+  "lg": 992px,
+  "xl": 1200px
+);
+
+
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 16px;
