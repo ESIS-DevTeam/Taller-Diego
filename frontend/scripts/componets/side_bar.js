@@ -1,6 +1,6 @@
 export function loadSideBar(){
     return `
-        <aside id="sidebar" class="sidebar">
+        <aside id="sidebar" class="side-bar-container">
             <nav class="sidebar-nav">
                 <ul>
                     <li>
