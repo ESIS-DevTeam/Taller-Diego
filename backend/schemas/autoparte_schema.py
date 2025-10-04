@@ -9,7 +9,7 @@ class AutoparteBase(BaseModel):
     stock: int
     stockMin: int
     modelo: str
-    año: int
+    anio: int
 
 class AutoparteCreate(AutoparteBase):
     codBarras: str | None = None

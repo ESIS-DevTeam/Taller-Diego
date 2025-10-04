@@ -45,11 +45,11 @@ class AutoparteRepository:
     def get_by_modelo(self, modelo: str):
         return self.db.query(Autoparte).filter(Autoparte.modelo == modelo).all()
     
-    def get_by_año(self, año: int):
-        return self.db.query(Autoparte).filter(Autoparte.año == año).all()
+    def get_by_anio(self, anio: int):
+        return self.db.query(Autoparte).filter(Autoparte.anio == anio).all()
     
-    def get_by_modelo_and_año(self, modelo: str, año: int):
+    def get_by_modelo_and_anio(self, modelo: str, anio: int):
         return self.db.query(Autoparte).filter(
             Autoparte.modelo == modelo,
-            Autoparte.año == año
+            Autoparte.anio == anio
         ).all()

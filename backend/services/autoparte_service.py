@@ -38,8 +38,8 @@ class AutoparteService:
     def get_by_modelo(self, modelo: str):
         return self.repo.get_by_modelo(modelo)
     
-    def get_by_año(self, año: int):
-        return self.repo.get_by_año(año)
+    def anio(self, año: int):
+        return self.repo.anio(año)
     
     def get_by_modelo_and_año(self, modelo: str, año: int):
         return self.repo.get_by_modelo_and_año(modelo, año)

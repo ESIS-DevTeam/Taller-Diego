@@ -62,9 +62,9 @@ def get_autopartes_by_modelo(
 ):
     return service.get_by_modelo(modelo)
 
-@router.get("/año/{año}", response_model=list[AutoparteResponse])
-def get_autopartes_by_año(
-    año: int,
+@router.get("/anio/{anio}", response_model=list[AutoparteResponse])
+def get_autopartes_by_anio(
+    anio: int,
     service: AutoparteService = Depends(get_autoparte_service)
 ):
-    return service.get_by_año(año)
+    return service.get_by_anio(anio)
