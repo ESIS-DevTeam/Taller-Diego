@@ -1,13 +1,7 @@
 from pydantic import BaseModel
+from .producto_schema import ProductoBase, ProductoCreate, ProductoResponse
 
 class AutoparteBase(BaseModel):
-    nombre: str
-    descripcion: str
-    precio: float
-    marca: str
-    categoria: str
-    stock: int
-    stockMin: int
     modelo: str
     anio: int
 
