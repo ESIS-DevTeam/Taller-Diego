@@ -6,9 +6,12 @@
     <title>Taller de Mecánica Diego</title>
     <link rel="stylesheet" href="../styles/css/home.css">
     <link rel="stylesheet" href="../styles/css/side_bar.css">
+    <link rel="stylesheet" href="../styles/css/header.css">
 </head>
 <body>   
-    <div id="app">
+    <div id="side-bar">
+    </div>
+    <div id="header">
     </div>
     <div class="main-content">
             <div class="content">
@@ -86,7 +89,11 @@
     </div>
     <script type="module">
         import { loadSideBar } from '../scripts/componets/side_bar.js';
-        document.getElementById('app').innerHTML = loadSideBar();
+        document.getElementById('side-bar').innerHTML = loadSideBar();
+    </script>
+    <script type="module">
+        import { loadHeader } from '../scripts/componets/header.js';
+        document.getElementById('header').innerHTML = loadHeader();
     </script>
 </body>
 </html>
