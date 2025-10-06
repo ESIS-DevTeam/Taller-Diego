@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from repositories.venta_repo import VentaRepository
 from schemas.venta_schema import VentaCreate
 from datetime import datetime
+from fastapi import HTTPException
 
 class VentaService:
     
@@ -9,6 +10,13 @@ class VentaService:
         self.repo = VentaRepository(db)
 
     def create_venta(self, data: VentaCreate):
+        productos = getattr(data, "productos", None)
+        if productos:
+            productos_list = [p.model_dump() if hasattr(p, 'model_dump') else p for p in productos]
+            try:
+                return self.repo.create_with_products(data.fecha, productos_list)
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
         return self.repo.create(data.fecha)
 
     def list_ventas(self):
