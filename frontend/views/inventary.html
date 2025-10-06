@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="../styles/css/side_bar.css">
     <link rel="stylesheet" href="../styles/css/header.css">
     <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/css/modal-add-product.css">
+    <link rel="stylesheet" href="../styles/css/modal-confirm.css">
+    <link rel="stylesheet" href="../styles/css/product-details.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 </head>
 <body>
     <div id="header"></div>
@@ -17,7 +21,7 @@
 
         <main class="main-content">
             <h1>Gestion de inventario</h1>
-            <div class="card">
+            <div class="card" id="open-modal-btn">
                 <a href="#">
                     <p>Nuevo producto</p>
                 </a>
@@ -34,9 +38,6 @@
                         <div class="category-filter">
                             <h3>Categoría</h3>
                             <ul class="category-option">
-                                <li><label><input type="checkbox" name="category" value="sparkPlugs"> Bujías</label></li>
-                                <li><label><input type="checkbox" name="category" value="filter"> Filtro</label></li>
-                                <li><label><input type="checkbox" name="category" value="carOil"> Aceites</label></li>
                             </ul>
                         </div>
 
@@ -76,6 +77,7 @@
         </main>
         
     </div>
+    <div id="modal-container"></div>
     <script type="module" src="../scripts/inventary.js"></script>
 </body>
 </html>
