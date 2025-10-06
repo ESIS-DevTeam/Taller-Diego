@@ -16,6 +16,7 @@ class ProductoResponse(ProductoBase):
     id: int
     codBarras: str | None = None
     img: str | None = None
+    tipo: str | None = None
 
     class Config:
         from_attributes = True

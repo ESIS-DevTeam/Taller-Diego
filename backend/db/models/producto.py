@@ -15,10 +15,9 @@ class Producto(Base):
     stockMin = Column(Integer, nullable=False, default=0)
     codBarras = Column(String, nullable=True, unique=True)
     img = Column(String, nullable=True)
+    tipo = Column(String, nullable=False)
 
     ventas = relationship("VentaProducto", back_populates="producto")
-
-    tipo = Column(String(50))
     
     __mapper_args__ = {
         'polymorphic_identity': 'producto',

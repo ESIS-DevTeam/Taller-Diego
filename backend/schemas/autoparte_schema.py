@@ -1,7 +1,6 @@
-from pydantic import BaseModel
-from .producto_schema import ProductoBase, ProductoCreate, ProductoResponse
+from .producto_schema import ProductoBase
 
-class AutoparteBase(BaseModel):
+class AutoparteBase(ProductoBase):
     modelo: str
     anio: int
 

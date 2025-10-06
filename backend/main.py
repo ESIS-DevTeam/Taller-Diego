@@ -13,8 +13,6 @@ app.add_middleware(
 
 app.include_router(producto_routes.router,
                    prefix="/api/v1/productos", tags=["Productos"])
-
-
 app.include_router(autoparte_routes.router,
                    prefix="/api/v1/autopartes", tags=["Autopartes"])
 

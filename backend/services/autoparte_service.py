@@ -38,18 +38,5 @@ class AutoparteService:
     def get_by_modelo(self, modelo: str):
         return self.repo.get_by_modelo(modelo)
     
-    def anio(self, año: int):
-        return self.repo.anio(año)
-    
-    def get_by_modelo_and_año(self, modelo: str, año: int):
-        return self.repo.get_by_modelo_and_año(modelo, año)
-    
-    def check_stock_minimo(self, id: int):
-        autoparte = self.repo.get_by_id(id)
-        if autoparte and autoparte.stock <= autoparte.stockMin:
-            return True
-        return False
-    
-    def get_autopartes_bajo_stock(self):
-        autopartes = self.repo.get_all()
-        return [ap for ap in autopartes if ap.stock <= ap.stockMin]
+    def get_by_anio(self, anio: int):
+        return self.repo.get_by_anio(anio)

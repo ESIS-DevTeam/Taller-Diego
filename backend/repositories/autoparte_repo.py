@@ -47,9 +47,3 @@ class AutoparteRepository:
     
     def get_by_anio(self, anio: int):
         return self.db.query(Autoparte).filter(Autoparte.anio == anio).all()
-    
-    def get_by_modelo_and_anio(self, modelo: str, anio: int):
-        return self.db.query(Autoparte).filter(
-            Autoparte.modelo == modelo,
-            Autoparte.anio == anio
-        ).all()
