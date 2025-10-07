@@ -1,3 +1,5 @@
+@use 'variables' as v;
+@use 'sass:color';
 // Overlay de fondo
 .modal-overlay {
   position: fixed;
@@ -61,7 +63,63 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px 60px;
-    
+    .autopart-toggle {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border: 1px dashed #cbd4e1;
+      border-radius: 10px;
+      background: #f7f9fc;
+
+      .autopart-toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+
+        input[type="checkbox"] {
+          width: 20px;
+          height: 20px;
+          accent-color: v.color("primary");
+        }
+
+        span {
+          font-size: 18px;
+          font-weight: 600;
+          color: #233043;
+        }
+      }
+
+      .autopart-helper {
+        font-size: 14px;
+        color: #607089;
+      }
+    }
+
+    .auto-part-fields {
+      grid-column: 1 / -1;
+      display: none;
+      margin-top: -5px;
+
+      &.is-visible {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 60px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .form-label {
+          font-size: 20px;
+        }
+      }
+    }
     .form-group {
       display: flex;
       flex-direction: column;
@@ -129,6 +187,28 @@
     }
   }
 }
+.autopart-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: v.color("primary");
+  }
+}
+
+.auto-part-fields {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+
+  &.is-visible {
+    display: flex;
+  }
+}
+
 
 // Media query para móviles
 @media (max-width: 800px) {

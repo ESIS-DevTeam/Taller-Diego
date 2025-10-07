@@ -19,7 +19,7 @@ export function openProductDetails(product) {
     modalContainer.innerHTML = generateProductDetailsHTML(product);
     document.body.style.overflow = "hidden";
 
-    setupModalCloseEvents();
+    setupModalCloseEvents(product);
 }
 
 
@@ -109,8 +109,9 @@ function setupModalCloseEvents(product) {
 
     editBtn?.addEventListener("click", () => {
         handleClose();
+        const productID = editBtn.dataset.id;
         if (product?.id) {
-            openModal("edit", product.id);
+            openModal("edit", Number(productID));
         }
     });
 }
