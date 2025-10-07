@@ -1,70 +1,82 @@
+const defaultFilters = {
+  search: "",
+  categories: [],
+  lowStock: false,
+  minPrice: null,
+  maxPrice: null
+};
+
 export class FilterManager {
-    constructor(products) {
-        this.products = products;
-        this.filteredProducts = [...products];
-        this.currentFilters = {
-            search: '',
-            categories: [],
-            lowStock: false,
-            minPrice: null,
-            maxPrice: null
-        };
+  constructor(products = []) {
+    this.products = [...products];
+    this.currentFilters = { ...defaultFilters };
+    this._initFuse();
+  }
+
+  _initFuse() {
+    if (typeof Fuse !== "undefined") {
+      this.fuse = new Fuse(this.products, {
+        keys: ["name", "description", "brand", "category"],
+        threshold: 0.35,
+        ignoreLocation: true
+      });
+    } else {
+      this.fuse = null;
+    }
+  }
+
+  updateProducts(products = []) {
+    this.products = [...products];
+    this._initFuse();
+    return this.getFilteredProducts();
+  }
+
+  updateFilters(partial = {}) {
+    this.currentFilters = { ...this.currentFilters, ...partial };
+    return this.getFilteredProducts();
+  }
+
+  clearFilters() {
+    this.currentFilters = { ...defaultFilters };
+  }
+
+  getFilteredProducts() {
+    let result = [...this.products];
+    const { search, categories, lowStock, minPrice, maxPrice } = this.currentFilters;
+
+    if (search.trim()) {
+      const query = search.trim();
+      if (this.fuse) {
+        result = this.fuse.search(query).map((item) => item.item);
+      } else {
+        const normalized = query.toLowerCase();
+        result = result.filter(
+          (p) =>
+            p.name.toLowerCase().includes(normalized) ||
+            p.description.toLowerCase().includes(normalized) ||
+            p.brand.toLowerCase().includes(normalized) ||
+            p.category.toLowerCase().includes(normalized)
+        );
+      }
     }
 
-    // Actualizar filtros
-    updateFilters(newFilters) {
-        this.currentFilters = { ...this.currentFilters, ...newFilters };
-        return this.applyFilters();
+    if (categories?.length) {
+      const set = new Set(categories.map((c) => c.toLowerCase()));
+      result = result.filter((p) => set.has((p.category || "").toLowerCase()));
     }
 
-    // Aplicar todos los filtros
-    applyFilters() {
-        this.filteredProducts = this.products.filter(product => {
-            // Filtrar por texto de búsqueda
-            const searchMatch = !this.currentFilters.search ||
-                product.name.toLowerCase().includes(this.currentFilters.search.toLowerCase()) ||
-                product.description.toLowerCase().includes(this.currentFilters.search.toLowerCase());
-
-            // Filtrar por categoría
-            const categoryMatch = this.currentFilters.categories.length === 0 ||
-                this.currentFilters.categories.includes(product.category);
-
-            // Filtrar por stock bajo
-            const stockMatch = !this.currentFilters.lowStock ||
-                product.stock <= product.minStock;
-
-            // Filtrar por precio
-            const minPriceMatch = this.currentFilters.minPrice === null ||
-                product.sellingPrice >= this.currentFilters.minPrice;
-            const maxPriceMatch = this.currentFilters.maxPrice === null ||
-                product.sellingPrice <= this.currentFilters.maxPrice;
-
-            return searchMatch && categoryMatch && stockMatch && minPriceMatch && maxPriceMatch;
-        });
-
-        return this.filteredProducts;
+    if (lowStock) {
+      result = result.filter((p) => Number(p.stock) <= Number(p.minStock));
     }
 
-    // Limpiar filtros
-    clearFilters() {
-        this.currentFilters = {
-            search: '',
-            categories: [],
-            lowStock: false,
-            minPrice: null,
-            maxPrice: null
-        };
-        return this.applyFilters();
+    if (minPrice !== null) {
+      result = result.filter((p) => Number(p.sellingPrice) >= Number(minPrice));
     }
 
-    // Obtener productos filtrados
-    getFilteredProducts() {
-        return this.filteredProducts;
+    if (maxPrice !== null) {
+      result = result.filter((p) => Number(p.sellingPrice) <= Number(maxPrice));
     }
 
-    // Actualizar lista de productos
-    updateProducts(newProducts) {
-        this.products = newProducts;
-        return this.applyFilters();
-    }
+    return result;
+  }
 }

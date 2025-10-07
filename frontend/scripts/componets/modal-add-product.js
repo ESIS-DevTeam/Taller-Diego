@@ -58,9 +58,9 @@ export function loadModalAddProduct(typeActions, productData = null) {
                     <label for="product-category" class="form-label">Categoría</label>
                     <select id="product-category" name="product-category" required>
                         <option value="" disabled ${!data.category ? 'selected' : ''}>Selecciona una categoría</option>
-                        <option value="oil" ${data.category === 'oil' ? 'selected' : ''}>Aceite</option>
-                        <option value="sparkPlugs" ${data.category === 'sparkPlugs' ? 'selected' : ''}>Bujia</option>
-                        <option value="replacement" ${data.category === 'replacement' ? 'selected' : ''}>Repuesto</option>
+                        <option value="Aceite" ${data.category === 'Aceite' ? 'selected' : ''}>Aceite</option>
+                        <option value="Bujia" ${data.category === 'Bujia' ? 'selected' : ''}>Bujia</option>
+                        <option value="Repuesto" ${data.category === 'Repuesto' ? 'selected' : ''}>Repuesto</option>
                     </select>
                 </div>
                 

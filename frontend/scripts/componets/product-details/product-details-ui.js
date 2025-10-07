@@ -1,20 +1,35 @@
-import { getProductById } from "../../data-manager.js";
 import { openModal, closeModal } from "../../inventary.js";
 
-export function openProductDetails(productId) {
-    const product = getProductById(productId);
+const currencyFormatter = new Intl.NumberFormat("es-CL", {
+  style: "currency",
+  currency: "CLP",
+  minimumFractionDigits: 0
+});
+
+function formatCurrency(value) {
+  return currencyFormatter.format(Number(value ?? 0));
+}
+
+export function openProductDetails(product) {
     if (!product) return;
-    
-    const modalContainer = document.getElementById('modal-container');
+
+    const modalContainer = document.getElementById("modal-container");
     if (!modalContainer) return;
-    
+
     modalContainer.innerHTML = generateProductDetailsHTML(product);
-    document.body.style.overflow = 'hidden';
-    
+    document.body.style.overflow = "hidden";
+
     setupModalCloseEvents();
 }
 
+
 function generateProductDetailsHTML(product) {
+    const profit = Number(product.sellingPrice ?? 0) - Number(product.purchasePrice ?? 0);
+    const profitPercent =
+        Number(product.purchasePrice) > 0
+            ? Math.round((profit / Number(product.purchasePrice)) * 100)
+            : 0;
+
     return `
         <div class="modal-overlay active">
             <div class="modal-content product-details-modal">
@@ -26,19 +41,19 @@ function generateProductDetailsHTML(product) {
                     <div class="product-details-grid">
                         <div class="detail-group">
                             <label>Nombre:</label>
-                            <span class="detail-value">${product.name}</span>
+                            <span class="detail-value">${product.name || "Sin nombre"}</span>
                         </div>
                         <div class="detail-group">
                             <label>Descripción:</label>
-                            <span class="detail-value">${product.description}</span>
+                            <span class="detail-value">${product.description || "Sin descripción"}</span>
                         </div>
                         <div class="detail-group">
                             <label>Categoría:</label>
-                            <span class="detail-value">${product.category}</span>
+                            <span class="detail-value">${product.category || "Sin categoría"}</span>
                         </div>
                         <div class="detail-group">
                             <label>Stock Actual:</label>
-                            <span class="detail-value ${product.stock <= product.minStock ? 'low-stock' : 'normal-stock'}">
+                            <span class="detail-value ${product.stock <= product.minStock ? "low-stock" : "normal-stock"}">
                                 ${product.stock} unidades
                             </span>
                         </div>
@@ -48,17 +63,16 @@ function generateProductDetailsHTML(product) {
                         </div>
                         <div class="detail-group">
                             <label>Precio de Compra:</label>
-                            <span class="detail-value">$${product.purchasePrice.toLocaleString()}</span>
+                            <span class="detail-value">${formatCurrency(product.purchasePrice)}</span>
                         </div>
                         <div class="detail-group">
                             <label>Precio de Venta:</label>
-                            <span class="detail-value">$${product.sellingPrice.toLocaleString()}</span>
+                            <span class="detail-value">${formatCurrency(product.sellingPrice)}</span>
                         </div>
                         <div class="detail-group">
                             <label>Margen de Ganancia:</label>
                             <span class="detail-value profit-margin">
-                                $${(product.sellingPrice - product.purchasePrice).toLocaleString()} 
-                                (${Math.round(((product.sellingPrice - product.purchasePrice) / product.purchasePrice) * 100)}%)
+                                ${formatCurrency(profit)} (${profitPercent}%)
                             </span>
                         </div>
                     </div>
@@ -72,33 +86,31 @@ function generateProductDetailsHTML(product) {
     `;
 }
 
-function setupModalCloseEvents() {
-    const overlay = document.querySelector('.modal-overlay');
-    const closeBtn = document.querySelector('.close-modal');
-    const closeDetailsBtn = document.getElementById('close-details-btn');
-    const editProductBtn = document.getElementById('edit-product-btn');
-    
+
+function setupModalCloseEvents(product) {
+    const modalContainer = document.getElementById("modal-container");
+    if (!modalContainer) return;
+
+    const overlay = modalContainer.querySelector(".modal-overlay");
+    const closeBtn = modalContainer.querySelector(".close-modal");
+    const closeFooterBtn = modalContainer.querySelector("#close-details-btn");
+    const editBtn = modalContainer.querySelector("#edit-product-btn");
+
+    const handleClose = () => closeModal();
+
     if (overlay) {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                closeModal();
-            }
+        overlay.addEventListener("click", (event) => {
+            if (event.target === overlay) handleClose();
         });
     }
-    
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
-    }
-    
-    if (closeDetailsBtn) {
-        closeDetailsBtn.addEventListener('click', closeModal);
-    }
-    
-    if (editProductBtn) {
-        editProductBtn.addEventListener('click', function() {
-            const productId = this.dataset.id;
-            closeModal();
-            setTimeout(() => openModal('edit', parseInt(productId)), 100);
-        });
-    }
+
+    closeBtn?.addEventListener("click", handleClose);
+    closeFooterBtn?.addEventListener("click", handleClose);
+
+    editBtn?.addEventListener("click", () => {
+        handleClose();
+        if (product?.id) {
+            openModal("edit", product.id);
+        }
+    });
 }

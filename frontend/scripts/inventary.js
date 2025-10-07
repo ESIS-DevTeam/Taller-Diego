@@ -6,93 +6,158 @@ import { setupModalEvents, loadModalAddProduct } from "./componets/modal-add-pro
 import { confirmDelete } from "./componets/modal-confirm.js";
 import { FilterManager } from "./componets/filter/filter-manager.js";
 import { setupFilterHandlers } from "./componets/filter/filterHandlers.js";
-import { setupProductEvents } from "./componets/product-details/product-events.js";
-import { 
+import { openProductDetails } from "./componets/product-details/product-details-ui.js";
+import {
     getProducts,
     addProduct,
     updateProduct,
     deleteProduct,
-    getProductById 
+    getProductById
 } from "./data-manager.js";
 
 // Cargar componentes UI
 const sideBarContainer = document.getElementById("side-bar-container");
 const mobileMenu = document.getElementById("mobile-menu-container");
-const header = document.getElementById('header');
+const header = document.getElementById("header");
 
-sideBarContainer.innerHTML = loadSideBar();
-mobileMenu.innerHTML = loadMobileMenu();
-mobileMenuControler();
-header.innerHTML = loadHeader();
+if (sideBarContainer) sideBarContainer.innerHTML = loadSideBar();
+if (mobileMenu) {
+    mobileMenu.innerHTML = loadMobileMenu();
+    mobileMenuControler();
+}
+if (header) header.innerHTML = loadHeader();
 
-//Var globales
+// Estado global
 let products = [];
-let categories = []
+let categories = [];
 let filterManager = null;
+let filtersInitialized = false;
+let productListEventsBound = false;
 
-// Cargar los datos de categoria de forma dinamica
+// Render dinámico de categorías
 function renderCategory(categoriesToRender) {
     const categoryList = document.querySelector(".category-option");
     if (!categoryList) return;
-    
+
+    const activeCategories = filterManager?.currentFilters?.categories ?? [];
     categoryList.innerHTML = "";
-    categoriesToRender.forEach(ctg => {
-        categoryList.insertAdjacentHTML("beforeend", `
+
+    categoriesToRender.forEach((category) => {
+        const checked = activeCategories.includes(category) ? "checked" : "";
+        categoryList.insertAdjacentHTML(
+            "beforeend",
+            `
             <li>
                 <label>
-                    <input type="checkbox" name="category" value="${ctg}">
-                    ${ctg.charAt(0).toUpperCase() + ctg.slice(1)}
+                    <input type="checkbox" name="category" value="${category}" ${checked}>
+                    ${category.charAt(0).toUpperCase() + category.slice(1)}
                 </label>
             </li>
-        `);
+        `
+        );
     });
 }
 
-// Cargar los datos de productos de forma dinamica
+// Render dinámico de productos
 function renderProduct(productsToRender) {
     const productsList = document.querySelector(".product-list");
     if (!productsList) return;
 
     productsList.innerHTML = "";
-    
-    if (productsToRender.length === 0) {
+
+    if (!productsToRender.length) {
         productsList.innerHTML = `
             <div class="no-products">
-                <p>No se encontraron productos que coincidan con los filtros</p>
+                <p>No se encontraron productos</p>
             </div>
         `;
         return;
     }
-    
-    productsToRender.forEach(product => {
-        const stockClass = product.stock <= product.minStock ? "low-stock" : "normal-stock";
-        
-        productsList.insertAdjacentHTML("beforeend", `
-            <div class="product-item" data-id="${product.id}">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <div class="product-info">
-                    <span class="stock ${stockClass}">Stock: ${product.stock}</span>
-                    <span class="price">Precio: $${product.sellingPrice.toLocaleString()}</span>
-                </div>
-                <div class="actions">
-                    <button class="btn-edit" data-id="${product.id}">Editar</button>
-                    <button class="btn-delete" data-id="${product.id}">Eliminar</button>
+
+    productsToRender.forEach((product) => {
+        const stockClass = product.stock <= product.minStock ? "low-stock" : "";
+
+        productsList.insertAdjacentHTML(
+            "beforeend",
+            `
+            <div class="product-item grid-layout" data-id="${product.id}">
+                <div class="product-name">${product.name}</div>
+                <div class="product-desc">${product.description}</div>
+                <div class="product-stock ${stockClass}">${product.stock}</div>
+                <div class="product-purchase-price">$${product.purchasePrice.toLocaleString()}</div>
+                <div class="product-selling-price">$${product.sellingPrice.toLocaleString()}</div>
+                <div class="product-actions">
+                    <button class="btn-edit" data-id="${product.id}">
+                        <img src="../assets/icons/edit.png" alt="Editar">
+                    </button>
+                    <button class="btn-delete" data-id="${product.id}">
+                        <img src="../assets/icons/delete.png" alt="Eliminar">
+                    </button>
                 </div>
             </div>
-        `);
+        `
+        );
     });
-    
-    // Configurar eventos de productos
-    setupProductEvents();
 }
 
-// Funciones de productos usando data-manager.js
-async function deleteProductHandler(productId) {
-    console.log("🗑️ Eliminando producto:", productId);
+// Delegación de eventos en la lista de productos
+function setupProductListEvents() {
+    if (productListEventsBound) return;
+
+    const productsList = document.querySelector(".product-list");
+    if (!productsList) return;
+
+    productsList.addEventListener("click", async (event) => {
+        const deleteBtn = event.target.closest(".btn-delete");
+        if (deleteBtn) {
+            event.preventDefault();
+            event.stopPropagation();
+            await handleDeleteClick(deleteBtn.dataset.id);
+            return;
+        }
+
+        const editBtn = event.target.closest(".btn-edit");
+        if (editBtn) {
+            event.preventDefault();
+            event.stopPropagation();
+            openModal("edit", editBtn.dataset.id);
+            return;
+        }
+
+        const row = event.target.closest(".product-item");
+        if (row) {
+            const product = products.find((item) => item.id === Number(row.dataset.id));
+            if (product) openProductDetails(product);
+        }
+    });
+
+    productListEventsBound = true;
+}
+
+async function handleDeleteClick(productId) {
+    const id = parseInt(productId, 10);
+    if (isNaN(id) || id <= 0) {
+        console.error("ID inválido:", productId);
+        return;
+    }
+
+    console.log("Solicitando confirmación para eliminar producto ID:", id);
+    const confirmed = await confirmDelete(id);
     
+    if (confirmed) {
+        console.log("Confirmación recibida, eliminando producto ID:", id);
+        const success = await deleteProductHandler(id);
+        console.log("Resultado de eliminación:", success ? "Éxito" : "Fallido");
+    } else {
+        console.log("Eliminación cancelada por el usuario");
+    }
+}
+
+// CRUD handlers
+async function deleteProductHandler(productId) {
+    const id = Number(productId);
     try {
-        await deleteProduct(productId);
+        await deleteProduct(id);
         await loadProducts();
         showSuccess("Producto eliminado correctamente");
         return true;
@@ -104,25 +169,23 @@ async function deleteProductHandler(productId) {
 }
 
 async function editProductHandler(productId, productData) {
-    console.log("✏️ Editando producto:", productId);
-    
+    const id = Number(productId);
+    const payload = {
+        nombre: productData.name,
+        descripcion: productData.description,
+        precioVenta: productData.sellingPrice,
+        precioCompra: productData.purchasePrice,
+        marca: productData.brand,
+        categoria: productData.category,
+        stock: productData.stock,
+        stockMin: productData.minStock,
+        img: productData.image,
+        codBarras: productData.barcode,
+        tipo: productData.type
+    };
+
     try {
-        // Adaptar formato de datos para la API
-        const apiData = {
-            nombre: productData.name,
-            descripcion: productData.description,
-            precioVenta: productData.sellingPrice,
-            precioCompra: productData.purchasePrice,
-            marca: productData.brand,
-            categoria: productData.category,
-            stock: productData.stock,
-            stockMin: productData.minStock,
-            img: productData.image,
-            codBarras: productData.barcode,
-            tipo: productData.type
-        };
-        
-        await updateProduct(productId, apiData);
+        await updateProduct(id, payload);
         await loadProducts();
         showSuccess("Producto actualizado");
         return true;
@@ -134,8 +197,6 @@ async function editProductHandler(productId, productData) {
 }
 
 async function addNewProduct(productData) {
-    console.log(" Agregando nuevo producto");
-    
     try {
         await addProduct(
             productData.name,
@@ -150,7 +211,6 @@ async function addNewProduct(productData) {
             productData.image,
             productData.type
         );
-        
         await loadProducts();
         showSuccess("Producto agregado");
         return true;
@@ -161,61 +221,58 @@ async function addNewProduct(productData) {
     }
 }
 
-// Modal functions
-document.getElementById('open-modal-btn')?.addEventListener('click', function() {
+// Modal helpers
+document.getElementById("open-modal-btn")?.addEventListener("click", () => {
     openModal("add");
 });
 
 function openModal(typeActions, productID = null) {
-    const modalContainer = document.getElementById('modal-container');
+    const modalContainer = document.getElementById("modal-container");
     if (!modalContainer) return;
 
     let productData = null;
     if (typeActions === "edit" && productID) {
-        productData = products.find(p => p.id == productID);
+        productData = products.find((p) => p.id === Number(productID));
     }
 
     modalContainer.innerHTML = loadModalAddProduct(typeActions, productData);
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
-    setupModalEvents(typeActions, productID, (formData) => {
-        handleModalSubmit(typeActions, productID, formData);
+    setupModalEvents(typeActions, productID, async (formData) => {
+        await handleModalSubmit(typeActions, productID, formData);
     });
 }
 
 async function handleModalSubmit(typeActions, productID, formData) {
     let success = false;
-    
+
     if (typeActions === "add") {
         success = await addNewProduct(formData);
     } else if (typeActions === "edit") {
         success = await editProductHandler(productID, formData);
     }
-    
-    if (success) {
-        closeModal();
-    }
+
+    if (success) closeModal();
 }
 
 function closeModal() {
-    const modalContainer = document.getElementById('modal-container');
+    const modalContainer = document.getElementById("modal-container");
     if (modalContainer) {
-        modalContainer.innerHTML = '';
-        document.body.style.overflow = '';
+        modalContainer.innerHTML = "";
+        document.body.style.overflow = "";
     }
 }
 
-// Filter handling
+// Filtros
 function onFiltersChanged(filteredProducts) {
-    renderProduct(filteredProducts);
+    renderProduct(filteredProducts ?? []);
 }
 
+// Carga de productos desde la API
 async function loadProducts() {
     try {
         const apiProducts = await getProducts();
-        
-        // Transformar formato de API a frontend
-        products = apiProducts.map(p => ({
+        products = apiProducts.map((p) => ({
             id: p.id,
             name: p.nombre || "",
             description: p.descripcion || "",
@@ -229,50 +286,52 @@ async function loadProducts() {
             barcode: p.codBarras || "",
             type: p.tipo || ""
         }));
-        
-        // Extraer categorías únicas
-        categories = [...new Set(products.map(p => p.category))].filter(Boolean);
-        
-        // Reinicializar FilterManager
-        filterManager = new FilterManager(products);
-        
-        // Configurar manejo de filtros
-        setupFilterHandlers(filterManager, onFiltersChanged);
-        
-        // Renderizar UI
+
+        categories = [...new Set(products.map((p) => p.category))].filter(Boolean);
+
+        if (!filterManager) {
+            filterManager = new FilterManager(products);
+        } else {
+            filterManager.updateProducts(products);
+        }
+
         renderCategory(categories);
-        renderProduct(products);
+        renderProduct(filterManager.getFilteredProducts());
+
+        if (!filtersInitialized) {
+            setupFilterHandlers(filterManager, onFiltersChanged);
+            filtersInitialized = true;
+        }
     } catch (error) {
         console.error("Error cargando productos:", error);
         showError("No se pudieron cargar los productos");
     }
 }
 
+// Feedback básico
 function showError(message) {
-    // Implementar notificación (temporal)
     alert(message);
 }
 
 function showSuccess(message) {
-    // Implementar notificación (temporal)
     alert(message);
 }
 
 // Inicialización
 async function initializeApp() {
+    setupProductListEvents();
     await loadProducts();
 }
 
-// Iniciar la aplicación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", () => {
     initializeApp();
 });
 
-// Exportar funciones para uso en otros módulos
-export { 
-    getProductById, 
-    addNewProduct, 
-    editProductHandler, 
+// Exportaciones
+export {
+    getProductById,
+    addNewProduct,
+    editProductHandler,
     deleteProductHandler,
     openModal,
     closeModal

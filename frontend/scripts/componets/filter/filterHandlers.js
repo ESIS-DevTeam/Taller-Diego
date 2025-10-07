@@ -1,48 +1,72 @@
+import { debounce } from "../../utils/debounce.js"; // crea uno si no existe
+
 export function setupFilterHandlers(filterManager, onFilterChange) {
-    if (!filterManager) {
-        console.error("FilterManager no inicializado");
-        return;
-    }
-    
-    // Barra de búsqueda
-    const searchInput = document.querySelector('[data-search-input]');
-    if (searchInput) {
-        let searchTimeout;
-        
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                filterManager.updateFilters({ search: e.target.value });
-                if (onFilterChange) onFilterChange(filterManager.getFilteredProducts());
-            }, 300);
-        });
-    }
-    
-    // Filtros de categoría
-    const categoryInputs = document.querySelectorAll('.category-option input[type="checkbox"]');
-    categoryInputs.forEach(input => {
-        input.addEventListener('change', () => {
-            // Recolectar todas las categorías seleccionadas
-            const selectedCategories = Array.from(categoryInputs)
-                .filter(cb => cb.checked)
-                .map(cb => cb.value);
-                
-            filterManager.updateFilters({ categories: selectedCategories });
-            if (onFilterChange) onFilterChange(filterManager.getFilteredProducts());
-        });
+  if (!filterManager) return;
+
+  const form = document.getElementById("inventory-form");
+  if (!form || form.dataset.handlersAttached === "true") return;
+  form.dataset.handlersAttached = "true";
+
+  const searchInput = form.querySelector("[data-search-input]");
+  const minPriceInput = form.querySelector("[data-min-price]");
+  const maxPriceInput = form.querySelector("[data-max-price]");
+  const lowStockInput = form.querySelector("[data-low-stock]");
+  const clearBtn = form.querySelector("[data-clear-filters]");
+  const categoryContainer = form.querySelector(".category-option");
+
+  const emit = () => onFilterChange?.(filterManager.getFilteredProducts());
+
+  if (searchInput) {
+    const onSearch = debounce((value) => {
+      filterManager.updateFilters({ search: value });
+      emit();
+    }, 250);
+
+    searchInput.addEventListener("input", (e) => onSearch(e.target.value));
+  }
+
+  if (minPriceInput) {
+    minPriceInput.addEventListener("input", (e) => {
+      const value = e.target.value.trim();
+      filterManager.updateFilters({ minPrice: value === "" ? null : Number(value) });
+      emit();
     });
-    
-    // Botón limpiar filtros
-    const clearBtn = document.querySelector('[data-clear-filters]');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            // Limpiar UI
-            if (searchInput) searchInput.value = '';
-            categoryInputs.forEach(cb => cb.checked = false);
-            
-            // Limpiar filtros
-            filterManager.clearFilters();
-            if (onFilterChange) onFilterChange(filterManager.getFilteredProducts());
-        });
-    }
+  }
+
+  if (maxPriceInput) {
+    maxPriceInput.addEventListener("input", (e) => {
+      const value = e.target.value.trim();
+      filterManager.updateFilters({ maxPrice: value === "" ? null : Number(value) });
+      emit();
+    });
+  }
+
+  if (lowStockInput) {
+    lowStockInput.addEventListener("change", (e) => {
+      filterManager.updateFilters({ lowStock: e.target.checked });
+      emit();
+    });
+  }
+
+  if (categoryContainer) {
+    categoryContainer.addEventListener("change", () => {
+      const selected = Array.from(
+        categoryContainer.querySelectorAll('input[name="category"]:checked')
+      ).map((input) => input.value);
+      filterManager.updateFilters({ categories: selected });
+      emit();
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (searchInput) searchInput.value = "";
+      if (minPriceInput) minPriceInput.value = "";
+      if (maxPriceInput) maxPriceInput.value = "";
+      if (lowStockInput) lowStockInput.checked = false;
+      categoryContainer?.querySelectorAll('input[name="category"]').forEach((cb) => (cb.checked = false));
+      filterManager.clearFilters();
+      emit();
+    });
+  }
 }

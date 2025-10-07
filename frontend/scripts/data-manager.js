@@ -98,16 +98,20 @@ export async function updateProduct(id, updatedProduct) {
 }
 
 export async function deleteProduct(id) {
-  try{
-    const response = await fetch(`${API_BASE_URL}/productos/${id}`,{
-      method: 'DELETE'
+  try {
+    console.log(`Eliminando producto ${id}...`);
+    const response = await fetch(`${API_BASE_URL}/productos/${id}`, {
+      method: 'DELETE',
     });
-    if(!response.ok){
-      throw new Error("Network response was not ok");
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error ${response.status}: ${errorText}`);
     }
+    
     return await response.json();
-  }catch(error){
-    console.error(`Error delete product`,error);
+  } catch (error) {
+    console.error('Error eliminando producto:', error);
     throw error;
   }
 }

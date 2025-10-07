@@ -10,7 +10,7 @@ export function loadSideBar(){
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="inventary.html">
                             <img src="../assets/icons/package.png" alt="Inventario">
                             <span>Inventario</span>
                         </a>
