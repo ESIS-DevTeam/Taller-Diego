@@ -6,14 +6,12 @@ import { setupModalEvents, loadModalAddProduct } from "./componets/modal-add-pro
 import { confirmDelete } from "./componets/modal-confirm.js";
 import { FilterManager } from "./componets/filter/filter-manager.js";
 import { setupFilterHandlers } from "./componets/filter/filterHandlers.js";
-import { setupProductEvents, attachProductClickListeners } from "./componets/product-details/product-events.js";
-import { openProductDetails } from "./componets/product-details/product-details-ui.js";
+import { setupProductEvents } from "./componets/product-details/product-events.js";
 import { 
-    products, 
-    categories, 
-    addProduct, 
-    deleteProduct, 
-    updateProduct, 
+    getProducts,
+    addProduct,
+    updateProduct,
+    deleteProduct,
     getProductById 
 } from "./data-manager.js";
 
@@ -27,8 +25,10 @@ mobileMenu.innerHTML = loadMobileMenu();
 mobileMenuControler();
 header.innerHTML = loadHeader();
 
-// Inicializar FilterManager con los productos importados
-const filterManager = new FilterManager(products);
+//Var globales
+let products = [];
+let categories = []
+let filterManager = null;
 
 // Cargar los datos de categoria de forma dinamica
 function renderCategory(categoriesToRender) {
@@ -37,15 +37,14 @@ function renderCategory(categoriesToRender) {
     
     categoryList.innerHTML = "";
     categoriesToRender.forEach(ctg => {
-        const categoryHTML = `
+        categoryList.insertAdjacentHTML("beforeend", `
             <li>
                 <label>
-                    <input type="checkbox" name="category" value="${ctg.toLowerCase()}">
-                    ${ctg}
+                    <input type="checkbox" name="category" value="${ctg}">
+                    ${ctg.charAt(0).toUpperCase() + ctg.slice(1)}
                 </label>
             </li>
-        `;
-        categoryList.innerHTML += categoryHTML;
+        `);
     });
 }
 
@@ -66,25 +65,22 @@ function renderProduct(productsToRender) {
     }
     
     productsToRender.forEach(product => {
-        const verify = (product.stock <= product.minStock) ? "low-stock" : "normal-stock";
-        const productoHTML = `
-        <div class="product-item grid-layout" role="row" data-id="${product.id}">
-            <div class="product-name" role="cell">${product.name}</div>
-            <div class="product-desc" role="cell">${product.description}</div>
-            <div class="product-stock ${verify}" role="cell">${product.stock}</div>
-            <div class="product-purchase-price" role="cell">$${product.purchasePrice.toLocaleString()}</div>
-            <div class="product-selling-price" role="cell">$${product.sellingPrice.toLocaleString()}</div>
-            <div class="product-actions" role="cell">
-                <button class="btn-edit" data-id="${product.id}" title="Modificar">
-                    <img src="../assets/icons/edit.png" alt="Editar producto">
-                </button>
-                <button class="btn-delete" data-id="${product.id}" title="Eliminar">
-                    <img src="../assets/icons/delete.png" alt="Eliminar producto">
-                </button>
+        const stockClass = product.stock <= product.minStock ? "low-stock" : "normal-stock";
+        
+        productsList.insertAdjacentHTML("beforeend", `
+            <div class="product-item" data-id="${product.id}">
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <div class="product-info">
+                    <span class="stock ${stockClass}">Stock: ${product.stock}</span>
+                    <span class="price">Precio: $${product.sellingPrice.toLocaleString()}</span>
+                </div>
+                <div class="actions">
+                    <button class="btn-edit" data-id="${product.id}">Editar</button>
+                    <button class="btn-delete" data-id="${product.id}">Eliminar</button>
+                </div>
             </div>
-        </div>
-        `;
-        productsList.innerHTML += productoHTML;
+        `);
     });
     
     // Configurar eventos de productos
@@ -92,41 +88,77 @@ function renderProduct(productsToRender) {
 }
 
 // Funciones de productos usando data-manager.js
-function deleteProductHandler(productId) {
+async function deleteProductHandler(productId) {
     console.log("🗑️ Eliminando producto:", productId);
     
-    const deleted = deleteProduct(productId);
-    if (deleted) {
-        filterManager.products = products;
-        const filtered = filterManager.applyFilters();
-        renderProduct(filtered);
+    try {
+        await deleteProduct(productId);
+        await loadProducts();
+        showSuccess("Producto eliminado correctamente");
+        return true;
+    } catch (error) {
+        console.error("Error eliminando producto:", error);
+        showError("No se pudo eliminar el producto");
+        return false;
     }
 }
 
-function editProductHandler(productId, productData) {
+async function editProductHandler(productId, productData) {
     console.log("✏️ Editando producto:", productId);
     
-    const updated = updateProduct(productId, productData);
-    if (updated) {
-        filterManager.products = products;
-        const filtered = filterManager.applyFilters();
-        renderProduct(filtered);
+    try {
+        // Adaptar formato de datos para la API
+        const apiData = {
+            nombre: productData.name,
+            descripcion: productData.description,
+            precioVenta: productData.sellingPrice,
+            precioCompra: productData.purchasePrice,
+            marca: productData.brand,
+            categoria: productData.category,
+            stock: productData.stock,
+            stockMin: productData.minStock,
+            img: productData.image,
+            codBarras: productData.barcode,
+            tipo: productData.type
+        };
+        
+        await updateProduct(productId, apiData);
+        await loadProducts();
+        showSuccess("Producto actualizado");
         return true;
+    } catch (error) {
+        console.error("Error actualizando producto:", error);
+        showError("No se pudo actualizar el producto");
+        return false;
     }
-    return false;
 }
 
-function addNewProduct(productData) {
-    console.log("➕ Agregando nuevo producto");
+async function addNewProduct(productData) {
+    console.log(" Agregando nuevo producto");
     
-    const newProduct = addProduct(productData);
-    if (newProduct) {
-        filterManager.products = products;
-        const filtered = filterManager.applyFilters();
-        renderProduct(filtered);
-        return newProduct;
+    try {
+        await addProduct(
+            productData.name,
+            productData.description,
+            productData.sellingPrice,
+            productData.purchasePrice,
+            productData.brand,
+            productData.category,
+            productData.stock,
+            productData.minStock,
+            productData.barcode,
+            productData.image,
+            productData.type
+        );
+        
+        await loadProducts();
+        showSuccess("Producto agregado");
+        return true;
+    } catch (error) {
+        console.error("Error agregando producto:", error);
+        showError("No se pudo agregar el producto");
+        return false;
     }
-    return null;
 }
 
 // Modal functions
@@ -140,7 +172,7 @@ function openModal(typeActions, productID = null) {
 
     let productData = null;
     if (typeActions === "edit" && productID) {
-        productData = getProductById(productID);
+        productData = products.find(p => p.id == productID);
     }
 
     modalContainer.innerHTML = loadModalAddProduct(typeActions, productData);
@@ -149,26 +181,19 @@ function openModal(typeActions, productID = null) {
     setupModalEvents(typeActions, productID, (formData) => {
         handleModalSubmit(typeActions, productID, formData);
     });
-
-    setTimeout(() => {
-        const firstInput = document.getElementById('product-name');
-        firstInput?.focus();
-    }, 100);
 }
 
-function handleModalSubmit(typeActions, productID, formData) {
+async function handleModalSubmit(typeActions, productID, formData) {
+    let success = false;
+    
     if (typeActions === "add") {
-        const newProduct = addNewProduct(formData);
-        if (newProduct) {
-            console.log("✅ Producto agregado:", newProduct);
-            closeModal();
-        }
-    } else if (typeActions === "edit" && productID) {
-        const success = editProductHandler(productID, formData);
-        if (success) {
-            console.log("✅ Producto editado:", productID);
-            closeModal();
-        }
+        success = await addNewProduct(formData);
+    } else if (typeActions === "edit") {
+        success = await editProductHandler(productID, formData);
+    }
+    
+    if (success) {
+        closeModal();
     }
 }
 
@@ -181,21 +206,61 @@ function closeModal() {
 }
 
 // Filter handling
-function onFiltersChanged() {
-    const filteredProducts = filterManager.getFilteredProducts();
+function onFiltersChanged(filteredProducts) {
     renderProduct(filteredProducts);
 }
 
+async function loadProducts() {
+    try {
+        const apiProducts = await getProducts();
+        
+        // Transformar formato de API a frontend
+        products = apiProducts.map(p => ({
+            id: p.id,
+            name: p.nombre || "",
+            description: p.descripcion || "",
+            stock: Number(p.stock) || 0,
+            minStock: Number(p.stockMin) || 0,
+            purchasePrice: Number(p.precioCompra) || 0,
+            sellingPrice: Number(p.precioVenta) || 0,
+            category: (p.categoria || "").toLowerCase(),
+            brand: p.marca || "",
+            image: p.img || "",
+            barcode: p.codBarras || "",
+            type: p.tipo || ""
+        }));
+        
+        // Extraer categorías únicas
+        categories = [...new Set(products.map(p => p.category))].filter(Boolean);
+        
+        // Reinicializar FilterManager
+        filterManager = new FilterManager(products);
+        
+        // Configurar manejo de filtros
+        setupFilterHandlers(filterManager, onFiltersChanged);
+        
+        // Renderizar UI
+        renderCategory(categories);
+        renderProduct(products);
+    } catch (error) {
+        console.error("Error cargando productos:", error);
+        showError("No se pudieron cargar los productos");
+    }
+}
+
+function showError(message) {
+    // Implementar notificación (temporal)
+    alert(message);
+}
+
+function showSuccess(message) {
+    // Implementar notificación (temporal)
+    alert(message);
+}
+
 // Inicialización
-function initializeApp() {
-    renderCategory(categories);
-    
-    const initialProducts = filterManager.applyFilters();
-    renderProduct(initialProducts);
-    
-    setupFilterHandlers(filterManager, onFiltersChanged);
-    
-    console.log("📦 Inventario inicializado con", products.length, "productos");
+async function initializeApp() {
+    await loadProducts();
 }
 
 // Iniciar la aplicación cuando el DOM esté listo
@@ -205,8 +270,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Exportar funciones para uso en otros módulos
 export { 
-    products, 
-    categories, 
     getProductById, 
     addNewProduct, 
     editProductHandler, 

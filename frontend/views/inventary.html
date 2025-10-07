@@ -29,35 +29,37 @@
             <section class="form-inventary">
                 <h2>Inventario</h2>
                 <form id="inventory-form" class="inventory-form">
+                    <!-- Búsqueda -->
                     <div class="search-box">
-                        <img src="../assets/icons/search.png" alt="Buscador" title="Buscar">
-                        <input type="text" name="search" placeholder="Buscar producto">
+                        <img src="../assets/icons/search.png" alt="Buscar">
+                        <input type="text" data-search-input placeholder="Buscar producto...">
                     </div>
 
-                    <div class="section-filter">
-                        <div class="category-filter">
-                            <h3>Categoría</h3>
-                            <ul class="category-option">
-                            </ul>
-                        </div>
-
-                        <div class="stock-filter">
-                            <h3>Stock</h3>
-                            <ul>
-                                <li><label><input type="checkbox" name="stock" value="low"> Stock bajo</label></li>
-                            </ul>
-                        </div>
-
-                        <div class="price-filter">
-                            <h3>Precio</h3>
-                            <div>
-                                <input type="number" name="min-price" placeholder="Min">
-                                <input type="number" name="max-price" placeholder="Max">
-                            </div>
-                        </div>
+                    <!-- Categorías -->
+                    <div class="filter-section">
+                        <h4>Categorías</h4>
+                        <ul class="category-option">
+                            <!-- Se llenarán dinámicamente -->
+                        </ul>
                     </div>
 
-                    <button type="submit">Filtrar</button>
+                    <!-- Stock bajo -->
+                    <div class="filter-section">
+                        <h4>Stock</h4>
+                        <ul>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="stock" data-low-stock>
+                                    Stock bajo
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Botón limpiar -->
+                    <div class="filter-actions">
+                        <button type="button" data-clear-filters>Limpiar filtros</button>
+                    </div>
                 </form>
             </section>
 
