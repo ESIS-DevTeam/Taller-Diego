@@ -1,0 +1,295 @@
+@use 'variables' as v;
+@use 'sass:color';
+// Overlay de fondo
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; // Muy alto para estar por encima de todo
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.modal-inventory-form {
+  width: 650px;
+  max-width: 90vw; // Máximo 90% del viewport en móviles
+  height: auto;
+  max-height: 90vh; // Máximo 90% del viewport height
+  padding: 30px 50px 25px 50px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  background-color: white; // Fondo blanco sólido
+  overflow-y: auto; // Scroll interno si es necesario
+  position: relative;
+  z-index: 10001; // Por encima del overlay
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+    h2 {
+      font-size: 40px;
+    }
+    
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      border-radius: 50px;
+      background-color: white;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+    
+    .modal-info {
+      border: none;
+      font-size: 30px;
+    }
+  }
+  
+  .form-product {
+    font-size: 25px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 60px;
+    .autopart-toggle {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border: 1px dashed #cbd4e1;
+      border-radius: 10px;
+      background: #f7f9fc;
+
+      .autopart-toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+
+        input[type="checkbox"] {
+          width: 20px;
+          height: 20px;
+          accent-color: v.color("primary");
+        }
+
+        span {
+          font-size: 18px;
+          font-weight: 600;
+          color: #233043;
+        }
+      }
+
+      .autopart-helper {
+        font-size: 14px;
+        color: #607089;
+      }
+    }
+
+    .auto-part-fields {
+      grid-column: 1 / -1;
+      display: none;
+      margin-top: -5px;
+
+      &.is-visible {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 60px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .form-label {
+          font-size: 20px;
+        }
+      }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      
+      .form-label {
+        font-size: 20px;
+      }
+      
+      input, select, textarea {
+        width: 100%;
+        height: 30px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      
+      textarea {
+        height: 80px;
+        resize: none;
+        font-family: inherit;
+      }
+    }
+    
+    .form-textarea{
+      grid-column: 1 / -1;
+    }
+    
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      
+      button {
+        flex: 1;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-save {
+        background-color: #005bb6;
+        color: white;
+      }
+      
+      .btn-save:hover {
+        background-color: #004a94;
+      }
+      
+      .btn-cancel {
+        background-color: #e0e0e0;
+        color: #333;
+      }
+      
+      .btn-cancel:hover {
+        background-color: #d0d0d0;
+      }
+    }
+  }
+}
+.autopart-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: v.color("primary");
+  }
+}
+
+.auto-part-fields {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+
+  &.is-visible {
+    display: flex;
+  }
+}
+
+
+// Media query para móviles
+@media (max-width: 800px) {
+  .modal-overlay {
+    margin-bottom: 20px;
+    padding: 10px;
+    align-items: flex-start; // Alinear arriba en móviles
+    padding-top: 50px; // Espacio desde arriba
+  }
+  
+  .modal-inventory-form {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 15px;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+    max-height: calc(100vh - 20px); // Altura máxima ajustada
+    
+    .modal-header {
+      h2 {
+        font-size: 22px;
+      }
+    }
+    
+    .form-product {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      font-size: 16px;
+      
+      .form-group {
+        .form-label {
+          font-size: 16px;
+        }
+        
+        input, select, textarea {
+          width: 100%;
+          height: 40px;
+          border-radius: 4px;
+          font-size: 16px;
+          padding: 10px 12px;
+          box-sizing: border-box;
+        }
+        
+        textarea {
+          height: 80px;
+          width: 100%;
+        }
+      }
+      
+      .form-actions {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+        
+        button {
+          padding: 12px 20px;
+          font-size: 16px;
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+// Placeholders
+.form-product {
+  input::placeholder,
+  textarea::placeholder,
+  select::placeholder {
+    font-size: 14px;
+    color: #999;
+  }
+  
+  input:focus::placeholder,
+  textarea:focus::placeholder {
+    color: transparent;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
