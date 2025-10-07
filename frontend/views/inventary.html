@@ -4,74 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taller de Mecánica Diego</title>
-    <link rel="stylesheet" href="../styles/main.css"> 
+    <link rel="stylesheet" href="../styles/css/inventary.css"> 
+    <link rel="stylesheet" href="../styles/css/side_bar.css">
+    <link rel="stylesheet" href="../styles/css/header.css">
+    <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/css/modal-add-product.css">
+    <link rel="stylesheet" href="../styles/css/modal-confirm.css">
+    <link rel="stylesheet" href="../styles/css/product-details.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 </head>
 <body>
-    <header id="header">
-        <div class="header-container">
-            <img src="../assets/images/logo.svg" alt="Logo Taller Diego" class="logo">
-            <h1>Taller Diego</h1>
-        </div>
-    </header>
+    <div id="header"></div>
     <div class="container">
-        <aside id="sidebar" class="sidebar">
-            <nav class="sidebar-nav">
-                <ul>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/home.png" alt="Home" class="icon">
-                            <span>Inicio</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/package.png" alt="Inventario" class="icon">
-                            <span>Inventario</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/toolbox.png" alt="Servicios" class="icon">
-                            <span>Servicios</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/checklist.png" alt="Orden de servicio" class="icon">
-                            <span>Orden</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/leader.png" alt="Personal" class="icon">
-                            <span>Personal</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <div id="side-bar-container" class="side-bar-container"></div>
+        <div id="mobile-menu-container"></div>
+
         <main class="main-content">
             <h1>Gestion de inventario</h1>
-            <div class="card">
+            <div class="card" id="open-modal-btn">
                 <a href="#">
-                    <p>+ Nuevo producto</p>
+                    <p>Nuevo producto</p>
                 </a>
             </div>
-            <section>
+            <section class="form-inventary">
                 <h2>Inventario</h2>
-                <form id="inventory-form">
+                <form id="inventory-form" class="inventory-form">
                     <div class="search-box">
                         <img src="../assets/icons/search.png" alt="Buscador" title="Buscar">
-                        <input type="text" name="search" placeholder="Buscar inventario">
+                        <input type="text" name="search" placeholder="Buscar producto">
                     </div>
 
                     <div class="section-filter">
                         <div class="category-filter">
                             <h3>Categoría</h3>
-                            <ul>
-                                <li><label><input type="checkbox" name="category" value="sparkPlugs"> Bujías</label></li>
-                                <li><label><input type="checkbox" name="category" value="filter"> Filtro</label></li>
-                                <li><label><input type="checkbox" name="category" value="carOil"> Aceites</label></li>
+                            <ul class="category-option">
                             </ul>
                         </div>
 
@@ -84,8 +50,10 @@
 
                         <div class="price-filter">
                             <h3>Precio</h3>
-                            <input type="number" name="min-price" placeholder="Min">
-                            <input type="number" name="max-price" placeholder="Max">
+                            <div>
+                                <input type="number" name="min-price" placeholder="Min">
+                                <input type="number" name="max-price" placeholder="Max">
+                            </div>
                         </div>
                     </div>
 
@@ -93,64 +61,23 @@
                 </form>
             </section>
 
-            <section>
+            <section class="inventary-data">
                 <div class="inventory-header grid-layout" role="row">
                     <div class="header-item" role="columnheader">Nombre</div>
                     <div class="header-item" role="columnheader">Descripción</div>
                     <div class="header-item" role="columnheader">Stock</div>
-                    <div class="header-item" role="columnheader">Precio</div>
+                    <div class="header-item" role="columnheader">Precio de Compra</div>
+                    <div class="header-item" role="columnheader">Precio de Venta</div>
                     <div class="header-item" role="columnheader">Acciones</div>
                 </div>
                 
                 <div class="product-list">
-                    <div class="product-item grid-layout" role="row">
-                        <div class="product-name" role="cell">Aceite Motor 5W-30</div>
-                        <div class="product-desc" role="cell">Aceite sintético para motor</div>
-                        <div class="product-stock" role="cell">15 unidades</div>
-                        <div class="product-price" role="cell">$25.000</div>
-                        <div class="product-actions" role="cell">
-                            <button class="btn-edit" title="Modificar"><img src="../assets/icons/edit.png" alt="Editar producto"></button>
-                            <button class="btn-delete" title="Eliminar"><img src="../assets/icons/delete.png" alt="Eliminar producto"></button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item grid-layout" role="row">
-                        <div class="product-name" role="cell">Filtro de Aire</div>
-                        <div class="product-desc" role="cell">Filtro de aire premium</div>
-                        <div class="product-stock" role="cell">8 unidades</div>
-                        <div class="product-price" role="cell">$15.000</div>
-                        <div class="product-actions" role="cell">
-                            <button class="btn-edit" title="Modificar"><img src="../assets/icons/edit.png" alt="Editar producto"></button>
-                            <button class="btn-delete" title="Eliminar"><img src="../assets/icons/delete.png" alt="Eliminar producto"></button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item grid-layout" role="row">
-                        <div class="product-name" role="cell">Bujías Iridium</div>
-                        <div class="product-desc" role="cell">Bujías de alto rendimiento</div>
-                        <div class="product-stock" role="cell">20 unidades</div>
-                        <div class="product-price" role="cell">$12.000</div>
-                        <div class="product-actions" role="cell">
-                            <button class="btn-edit" title="Modificar"><img src="../assets/icons/edit.png" alt="Editar producto"></button>
-                            <button class="btn-delete" title="Eliminar"><img src="../assets/icons/delete.png" alt="Eliminar producto"></button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item grid-layout" role="row">
-                        <div class="product-name" role="cell">Pastillas de Freno</div>
-                        <div class="product-desc" role="cell">Pastillas delanteras</div>
-                        <div class="product-stock" role="cell">5 unidades</div>
-                        <div class="product-price" role="cell">$45.000</div>
-                        <div class="product-actions" role="cell">
-                            <button class="btn-edit" title="Modificar"><img src="../assets/icons/edit.png" alt="Editar producto"></button>
-                            <button class="btn-delete" title="Eliminar"><img src="../assets/icons/delete.png" alt="Eliminar producto"></button>
-                        </div>
-                    </div>
                 </div>
             </section>
         </main>
         
     </div>
-    
+    <div id="modal-container"></div>
+    <script type="module" src="../scripts/inventary.js"></script>
 </body>
 </html>

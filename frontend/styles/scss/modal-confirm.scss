@@ -1,0 +1,150 @@
+.confirmation-action {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 450px;
+  background-color: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 2000;
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: #f0f0f0;
+      }
+    }
+    
+    .modal-info {
+      font-size: 24px;
+      color: #666;
+    }
+    
+    .modal-close {
+      font-size: 28px;
+      color: #666;
+      font-weight: 300;
+    }
+  }
+  
+  .form-title {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 700;
+  }
+  
+  #confirm-message {
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+    margin-bottom: 25px;
+    line-height: 1.5;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    
+    button {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    #confirm-yes {
+      background-color: #e74c3c;
+      color: white;
+      
+      &:hover {
+        background-color: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      }
+    }
+    
+    #confirm-no {
+      background-color: #e0e0e0;
+      color: #333;
+      
+      &:hover {
+        background-color: #d0d0d0;
+      }
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1999;
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 480px) {
+  .confirmation-action {
+    width: 95%;
+    padding: 25px 20px;
+    
+    .form-title {
+      font-size: 20px;
+    }
+    
+    #confirm-message {
+      font-size: 15px;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+        padding: 14px;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.confirmation-action {
+  animation: fadeIn 0.3s ease;
+}
