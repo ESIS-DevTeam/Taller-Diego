@@ -8,7 +8,7 @@ class OrdenServicio(Base):
     id = Column(Integer, primary_key=True)
     orden_id = Column(Integer, ForeignKey("ordenes.id"), nullable=False)
     servicio_id = Column(Integer, ForeignKey("servicios.id"), nullable=False)
-    precioServicio = Column(Integer, nullable=False)
+    precio_servicio = Column(Integer, nullable=False)
 
     servicio = relationship("Servicio", back_populates="ordenes")
     orden = relationship("Orden", back_populates="servicios")

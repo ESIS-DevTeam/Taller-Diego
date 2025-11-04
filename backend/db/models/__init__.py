@@ -5,3 +5,5 @@ from db.models.venta_producto import VentaProducto
 from db.models.orden import Orden
 from db.models.servicio import Servicio
 from db.models.orden_servicio import OrdenServicio
+from db.models.empleado import Empleado
+from db.models.orden_empleado import OrdenEmpleado
