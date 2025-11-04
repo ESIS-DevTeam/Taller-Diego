@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller de Mecánica Diego</title>
+    <link rel="stylesheet" href="../styles/css/inventary.css"> 
+    <link rel="stylesheet" href="../styles/css/side_bar.css">
+    <link rel="stylesheet" href="../styles/css/header.css">
+    <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/css/modal-add-product.css">
+    <link rel="stylesheet" href="../styles/css/modal-confirm.css">
+    <link rel="stylesheet" href="../styles/css/product-details.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <div class="container">
+        <div id="side-bar-container" class="side-bar-container"></div>
+        <div id="mobile-menu-container"></div>
+
+        <main class="main-content">
+            <h1>Gestion de inventario</h1>
+            <div class="card" id="open-modal-btn">
+                <a href="#">
+                    <p>Nuevo producto</p>
+                </a>
+            </div>
+            <section class="form-inventary">
+                <h2>Inventario</h2>
+                <form id="inventory-form" class="inventory-form">
+                    <!-- Búsqueda -->
+                    <div class="search-box">
+                        <img src="../assets/icons/search.png" alt="Buscar">
+                        <input type="text" data-search-input placeholder="Buscar producto...">
+                    </div>
+
+                    <!-- Categorías -->
+                    <div class="section-filter">
+                        <h4>Categorías</h4>
+                        <ul class="category-option">
+                        </ul>
+                    </div>
+
+                    <!-- Stock bajo -->
+                    <div class="section-filter">
+                        <h4>Stock</h4>
+                        <ul>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="stock" data-low-stock>
+                                    Stock bajo
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="section-filter">
+                        <h4>Rango de precios</h4>
+                        <div class="price-range">
+                            <input type="number" placeholder="Mínimo" data-min-price>
+                            <span>-</span>
+                            <input type="number" placeholder="Máximo" data-max-price>
+                        </div>
+                    </div>
+
+                    <!-- Botón limpiar -->
+                    <div class="filter-actions">
+                        <button type="button" data-clear-filters>Limpiar filtros</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="inventary-data">
+                <div class="inventory-header grid-layout" role="row">
+                    <div class="header-item" role="columnheader">Nombre</div>
+                    <div class="header-item" role="columnheader">Descripción</div>
+                    <div class="header-item" role="columnheader">Stock</div>
+                    <div class="header-item" role="columnheader">Precio de Compra</div>
+                    <div class="header-item" role="columnheader">Precio de Venta</div>
+                    <div class="header-item" role="columnheader">Acciones</div>
+                </div>
+                
+                <div class="product-list">
+                </div>
+            </section>
+        </main>
+        
+    </div>
+    <div id="modal-container"></div>
+    <script type="module" src="../scripts/inventary.js"></script>
+</body>
+</html>

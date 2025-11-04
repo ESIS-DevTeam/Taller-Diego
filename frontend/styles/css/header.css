@@ -1,0 +1,21 @@
+#header {
+  width: 100%;
+  height: 100px;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+#header .header-container {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 100%;
+}
+#header .header-container .logo {
+  width: 100px;
+  height: 100px;
+}
+
+/*# sourceMappingURL=header.css.map */
