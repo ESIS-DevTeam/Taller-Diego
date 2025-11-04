@@ -27,8 +27,6 @@ body {
 
 .side-bar-container .sidebar-nav ul li {
   width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 .side-bar-container .sidebar-nav ul li a {
