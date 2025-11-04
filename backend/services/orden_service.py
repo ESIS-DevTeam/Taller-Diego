@@ -10,13 +10,27 @@ class OrdenService:
 
     def create_orden(self, data: OrdenCreate):
         servicios = getattr(data, "servicios", None)
-        if servicios:
-            servicios_list = [p.model_dump() if hasattr(p, 'model_dump') else p for p in servicios]
+        empleados = getattr(data, "empleados", None)
+
+        servicios_list = [p.model_dump() if hasattr(p, 'model_dump') else p for p in servicios] if servicios else []
+        empleados_list = [p.model_dump() if hasattr(p, 'model_dump') else p for p in empleados] if empleados else []
+
+        # Si hay servicios o empleados asociados, crear con relaciones
+        if servicios_list or empleados_list:
             try:
-                return self.repo.create_with_services(data.fecha, servicios_list)
+                return self.repo.create_with_services(
+                    data.garantia,
+                    data.estadoPago,
+                    data.precio,
+                    data.fecha,
+                    servicios_list,
+                    empleados_list,
+                )
             except ValueError as e:
                 raise HTTPException(status_code=400, detail=str(e))
-        return self.repo.create(data.fecha)
+
+        # Caso simple: solo la orden
+        return self.repo.create(data.garantia, data.estadoPago, data.precio, data.fecha)
 
     def list_ordens(self):
         return self.repo.get_all()

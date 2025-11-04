@@ -12,3 +12,4 @@ class Orden(Base):
     fecha = Column(Date, nullable=False)
 
     servicios = relationship("OrdenServicio", back_populates="orden")
+    empleados = relationship("OrdenEmpleado", back_populates="orden")
