@@ -38,7 +38,7 @@ body li {
   background-color: #D8E8F5;
   width: calc(100% - 110px);
   /* Ancho completo menos el sidebar */
-  padding: 12px 20px;
+  padding: 60px 10px;
   /* Padding interno */
   box-sizing: border-box;
   margin-left: 110px;
