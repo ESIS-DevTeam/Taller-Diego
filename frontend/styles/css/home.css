@@ -1,196 +1,382 @@
+/* ===================================
+   ESTILOS GENERALES DEL BODY
+   =================================== */
+
+/* Configuración base del body */
 body {
   font-family: "Montserrat", sans-serif;
+  /* Fuente principal */
   margin: 0;
   padding: 0;
   gap: 20px;
+  background-color: #D8E8F5;
+  /* Color de fondo azul claro */
 }
+
+/* Elimina padding por defecto de listas */
 body ul {
   padding-inline-start: 0px;
 }
+
+/* Elimina márgenes por defecto de párrafos */
 body p {
   margin-block-start: 0px;
   margin-block-end: 0px;
 }
+
+/* Hace que los items de lista sean flexibles */
 body li {
   display: flex;
 }
 
+/* ===================================
+   CONTENEDOR PRINCIPAL
+   =================================== */
+
+/* Contenedor principal que envuelve todo el dashboard */
 .main-content {
-  background-color: azure;
-  width: 100%;
-  padding: 20px;
+  background-color: #D8E8F5;
+  width: calc(100% - 110px);
+  /* Ancho completo menos el sidebar */
+  padding: 12px 20px;
+  /* Padding interno */
   box-sizing: border-box;
+  margin-left: 110px;
+  /* Espacio para el sidebar */
+  margin-top: 60px;
+  /* Espacio para el header */
+  height: calc(100vh - 60px);
+  /* Altura completa menos el header */
+  overflow: hidden;
+  /* Oculta scrollbars */
 }
 
+/* Contenedor blanco interno que contiene todas las secciones */
 .content {
   background-color: white;
   width: 100%;
-  padding: 20px;
+  height: 100%;
+  padding: 18px 25px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  gap: 20px;
+  gap: 12px;
+  /* Espacio entre secciones */
+  border-radius: 12px;
+  overflow: hidden;
 }
+
+/* ===================================
+   SECCIÓN DE BIENVENIDA Y ALERTAS
+   =================================== */
+
+/* Contenedor de la sección de bienvenida */
 .content .welcome-alert {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 8px;
 }
-.content .welcome-alert .h2 {
-  font-size: 1.5rem;
+
+/* Título de bienvenida */
+.content .welcome-alert h2 {
+  font-size: 1.4rem;
   margin: 0;
+  font-weight: 700;
+  color: #1f2937;
 }
+
+/* Alerta roja de productos con bajo stock */
 .content .welcome-alert .alert-content {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   color: white;
   background-color: rgb(139, 39, 33);
-  border-top-left-radius: 10px;
-  padding: 5px;
-  text-align: center;
-  gap: 15px;
-}
-.content .welcome-alert .alert-content a {
-  padding: 10px 20px;
-  border-radius: 10px;
-  background-color: white;
-  color: rgb(139, 39, 33);
-  font-weight: bold;
-  text-decoration: none;
-  display: inline-block;
+  /* Fondo rojo */
+  border-radius: 8px;
+  padding: 12px 20px;
+  gap: 20px;
 }
 
+/* Texto de la alerta */
+.content .welcome-alert .alert-content h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Botón "Ver productos" dentro de la alerta */
+.content .welcome-alert .alert-content a {
+  padding: 8px 20px;
+  border-radius: 8px;
+  background-color: white;
+  color: rgb(139, 39, 33);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+/* Efecto hover del botón */
+.content .welcome-alert .alert-content a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ===================================
+   GRID DE TARJETAS DE ESTADÍSTICAS
+   =================================== */
+
+/* Grid contenedor de las 3 tarjetas principales */
 .dashboard-card-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  /* 3 columnas iguales */
+  gap: 12px;
 }
+
+/* Diseño responsive: 2 columnas en tablets */
 @media (max-width: 768px) {
   .dashboard-card-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Estilo individual de cada tarjeta de estadística */
 .dashboard-card-grid .card {
-  background: #F5F5F5;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 4px 7px 7px 0px rgba(186, 182, 182, 0.75);
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  /* Sombra pronunciada */
+  border: 1px solid #E5E7EB;
+  /* Borde gris claro */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  min-height: 120px;
+  transition: all 0.3s ease;
 }
+
+.dashboard-card-grid .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border-color: #2563EB;
+}
+
 .dashboard-card-grid .card h3 {
-  margin: 0 0 10px 0;
-  font-size: 1rem;
+  margin: 0 0 8px 0;
+  font-size: 0.75rem;
   color: #1f2937;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
 }
+
 .dashboard-card-grid .card p {
-  margin: 0 0 15px 0;
-  font-size: 1.5rem;
-  font-weight: bold;
+  margin: 8px 0;
+  font-size: 1.8rem;
+  font-weight: 700;
   color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+
+.dashboard-card-grid .card .card-icon {
+  width: 34px;
+  height: 34px;
+  filter: invert(20%) sepia(8%) saturate(1447%) hue-rotate(183deg) brightness(93%) contrast(89%);
+}
+
 .dashboard-card-grid .card a {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: rgb(14, 62, 124);
+  gap: 6px;
+  color: #1D4ED8;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 700;
   margin-top: auto;
+  font-size: 0.9rem;
 }
+
 .dashboard-card-grid .card a:hover {
-  color: rgb(8.8260869565, 39.0869565217, 78.1739130435);
+  color: #1E40AF;
+  text-decoration: underline;
 }
+
 .dashboard-card-grid .card .arrow {
   width: 16px;
   height: 16px;
   transition: transform 0.2s;
+  filter: invert(25%) sepia(98%) saturate(3500%) hue-rotate(215deg) brightness(98%) contrast(90%);
 }
+
 .dashboard-card-grid .card:hover .arrow {
   transform: translateX(3px);
 }
 
+/* ===================================
+   SECCIÓN INFERIOR (Acciones y Actividades)
+   =================================== */
+
+/* Contenedor que divide acciones rápidas y actividades recientes */
 .botton-actions {
   display: flex;
-  gap: 20px;
+  gap: 15px;
+  flex: 1;
+  min-height: 0;
 }
 
+/* Estilo de los títulos de sección (h3) */
 .title-h3 {
-  justify-content: center;
-  align-items: center;
-  border-bottom: 1px solid rgb(225, 220, 220);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #E5E7EB;
+  /* Línea separadora */
 }
 
 .quick-actions {
-  padding: 10px;
-  background: white;
+  padding: 0;
+  background: transparent;
   width: 50%;
+  display: flex;
+  flex-direction: column;
 }
+
 .quick-actions .list-action {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
+  gap: 8px;
 }
+
+.quick-actions .list-action li:last-child {
+  grid-column: 1 / -1;
+  max-width: 50%;
+}
+
 @media (max-width: 768px) {
   .quick-actions .list-action {
     grid-template-columns: repeat(1, 1fr);
   }
+
+  .quick-actions .list-action li:last-child {
+    max-width: 100%;
+  }
 }
 
 .card-action {
-  background-color: rgb(14, 62, 124);
+  background-color: #1e3a5f;
   list-style: none;
-  border-radius: 10px;
-  padding: 10px 5px;
-  width: 160px;
+  border-radius: 8px;
+  padding: 10px 16px;
+  width: 100%;
   box-sizing: border-box;
+  transition: all 0.3s ease;
 }
+
+.card-action:hover {
+  background-color: #234a73;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+}
+
 .card-action a {
   color: white;
   text-decoration: none;
   white-space: nowrap;
+  font-weight: 500;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
 .card-action .logo {
   width: 16px;
   height: 16px;
 }
 
+/* ===================================
+   ACTIVIDADES RECIENTES (Lado derecho)
+   =================================== */
+
+/* Contenedor de la sección de actividades recientes */
 .recent-activities {
   width: 50%;
-  background: #F5F5F5;
+  /* Ocupa la otra mitad del espacio */
+  background: transparent;
   border-radius: 10px;
-  padding: 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
+/* Lista de actividades */
 .list-recent-activities {
   display: flex;
   flex-direction: column;
-  color: #484e53;
-  font-size: 15px;
-  gap: 20px;
+  color: #6B7280;
+  font-size: 0.8rem;
+  gap: 10px;
 }
 
+/* Elimina estilos de lista por defecto */
 li {
   list-style: none;
 }
 
+/* Cada item de actividad (check + texto) */
 .item-recent-activities {
   display: flex;
   flex-direction: row;
-  line-height: 20px;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  line-height: 1.4;
+  margin-bottom: 0;
   gap: 10px;
 }
 
+/* Contenedor del texto de cada actividad */
+.item-recent-activities-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Descripción de la actividad */
+.item-recent-activities-text p {
+  margin: 0;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* Timestamp de la actividad */
+.item-recent-activities-text time {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  /* Gris claro */
+}
+
+/* Icono de check verde */
 .checked {
-  margin-right: 10px;
+  margin-right: 0;
   width: 20px;
   height: 20px;
-  fill: green;
+  min-width: 20px;
+  fill: #10B981;
+  /* Verde */
+  flex-shrink: 0;
+  /* No se encoge */
 }
 
 /*# sourceMappingURL=home.css.map */
