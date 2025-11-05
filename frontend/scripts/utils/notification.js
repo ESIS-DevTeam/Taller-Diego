@@ -9,7 +9,7 @@ export function showNotification(message, type = "info", duration = 3000) {
   let container = document.getElementById(idContainer);
 
   if (!container) {
-    container = docum|ent.createElement("div");
+    container = document.createElement("div");
     container.id = idContainer;
     document.body.appendChild(container);
   }
@@ -19,5 +19,11 @@ export function showNotification(message, type = "info", duration = 3000) {
   noti.innerHTML = `<p>${message}</p>`;
   container.appendChild(noti);
 
-  setTimeout(() => noti.remove(), duration);
+  setTimeout(() => {
+    noti.classList.add("hiding");
+    setTimeout(() => {
+      noti.remove();
+      if (container.children.length === 0) container.remove();
+    }, 300); 
+}, duration);
 }
