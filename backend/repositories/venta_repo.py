@@ -1,8 +1,13 @@
-from sqlalchemy.orm import Session
-from db.models import Venta
 from datetime import datetime
+
 from sqlalchemy import Date, cast
-from db.models import VentaProducto, Producto
+from sqlalchemy.orm import Session
+
+from db.models import Venta
+from db.models import VentaProducto
+from db.models import Producto
+
+
 
 class VentaRepository:
     def __init__(self, db: Session):
