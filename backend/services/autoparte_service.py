@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from repositories.autoparte_repo import AutoparteRepository
 from schemas.autoparte_schema import AutoparteCreate
 
+
+
 class AutoparteService:
 
     def __init__(self, db: Session):
