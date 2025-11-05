@@ -3,28 +3,65 @@
   z-index: 9999;
   right: 20px;
   top: 10px;
+  gap: 15px;
+  display: flex;
+  flex-direction: column;
   .notification {
     color: black;
+    padding: 16px 20px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
     transition:  all 0.3s  ease;
     font-size: 18px;
-    .success {
-      background-color: rgba(25, 114, 37, 0.1);
-       border-left-color: #3fb950;
+    min-width: 300px;
+    animation: slideIn 0.3s ease;
+    &.success {
+      background-color: rgba(25, 114, 37, 0.07);
+      border-left-color: #3fb950;
     }
-    .warning {
-      background-color: rgba(247, 133, 57, 0.1);
+    &.warning {
+      background-color: rgba(247, 133, 57, 0.07);
       border-left-color: #d29922;
     }
-    .error {
-      background-color: rgba(185, 32, 32, 0.1);
+    &.error {
+      background-color: rgba(185, 32, 32, 0.07);
       border-left-color: #f85149; 
     }
-    .info {
-      background-color: rgba(31, 66, 112, 0.1);
+    &.info {
+      background-color: rgba(31, 66, 112, 0.07);
       border-left-color: #1951b9; 
+    }
+    p {
+      margin: 0;
+    }
+    &.hiding {
+      animation: slideOut 0.3s ease forwards;
     }
   }
 }
+
+@keyframes slideIn {
+ from {
+  transform: translateX(400px);
+  opacity: 0;
+ } to {
+  transform: translateX(0);
+  opacity: 1;
+ }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  } to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
 
 @media (max-width: 600px) {
   #notification-container {
