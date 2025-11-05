@@ -6,12 +6,16 @@ from services.producto_service import ProductoService
 
 router = APIRouter(tags=["Productos"])
 
+
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+ 
 
 def get_producto_service(db: Session = Depends(get_db)) -> ProductoService:
     return ProductoService(db)
@@ -23,11 +27,13 @@ def create_producto(
 ):
     return service.create_producto(data)
 
+
 @router.get("/", response_model=list[ProductoResponse])
 def list_productos(
     service: ProductoService = Depends(get_producto_service)
 ):
     return service.list_productos()
+
 
 @router.get("/{id}", response_model=ProductoResponse)
 def get_producto(id: int, service: ProductoService = Depends(get_producto_service)):
@@ -35,6 +41,7 @@ def get_producto(id: int, service: ProductoService = Depends(get_producto_servic
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return producto
+
 
 @router.put("/{id}", response_model=ProductoResponse)
 def update_producto(
@@ -46,6 +53,7 @@ def update_producto(
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return producto
+
 
 @router.delete("/{id}")
 def delete_producto(id: int, service: ProductoService = Depends(get_producto_service)):
