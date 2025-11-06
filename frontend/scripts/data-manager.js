@@ -1,5 +1,20 @@
+/**
+ * URL base para la API
+ * @constant {string}
+ */
 const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
 
+// ========================================
+// FUNCIONES GENÉRICAS
+// ========================================
+
+/**
+ * Realiza peticiones GET a la API.
+ * @param {string} endpoint - Ruta del endpoint (ej: 'productos', 'autopartes').
+ * @param {number|null} id - ID opcional para obtener un recurso específico.
+ * @returns {Promise<Object|Array>} Datos de la respuesta en formato JSON.
+ * @throws {Error} Si la petición falla.
+ */
 export async function fetchFromApi(endpoint, id = null) {
   try {
     let apiUrl = `${API_BASE_URL}/${endpoint}`;
@@ -19,6 +34,13 @@ export async function fetchFromApi(endpoint, id = null) {
   }
 }
 
+/**
+ * Crea un recurso en la API mediante POST.
+ * @param {string} endpoint - Ruta del endpoint.
+ * @param {Object} data - Datos a enviar en el body.
+ * @returns {Promise<Object>} Recurso creado.
+ * @throws {Error} Si la petición falla.
+ */
 export async function createResource(endpoint, data) {
   try {
     const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
@@ -38,6 +60,14 @@ export async function createResource(endpoint, data) {
   }
 }
 
+/**
+ * Actualiza un recurso en la API mediante PUT.
+ * @param {string} endpoint - Ruta del endpoint.
+ * @param {number} id - ID del recurso a actualizar.
+ * @param {Object} data - Datos actualizados en formato JSON.
+ * @returns {Promise<Object>} Recurso actualizado.
+ * @throws {Error} Si la petición falla.
+ */
 export async function updateResource(endpoint, id, data) {
   try {
     const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
@@ -57,6 +87,13 @@ export async function updateResource(endpoint, id, data) {
   }
 }
 
+/**
+ * Elimina un recurso de la API mediante DELETE.
+ * @param {string} endpoint - Ruta del endpoint.
+ * @param {number} id - ID del recurso a eliminar.
+ * @returns {Promise<Object>} Respuesta del servidor.
+ * @throws {Error} Si la petición falla.
+ */
 export async function deleteResource(endpoint, id) {
   try {
     const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
@@ -72,6 +109,11 @@ export async function deleteResource(endpoint, id) {
   }
 }
 
+/**
+ * Cuenta elementos de un endpoint.
+ * @param {string} endpoint - Ruta del endpoint a contar elementos.
+ * @returns {Promise<number>} Cantidad de elementos.
+ */
 export async function countFromApi(endpoint) {
   try {
     const object = await fetchFromApi(endpoint);
@@ -86,6 +128,15 @@ export async function countFromApi(endpoint) {
   }
 }
 
+// ========================================
+// FUNCIONES ESPECÍFICAS - PRODUCTOS
+// (Provisionales hasta implementación en backend)
+// ========================================
+
+/**
+ * Cuenta productos con stock menor o igual al mínimo.
+ * @returns {Promise<number>} Cantidad de productos en bajo stock.
+ */
 export async function productUnderStock() {
   try {
     const products = await fetchFromApi('productos');
