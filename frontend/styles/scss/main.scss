@@ -1,0 +1,361 @@
+// ===================================
+// VARIABLES GLOBALES
+// ===================================
+
+$hover: rgb(14, 62, 124); // Color azul oscuro para hover en enlaces
+$alert: rgb(139, 39, 33); // Color rojo para alertas
+$light: #f7f7f7; // Color gris claro
+$primary: #1f2937; // Color de texto principal (gris oscuro)
+$card: #F5F5F5; // Color de fondo de tarjetas
+$gray-text: #484e53; // Color de texto gris
+$font-body: 'Montserrat', sans-serif; // Fuente principal del sitio
+$font-size: 20px; // Tamaño de fuente base
+$gap: 20px; // Espaciado general
+$gap-desktop: 5px; // Espaciado para desktop
+$icon-height: 60px; // Altura de iconos
+
+// ===================================
+// ESTILOS GENERALES DEL BODY
+// ===================================
+
+body {
+  font-family: $font-body; // Aplica la fuente Montserrat
+  margin: 0;
+  padding: 0;
+  gap: 20px;
+  background-color: #D8E8F5; // Fondo azul claro
+
+  ul {
+    padding-inline-start: 0px; // Elimina padding izquierdo de listas
+  }
+
+  p {
+    margin-block-start: 0px; // Elimina margen superior de párrafos
+    margin-block-end: 0px; // Elimina margen inferior de párrafos
+  }
+
+  li {
+    display: flex; // Hace que los items de lista sean flexibles
+  }
+}
+
+// ===================================
+// CONTENEDOR PRINCIPAL (Área azul externa)
+// ===================================
+
+.main-content {
+  background-color: #D8E8F5; // Fondo azul claro
+  width: calc(100% - 130px); // Ancho total menos el sidebar (130px)
+  padding: 12px 20px; // Espaciado interno
+  box-sizing: border-box; // Incluye padding y border en el ancho
+  margin-left: 130px; // Espacio para el sidebar fijo (130px)
+  margin-top: 75px; // Espacio para el header fijo (75px)
+  height: calc(100vh - 75px); // Altura: pantalla completa menos header (75px)
+  overflow: auto; // Permite scroll si el contenido excede
+  display: flex; // Activa flexbox
+  justify-content: center; // Centra el contenedor blanco horizontalmente
+}
+
+// ===================================
+// CONTENEDOR BLANCO INTERNO (Dashboard)
+// ===================================
+
+.content {
+  background-color: white; // Fondo blanco del dashboard
+  width: 100%; // Ancho completo hasta el max-width
+  max-width: 1280px; // Ancho máximo del contenedor (AJUSTABLE)
+  height: fit-content; // Altura ajustada al contenido
+  min-height: 100%; // Mínimo ocupa toda la altura disponible
+  padding: 18px 25px; // Espaciado interno del dashboard
+  display: flex; // Activa flexbox
+  flex-direction: column; // Organiza elementos en columna
+  box-sizing: border-box; // Incluye padding en el ancho/alto
+  gap: 30px; // Espacio entre secciones
+  border-radius: 12px; // Bordes redondeados
+  overflow: hidden; // Oculta contenido que exceda
+
+  // ===================================
+  // SECCIÓN DE BIENVENIDA Y ALERTAS
+  // ===================================
+
+  .welcome-alert {
+    display: flex; // Activa flexbox
+    flex-direction: column; // Organiza elementos en columna
+    gap: 20px; // Espacio entre título y alerta
+
+    h2 {
+      font-size: 1.8rem; // Tamaño grande para el título de bienvenida
+      margin: 0;
+      font-weight: 800; // Texto muy grueso para destacar
+      color: #1f2937; // Gris oscuro
+    }
+
+    .alert-content {
+      display: flex; // Activa flexbox
+      flex-direction: row; // Organiza contenido horizontalmente
+      justify-content: space-between; // Separa texto y botón
+      align-items: center; // Centra verticalmente
+      color: white; // Texto blanco
+      background-color: $alert; // Fondo rojo de alerta
+      border-radius: 8px; // Bordes redondeados
+      padding: 12px 20px; // Espaciado interno
+      gap: 30px; // Espacio entre elementos
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem; // Tamaño del mensaje de alerta
+        font-weight: 700; // Texto grueso
+      }
+
+      a {
+        padding: 8px 20px; // Espaciado del botón
+        border-radius: 8px; // Bordes redondeados del botón
+        background-color: white; // Fondo blanco del botón
+        color: $alert; // Texto rojo (contrasta con fondo blanco)
+        font-weight: 700; // Texto grueso
+        text-decoration: none; // Sin subrayado
+        display: inline-block;
+        transition: all 0.3s ease; // Animación suave
+        white-space: nowrap; // Evita que el texto se parta en líneas
+        font-size: 1rem; // Tamaño del texto del botón
+
+        &:hover {
+          transform: translateY(-2px); // Eleva el botón al pasar el mouse
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); // Sombra al hacer hover
+        }
+      }
+    }
+  }
+}
+
+// ===================================
+// GRID DE TARJETAS DE ESTADÍSTICAS
+// ===================================
+
+.dashboard-card-grid {
+  display: grid; // Activa CSS Grid
+  grid-template-columns: repeat(3, 1fr); // 3 columnas de igual tamaño
+  gap: 12px; // Espacio entre tarjetas
+
+  // Diseño responsive: 2 columnas en tablets
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card {
+    background: #FFFFFF; // Fondo blanco de la tarjeta
+    border-radius: 12px; // Bordes redondeados
+    padding: 16px 14px; // Espaciado interno
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15); // Sombra pronunciada
+    border: 1px solid #E5E7EB; // Borde gris claro
+    display: flex; // Activa flexbox
+    flex-direction: column; // Organiza contenido en columna
+    justify-content: space-between; // Distribuye espacio entre elementos
+    align-items: center; // Centra elementos horizontalmente
+    min-height: 120px; // Altura mínima de la tarjeta
+    transition: all 0.3s ease; // Animación suave para efectos
+
+    &:hover {
+      transform: translateY(-5px); // Eleva la tarjeta al pasar el mouse
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); // Sombra más pronunciada
+      border-color: #2563EB; // Cambia el borde a azul
+    }
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 0.85rem; // Tamaño del título de la tarjeta
+      color: $primary; // Color gris oscuro
+      font-weight: 700; // Texto grueso
+      text-transform: uppercase; // Convierte a mayúsculas
+      letter-spacing: 0.5px; // Espaciado entre letras
+      text-align: center; // Centra el texto
+    }
+
+    p {
+      margin: 8px 0;
+      font-size: 2rem; // Tamaño grande para los números
+      font-weight: 800; // Texto muy grueso
+      color: $primary; // Color gris oscuro
+      display: flex; // Activa flexbox
+      align-items: center; // Centra el icono con el número
+      gap: 10px; // Espacio entre número e icono
+    }
+
+    .card-icon {
+      width: 34px; // Ancho del icono
+      height: 34px; // Alto del icono
+      filter: invert(20%) sepia(8%) saturate(1447%) hue-rotate(183deg) brightness(93%) contrast(89%); // Filtro para color gris oscuro
+    }
+
+    a {
+      display: flex; // Activa flexbox
+      align-items: center; // Centra verticalmente
+      gap: 6px; // Espacio entre texto y flecha
+      color: #1D4ED8; // Azul oscuro
+      text-decoration: none; // Sin subrayado
+      font-weight: 800; // Texto muy grueso
+      margin-top: auto; // Empuja el enlace al final de la tarjeta
+      font-size: 1rem; // Tamaño del texto del enlace
+
+      &:hover {
+        color: #1E40AF; // Azul más oscuro al hacer hover
+        text-decoration: underline; // Subraya al hacer hover
+      }
+    }
+
+    .arrow {
+      width: 16px; // Ancho de la flecha
+      height: 16px; // Alto de la flecha
+      transition: transform 0.2s; // Animación suave
+      filter: invert(25%) sepia(98%) saturate(3500%) hue-rotate(215deg) brightness(98%) contrast(90%); // Filtro para color azul
+    }
+
+    &:hover .arrow {
+      transform: translateX(3px); // Mueve la flecha a la derecha al hacer hover
+    }
+  }
+}
+
+// ===================================
+// SECCIÓN INFERIOR (Acciones y Actividades)
+// ===================================
+
+.botton-actions {
+  display: flex; // Activa flexbox
+  gap: 15px; // Espacio entre secciones
+  flex: 1; // Toma el espacio disponible
+  min-height: 0; // Permite que se ajuste al contenido
+}
+
+.title-h3 {
+  font-size: 1.1rem; // Tamaño de títulos de sección
+  font-weight: 800; // Texto muy grueso
+  color: #1f2937; // Gris oscuro
+  margin-bottom: 10px; // Espacio inferior
+  padding-bottom: 8px; // Padding inferior
+  border-bottom: 2px solid #E5E7EB; // Línea separadora gris
+}
+
+// ===================================
+// SECCIÓN DE ACCIONES RÁPIDAS
+// ===================================
+
+.quick-actions {
+  padding: 0;
+  background: transparent; // Fondo transparente
+  width: 40%; // Ocupa el 40% del ancho
+
+  .list-action {
+    display: grid; // Activa CSS Grid
+    grid-template-columns: repeat(2, 1fr); // 2 columnas
+    gap: 12px; // Espacio entre botones
+
+    li:last-child {
+      grid-column: 1 / -1; // El último botón ocupa 2 columnas
+      max-width: 50%; // Máximo 50% del ancho
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(1, 1fr); // 1 columna en móviles
+
+      li:last-child {
+        max-width: 100%; // Ocupa todo el ancho en móviles
+      }
+    }
+  }
+}
+
+.card-action {
+  background-color: #1e3a5f; // Azul oscuro
+  list-style: none; // Sin viñetas
+  border-radius: 8px; // Bordes redondeados
+  padding: 14px 20px; // Espaciado interno
+  width: 100%; // Ancho completo
+  box-sizing: border-box; // Incluye padding en el ancho
+  transition: all 0.3s ease; // Animación suave
+
+  &:hover {
+    background-color: lighten(#1e3a5f, 5%); // Aclara el color al hacer hover
+    transform: translateY(-2px); // Eleva el botón
+    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3); // Sombra al hacer hover
+  }
+
+  a {
+    color: white; // Texto blanco
+    text-decoration: none; // Sin subrayado
+    white-space: nowrap; // Evita que el texto se parta
+    font-weight: 600; // Texto semibold
+    font-size: 1rem; // Tamaño del texto
+    display: flex; // Activa flexbox
+    align-items: center; // Centra verticalmente
+    gap: 8px; // Espacio entre icono y texto
+  }
+
+  .logo {
+    width: 16px; // Ancho del icono
+    height: 16px; // Alto del icono
+  }
+}
+
+// ===================================
+// SECCIÓN DE ACTIVIDADES RECIENTES
+// ===================================
+
+.recent-activities {
+  width: 60%; // Ocupa el 60% del ancho
+  background: transparent; // Fondo transparente
+  border-radius: 10px; // Bordes redondeados
+  padding: 0;
+}
+
+.list-recent-activities {
+  display: flex; // Activa flexbox
+  flex-direction: column; // Organiza actividades en columna
+  color: #6B7280; // Color gris
+  font-size: 1rem; // Tamaño base del texto
+  gap: 15px; // Espacio entre actividades
+}
+
+li {
+  list-style: none; // Sin viñetas
+}
+
+.item-recent-activities {
+  display: flex; // Activa flexbox
+  flex-direction: row; // Organiza horizontalmente
+  align-items: flex-start; // Alinea al inicio
+  line-height: 1.5; // Altura de línea
+  margin-bottom: 0;
+  gap: 12px; // Espacio entre icono y texto
+}
+
+.item-recent-activities-text {
+  display: flex; // Activa flexbox
+  flex-direction: column; // Organiza en columna
+  gap: 4px; // Espacio entre descripción y fecha
+
+  p {
+    margin: 0;
+    color: #374151; // Gris oscuro
+    font-weight: 600; // Texto semibold
+    font-size: 1rem; // Tamaño del texto
+  }
+
+  time {
+    font-size: 0.9rem; // Tamaño más pequeño para la fecha
+    color: #9CA3AF; // Gris claro
+  }
+}
+
+// ===================================
+// ICONO DE VERIFICACIÓN (Checkmark)
+// ===================================
+
+.checked {
+  margin-right: 0;
+  width: 24px; // Ancho del icono
+  height: 24px; // Alto del icono
+  min-width: 24px; // Ancho mínimo (no se comprime)
+  fill: #10B981; // Color verde
+  flex-shrink: 0; // No se encoge con flexbox
+}
