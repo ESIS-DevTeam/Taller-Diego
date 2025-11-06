@@ -20,6 +20,9 @@ export function handleApiError(error) {
   }
   if (error.status) {
     switch (error.status) {
+      case 200:
+        message = "Proceso realizado.";
+        typeNotification = "success";
       case 400:
         message = "Solicitud invalida, intente de nuevo.";  
         break;
@@ -35,6 +38,9 @@ export function handleApiError(error) {
         break;
       case 409:
         message = "Ya existe un registro con esos datos.";  
+        break;
+      case 422:
+        message = "Validacion incorrecto, intente de nuevo.";
         break;
       case 500:
         message = "Error interno del servidor, intente más tarde";  
