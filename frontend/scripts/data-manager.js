@@ -1,3 +1,5 @@
+import { handleApiError } from "./utils/error-handlers.js";
+
 /**
  * URL base para la API
  * @constant {string}
@@ -22,15 +24,15 @@ export async function fetchFromApi(endpoint, id = null) {
       apiUrl += `/${id}`;
     }
     const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
+    checkResponseStatus(response);
 
     return await response.json();
   } catch (error) {
-    console.error(`Error en fetchFromApi (${endpoint}):`, error);
-    throw error;
+    handleApiError(error, {
+      endpoint,
+      method: 'GET',
+      id,
+    });
   }
 }
 
@@ -50,13 +52,16 @@ export async function createResource(endpoint, data) {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
+    
+    checkResponseStatus(response);
+    
     return await response.json();
   } catch (error) {
-    console.error(`Error creando recurso en ${endpoint}:`, error);
-    throw error;
+    handleApiError(error, {
+      endpoint, 
+      method: 'POST',
+      data,
+    });
   }
 }
 
@@ -77,13 +82,17 @@ export async function updateResource(endpoint, id, data) {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
+
+    checkResponseStatus(response);
+
     return await response.json();
   } catch (error) {
-    console.error(`Error actualizando recurso en ${endpoint}/${id}:`, error);
-    throw error;
+    handleApiError(error, {
+      endpoint,
+      method: 'PUT',
+      id,
+      data,
+    });
   }
 }
 
@@ -99,13 +108,16 @@ export async function deleteResource(endpoint, id) {
     const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
+    
+    checkResponseStatus(response);
+    
     return await response.json();
   } catch (error) {
-    console.error(`Error eliminando recurso en ${endpoint}/${id}:`, error);
-    throw error;
+    handleApiError(error, {
+      endpoint,
+      method: 'DELETE',
+      id,
+    });
   }
 }
 
@@ -123,7 +135,10 @@ export async function countFromApi(endpoint) {
     }
     return object.length;
   } catch (error) {
-    console.error(`Error contando elementos de ${endpoint}:`, error);
+    handleApiError(error, {
+      endpoint,
+      method: 'GET',
+    });
     return 0;
   }
 }
@@ -146,7 +161,23 @@ export async function productUnderStock() {
 
     return amount;
   } catch (error) {
-    console.error('Error contando productos en bajo stock:', error);
+    handleApiError(error, {
+      endpoint: 'productos',
+      method: 'GET',
+    });
     return 0;
+  }
+}
+
+/**
+ * Verifica el estado de la respuesta HTTP y lanza error si no es exitosa.
+ * @param {Response} response - Objeto Response de fetch.
+ * @throws {Error} Error con status HTTP si la respuesta no es exitosa.
+ */
+function checkResponseStatus(response) {
+  if (!response.ok) {
+    const error = new Error(`Error HTTP: ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
 }
