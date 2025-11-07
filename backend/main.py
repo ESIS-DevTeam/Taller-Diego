@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.v1.routes import producto_routes, venta_routes, autoparte_routes
+from api.v1.routes import producto_routes, venta_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -18,6 +18,12 @@ app.include_router(autoparte_routes.router,
                    prefix="/api/v1/autopartes", tags=["Autopartes"])
 app.include_router(venta_routes.router,
                    prefix="/api/v1/ventas", tags=["Ventas"])
+app.include_router(orden_routes.router,
+                   prefix="/api/v1/ordenes", tags=["Ordenes"])
+app.include_router(servicio_routes.router,
+                   prefix="/api/v1/servicios", tags=["Servicios"])
+app.include_router(empleado_routes.router,
+                   prefix="/api/v1/empleados", tags=["Empleados"])
 
 @app.get("/")
 def read_root():
