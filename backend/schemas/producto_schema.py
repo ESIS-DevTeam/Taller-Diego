@@ -21,3 +21,14 @@ class ProductoResponse(ProductoBase):
 
     class Config:
         from_attributes = True
+
+
+class ProductosPaginatedResponse(BaseModel):
+    items: list[ProductoResponse]
+    page: int
+    page_size: int
+    total_items: int
+    total_pages: int
+
+    class Config:
+        from_attributes = True

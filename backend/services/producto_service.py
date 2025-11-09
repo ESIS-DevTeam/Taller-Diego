@@ -8,20 +8,17 @@ class ProductoService:
         self.repo = ProductoRepository(db)
     
     def create_producto(self, data: ProductoCreate):
-        if self.repo.get_by_name(data.nombre):
-            raise ValueError("Ya existe un producto con ese nombre")
         producto_data = data
         producto = self.repo.create(producto_data)
         return producto
     
-    def list_productos(self):
+    def list_productos(self, filtros: dict | None = None):
+        if filtros:
+            return self.repo.get_by_filters(filtros)
         return self.repo.get_all()
     
     def get_by_id(self, id: int):
         return self.repo.get_by_id(id)
-    
-    def get_by_name(self, nombre: str):
-        return self.repo.get_by_name(nombre)
     
     def update_producto(self, id: int, data: ProductoCreate):
         return self.repo.update(id, data)
