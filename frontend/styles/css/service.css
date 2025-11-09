@@ -443,6 +443,18 @@ body {
               min-width: 100px;
               height: 45px;
               padding: 10px 20px; }
+              .main-content .service-data .service-list .service-row .service-actions button:first-child {
+                background-color: #1976d2 !important; }
+                .main-content .service-data .service-list .service-row .service-actions button:first-child:hover {
+                  background-color: #1565c0 !important; }
+                .main-content .service-data .service-list .service-row .service-actions button:first-child .img-edit {
+                  filter: brightness(0) invert(1) !important; }
+              .main-content .service-data .service-list .service-row .service-actions button:last-child {
+                background-color: #d32f2f !important; }
+                .main-content .service-data .service-list .service-row .service-actions button:last-child:hover {
+                  background-color: #c62828 !important; }
+                .main-content .service-data .service-list .service-row .service-actions button:last-child .img-delete {
+                  filter: brightness(0) invert(1) !important; }
 
   #mobile-menu-container.active {
     display: none; } }

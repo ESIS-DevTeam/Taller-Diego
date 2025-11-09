@@ -517,6 +517,32 @@ body {
               min-width: 100px; // 👈 Ancho mínimo
               height: 45px; // 👈 Alto más grande
               padding: 10px 20px; // 👈 Más padding
+              
+              // Botón editar - fondo azul, icono blanco
+              &:first-child {
+                background-color: #1976d2 !important; // 👈 Fondo azul
+                
+                &:hover {
+                  background-color: #1565c0 !important; // 👈 Azul más oscuro
+                }
+                
+                .img-edit {
+                  filter: brightness(0) invert(1) !important; // 👈 Icono blanco
+                }
+              }
+              
+              // Botón eliminar - fondo rojo, icono blanco
+              &:last-child {
+                background-color: #d32f2f !important; // 👈 Fondo rojo
+                
+                &:hover {
+                  background-color: #c62828 !important; // 👈 Rojo más oscuro
+                }
+                
+                .img-delete {
+                  filter: brightness(0) invert(1) !important; // 👈 Icono blanco
+                }
+              }
             }
           }
         }
