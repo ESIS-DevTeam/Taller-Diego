@@ -18,7 +18,7 @@ function loadServiceMobileMenu() {
             <ul>
                 <li>
                     <button id="mobile-btn-list">
-                        <img src="../assets/icons/briefcase.png" alt="Lista de servicios">
+                        <img src="../assets/icons/list.png" alt="Lista de servicios">
                         <span>Servicios</span>
                     </button>
                 </li>
