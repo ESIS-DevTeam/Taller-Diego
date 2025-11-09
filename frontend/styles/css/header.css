@@ -25,7 +25,8 @@
       transform: translateX(-50%);
       margin: 0;
       padding: 0;
-      font-size: clamp(20px, 3vw, 28px);
+      font-size: clamp(24px, 4vw, 32px);
+      color: white;
       z-index: 0; }
 
 /*# sourceMappingURL=header.css.map */

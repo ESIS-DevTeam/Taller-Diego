@@ -28,7 +28,8 @@
       transform: translateX(-50%); // 👈 Centrar exactamente
       margin: 0;
       padding: 0; // 👈 Eliminar padding
-      font-size: clamp(20px, 3vw, 28px);
+      font-size: clamp(24px, 4vw, 32px); // 👈 Tamaño más grande
+      color: white; // 👈 Color blanco
       z-index: 0; // 👈 Detrás del logo
     }
   }
