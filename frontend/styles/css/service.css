@@ -374,14 +374,14 @@ body {
       grid-column: span 12; }
     .main-content .service-section {
       grid-column: span 12;
-      padding-bottom: 80px; }
+      padding-bottom: 120px; }
     .main-content .service-data {
       /* Ocultar encabezado en móvil */
       /* Lista de servicios con padding inferior */ }
       .main-content .service-data .service-header {
         display: none; }
       .main-content .service-data .service-list {
-        padding-bottom: 20px; }
+        padding-bottom: 95px; }
         .main-content .service-data .service-list .service-row {
           display: flex;
           flex-direction: column;
