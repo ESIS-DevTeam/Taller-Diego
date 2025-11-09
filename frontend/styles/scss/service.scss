@@ -429,6 +429,7 @@ body {
 
     .service-section {
       grid-column: span 12;
+      padding-bottom: 80px; // 👈 Espacio para la barra de navegación inferior
     }
 
     .service-data {
@@ -437,8 +438,10 @@ body {
         display: none;
       }
 
-      /* Convertir tabla en tarjetas */
+      /* Lista de servicios con padding inferior */
       .service-list {
+        padding-bottom: 20px; // 👈 Padding adicional al final de la lista
+        
         .service-row {
           display: flex;
           flex-direction: column;
