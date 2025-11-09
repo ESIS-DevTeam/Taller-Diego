@@ -413,46 +413,77 @@ body {
         .service-row {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 12px; // 👈 Más espacio entre elementos
           padding: 20px;
+          align-items: flex-start; // 👈 Alinear a la izquierda
 
           /* Mostrar etiquetas en móvil */
           .service-name {
             white-space: normal; // 👈 Permitir múltiples líneas
+            font-size: 15px; // 👈 Tamaño uniforme
+            text-align: left; // 👈 Alinear a la izquierda
+            width: 100%; // 👈 Ancho completo
+            word-wrap: break-word; // 👈 Romper palabras largas
             
             &::before {
               content: "Servicio: ";
               font-weight: 700;
               color: #666;
+              display: block; // 👈 Etiqueta en su propia línea
+              margin-bottom: 4px;
             }
           }
 
           .service-description {
             white-space: normal; // 👈 Permitir múltiples líneas
+            font-size: 15px; // 👈 Tamaño uniforme
+            text-align: left; // 👈 Alinear a la izquierda
+            width: 100%; // 👈 Ancho completo
+            word-wrap: break-word; // 👈 Romper palabras largas
+            overflow: hidden; // 👈 Ocultar desbordamiento
+            display: -webkit-box; // 👈 Formato de caja
+            -webkit-line-clamp: 3; // 👈 Máximo 3 líneas
+            line-clamp: 3; // 👈 Propiedad estándar
+            -webkit-box-orient: vertical; // 👈 Orientación vertical
+            line-height: 1.5; // 👈 Altura de línea
             
             &::before {
               content: "Descripción: ";
               font-weight: 700;
               color: #666;
+              display: block; // 👈 Etiqueta en su propia línea
+              margin-bottom: 4px;
             }
           }
 
-          .service-price::before {
-            content: "Precio: ";
-            font-weight: 700;
-            color: #666;
+          .service-price {
+            font-size: 15px; // 👈 Tamaño uniforme
+            text-align: left; // 👈 Alinear a la izquierda
+            width: 100%; // 👈 Ancho completo
+            
+            &::before {
+              content: "Precio: ";
+              font-weight: 700;
+              color: #666;
+              display: inline; // 👈 En la misma línea
+              margin-right: 4px;
+            }
           }
 
           .service-actions {
-            justify-content: center;
+            justify-content: flex-start; // 👈 Alinear a la izquierda
             padding-top: 10px;
             padding-right: 0; // 👈 Resetear padding en móvil
             border-top: 1px solid #e0e0e0;
+            width: 100%; // 👈 Ancho completo
+            gap: 12px; // 👈 Espacio entre botones
 
             button {
-              flex: 1;
+              flex: 0; // 👈 No expandir botones
               justify-content: center;
-              max-width: 150px; // 👈 Límite de ancho
+              max-width: none; // 👈 Sin límite de ancho
+              width: 40px; // 👈 Ancho fijo
+              height: 40px; // 👈 Alto fijo
             }
           }
         }
