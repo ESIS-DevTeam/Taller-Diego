@@ -498,20 +498,37 @@ async function loadAndRenderServices() {
 function setupMobileMenuControler() {
     const btnList = document.getElementById("mobile-btn-list");
     const btnAdd = document.getElementById("mobile-btn-add");
+    const btnBack = document.getElementById("mobile-back-btn");
     
     const mainContent = document.querySelector(".main-content");
     const mobileMenu = document.querySelector("#mobile-menu-container");
     
     if (btnList) {
         btnList.addEventListener('click', () => {
-            mainContent.classList.add('active');
-            mobileMenu.classList.add('active');
+            // Toggle: si está activo, lo oculta; si está oculto, lo muestra
+            if (mainContent.classList.contains('active')) {
+                // Volver al menú principal
+                mainContent.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            } else {
+                // Mostrar la lista de servicios
+                mainContent.classList.add('active');
+                mobileMenu.classList.add('active');
+            }
         });
     }
     
     if (btnAdd) {
         btnAdd.addEventListener('click', () => {
             openAddServiceModal();
+        });
+    }
+    
+    // Botón "Volver" en la vista de servicios
+    if (btnBack) {
+        btnBack.addEventListener('click', () => {
+            mainContent.classList.remove('active');
+            mobileMenu.classList.remove('active');
         });
     }
 }

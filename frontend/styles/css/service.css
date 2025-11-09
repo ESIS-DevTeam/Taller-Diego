@@ -107,9 +107,12 @@ body {
   align-items: start;
   max-width: 1920px;
   margin: 0 auto;
+  /* ===== BOTÓN VOLVER MÓVIL ===== */
   /* ===== BOTÓN AGREGAR SERVICIO ===== */
   /* ===== SECCIÓN DE SERVICIOS ===== */
   /* ===== TABLA DE SERVICIOS ===== */ }
+  .main-content .mobile-back-btn {
+    display: none; }
   .main-content h1 {
     grid-column: span 9;
     font-size: clamp(20px, 3vw, 28px);
@@ -343,9 +346,27 @@ body {
               text-align: center; }
 
   .main-content {
-    display: none; }
+    display: none;
+    /* ===== BOTÓN VOLVER MÓVIL ===== */ }
     .main-content.active {
       display: grid; }
+    .main-content .mobile-back-btn {
+      display: block !important;
+      grid-column: span 12;
+      background-color: #1A242F;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 10px; }
+      .main-content .mobile-back-btn:hover {
+        background-color: #080b0e; }
+      .main-content .mobile-back-btn:active {
+        transform: scale(0.98); }
     .main-content h1 {
       grid-column: span 12;
       text-align: center; }

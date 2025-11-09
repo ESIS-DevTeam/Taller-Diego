@@ -48,6 +48,11 @@ body {
   max-width: 1920px;
   margin: 0 auto;
 
+  /* ===== BOTÓN VOLVER MÓVIL ===== */
+  .mobile-back-btn {
+    display: none; // 👈 Oculto por defecto (solo móvil)
+  }
+
   h1 {
     grid-column: span 9;
     font-size: clamp(20px, 3vw, 28px);
@@ -387,6 +392,30 @@ body {
 
     &.active {
       display: grid;
+    }
+
+    /* ===== BOTÓN VOLVER MÓVIL ===== */
+    .mobile-back-btn {
+      display: block !important; // 👈 Mostrar en móvil
+      grid-column: span 12;
+      background-color: $color-primary;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 10px;
+      
+      &:hover {
+        background-color: darken($color-primary, 10%);
+      }
+      
+      &:active {
+        transform: scale(0.98);
+      }
     }
 
     h1 {
