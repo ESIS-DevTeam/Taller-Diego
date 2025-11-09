@@ -33,9 +33,9 @@ def list_productos(
     categoria: str | None = Query(None, description="Filtrar por categoría" ),
     precio_min: float | None = Query(None, description="Precio mínimo (precioVenta)"),
     precio_max: float | None = Query(None, description="Precio máximo (precioVenta)"),
-    low_stock: bool = Query(False, description="Si true, devuelve productos con stock <= stockMin")
+    low_stock: bool = Query(False, description="Si true, devuelve productos con stock <= stockMin"),
+    nombre: str | None = Query(None, description="Buscar por nombre (coincidencia parcial, case-insensitive)")
 ):
-    # Construir filtros que serán enviados al service/repo
     filtros: dict = {
         "page": page,
         "page_size": page_size,
@@ -47,6 +47,7 @@ def list_productos(
         "precio_min": precio_min,
         "precio_max": precio_max,
         "low_stock": low_stock,
+        "nombre": nombre,
     })
     # Eliminar claves con valor None
     filtros = {k: v for k, v in filtros.items() if v is not None}
@@ -58,6 +59,12 @@ def get_producto(id: int, service: ProductoService = Depends(get_producto_servic
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return producto
+
+
+@router.get("/low-stock/count")
+def count_low_stock(service: ProductoService = Depends(get_producto_service)):
+    count = service.count_low_stock()
+    return {"low_stock_count": count}
 
 @router.put("/{id}", response_model=ProductoResponse)
 def update_producto(

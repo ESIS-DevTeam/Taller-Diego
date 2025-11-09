@@ -25,3 +25,6 @@ class ProductoService:
     
     def delete_producto(self, id: int):
         return self.repo.delete(id)
+
+    def count_low_stock(self) -> int:
+        return self.repo.count_low_stock()

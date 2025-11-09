@@ -37,8 +37,10 @@ class ProductoRepository:
         if precio_max is not None:
             base_query = base_query.filter(Producto.precioVenta <= precio_max)
         if low_stock:
-            # Productos cuyo stock sea menor o igual al stock mínimo
             base_query = base_query.filter(Producto.stock <= Producto.stockMin)
+        nombre = filtros.get("nombre")
+        if nombre:
+            base_query = base_query.filter(Producto.nombre.ilike(f"%{nombre}%"))
 
         # Conteo total (sobre la consulta filtrada, sin orden ni limit)
         total_items = self.db.query(func.count(Producto.id)).select_from(Producto)
@@ -51,10 +53,12 @@ class ProductoRepository:
             total_items = total_items.filter(Producto.precioVenta <= precio_max)
         if low_stock:
             total_items = total_items.filter(Producto.stock <= Producto.stockMin)
+        if nombre:
+            total_items = total_items.filter(Producto.nombre.ilike(f"%{nombre}%"))
 
         total_items = total_items.scalar() or 0
 
-        # Ordenación (se aplica después de calcular total)
+        # Ordenación
         order_by = filtros.get("order_by")
         order_dir = (filtros.get("order_dir") or "asc").lower()
         if order_by and hasattr(Producto, order_by):
@@ -105,3 +109,7 @@ class ProductoRepository:
             self.db.delete(producto)
             self.db.commit()
         return producto
+
+    def count_low_stock(self) -> int:
+        cnt = self.db.query(func.count(Producto.id)).filter(Producto.stock <= Producto.stockMin).scalar()
+        return int(cnt or 0)
