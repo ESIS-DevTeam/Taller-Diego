@@ -479,11 +479,12 @@ body {
             gap: 12px; // 👈 Espacio entre botones
 
             button {
-              flex: 0; // 👈 No expandir botones
+              flex: 1; // 👈 Expandir botones proporcionalmente
               justify-content: center;
               max-width: none; // 👈 Sin límite de ancho
-              width: 40px; // 👈 Ancho fijo
-              height: 40px; // 👈 Alto fijo
+              min-width: 100px; // 👈 Ancho mínimo
+              height: 45px; // 👈 Alto más grande
+              padding: 10px 20px; // 👈 Más padding
             }
           }
         }

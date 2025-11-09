@@ -413,11 +413,12 @@ body {
           width: 100%;
           gap: 12px; }
           .main-content .service-data .service-list .service-row .service-actions button {
-            flex: 0;
+            flex: 1;
             justify-content: center;
             max-width: none;
-            width: 40px;
-            height: 40px; }
+            min-width: 100px;
+            height: 45px;
+            padding: 10px 20px; }
 
   #mobile-menu-container.active {
     display: none; } }
