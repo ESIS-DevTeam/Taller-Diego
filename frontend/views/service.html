@@ -3,20 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Taller de Mecánica Diego</title> 
+  <title>Taller de Mecánica Diego - Servicios</title>
+  <link rel="stylesheet" href="../styles/css/service.css">
   <link rel="stylesheet" href="../styles/css/side_bar.css">
   <link rel="stylesheet" href="../styles/css/header.css">
+  <link rel="stylesheet" href="../styles/css/modal-add-product.css">
+  <link rel="stylesheet" href="../styles/css/modal-confirm.css">
+  <link rel="stylesheet" href="../styles/css/notification.css">
   <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Header dinámico: Cargado desde componets/header.js -->
   <div id="header"></div>
+  
   <div class="container">
+    <!-- Sidebar dinámico: Cargado desde componets/side_bar.js -->
     <div id="side-bar-container" class="side-bar-container"></div>
+    
+    <!-- Menú móvil dinámico -->
     <div id="mobile-menu-container"></div>
+
+    <!-- Contenido principal: Gestión de servicios -->
+    <main class="main-content">
+      <h1>Gestión de servicios</h1>
+      
+      <!-- Botón para agregar nuevo servicio -->
+      <div class="card" id="open-modal-btn">
+        <a href="#">
+          <p>+ Nuevo servicio</p>
+        </a>
+      </div>
+
+      <!-- Sección de búsqueda y tabla de servicios -->
+      <section class="service-section">
+        <!-- Búsqueda de servicios -->
+        <div class="search-box">
+          <img src="../assets/icons/search.png" alt="Buscar">
+          <input type="text" id="search-input" placeholder="Buscar servicio">
+        </div>
+
+        <!-- Tabla de servicios -->
+        <div class="service-data">
+          <!-- Encabezado de la tabla -->
+          <div class="service-header grid-layout" role="row">
+            <div class="header-item" role="columnheader">Nombre del Servicio</div>
+            <div class="header-item" role="columnheader">Descripción</div>
+            <div class="header-item" role="columnheader">Precio</div>
+            <div class="header-item" role="columnheader">Acciones</div>
+          </div>
+          
+          <!-- Lista de servicios (renderizada dinámicamente) -->
+          <div class="service-list">
+            <!-- Los servicios se insertan aquí vía JavaScript -->
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
+  
+  <!-- Contenedor para modales dinámicos -->
   <div id="modal-container"></div>
-  <main class="main-content">
-    <h1>Gestion de servicios</h1>
-  </main>
+  
+  <!-- Script principal (tipo módulo ES6) -->
+  <script type="module" src="../scripts/service.js"></script>
 </body>
 </html>
