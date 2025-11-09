@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from .producto import Producto
 
+
+
 class Autoparte(Producto):
     __tablename__ = "autopartes"
     

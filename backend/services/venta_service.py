@@ -1,8 +1,12 @@
+from datetime import datetime
+
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
+
 from repositories.venta_repo import VentaRepository
 from schemas.venta_schema import VentaCreate
-from datetime import datetime
-from fastapi import HTTPException
+
+
 
 class VentaService:
     

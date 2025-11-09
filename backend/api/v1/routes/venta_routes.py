@@ -1,11 +1,15 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from db.base import SessionLocal
 from schemas.venta_schema import VentaCreate, VentaResponse
 from services.venta_service import VentaService
-from datetime import datetime
 
 router = APIRouter(tags=["Ventas"])
+
+
 
 def get_db():
     db = SessionLocal()
@@ -13,6 +17,8 @@ def get_db():
         yield db
     finally:
         db.close()
+
+ 
 
 def get_venta_service(db: Session = Depends(get_db)) -> VentaService:
     return VentaService(db)
@@ -24,11 +30,13 @@ def create_venta(
 ):
     return service.create_venta(data)
 
+
 @router.get("/", response_model=list[VentaResponse])
 def list_ventas(
     service: VentaService = Depends(get_venta_service)
 ):
     return service.list_ventas()
+
 
 @router.get("/{id}", response_model=VentaResponse)
 def get_venta_by_id(id: int, service: VentaService = Depends(get_venta_service)):
@@ -37,9 +45,11 @@ def get_venta_by_id(id: int, service: VentaService = Depends(get_venta_service))
         raise HTTPException(status_code=404, detail="Venta not found")
     return venta
 
+
 @router.get("/fecha/{fecha}", response_model=list[VentaResponse])
 def get_ventas_by_fecha(fecha: datetime, service: VentaService = Depends(get_venta_service)):
     return service.get_by_fecha(fecha)
+
 
 @router.delete("/{id}")
 def delete_venta(id: int, service: VentaService = Depends(get_venta_service)):
