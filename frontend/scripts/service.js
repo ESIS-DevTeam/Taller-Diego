@@ -6,12 +6,32 @@
  */
 
 import { loadSideBar } from "./componets/side_bar.js";
-import { loadMobileMenu } from "./componets/mobile_menu.js";
 import { loadHeader } from "./componets/header.js";
-import { mobileMenuControler } from "./componets/menu-controler.js";
 import { showSuccess, showError, showWarning } from "./utils/notification.js";
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+
+// ========== MENÚ MÓVIL PARA SERVICIOS ==========
+function loadServiceMobileMenu() {
+    return `
+        <div class="mobile-actions-menu">
+            <ul>
+                <li>
+                    <button id="mobile-btn-list">
+                        <img src="../assets/icons/briefcase.png" alt="Lista de servicios">
+                        <span>Servicios</span>
+                    </button>
+                </li>
+                <li>
+                    <button id="mobile-btn-add">
+                        <img src="../assets/icons/add.png" alt="Agregar servicio">
+                        <span>Agregar servicio</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    `;
+}
 
 // ========== CARGAR COMPONENTES UI ==========
 const sideBarContainer = document.getElementById("side-bar-container");
@@ -19,10 +39,7 @@ const mobileMenu = document.getElementById("mobile-menu-container");
 const header = document.getElementById("header");
 
 if (sideBarContainer) sideBarContainer.innerHTML = loadSideBar();
-if (mobileMenu) {
-    mobileMenu.innerHTML = loadMobileMenu();
-    mobileMenuControler();
-}
+if (mobileMenu) mobileMenu.innerHTML = loadServiceMobileMenu();
 if (header) header.innerHTML = loadHeader();
 
 // ========== ESTADO GLOBAL ==========
@@ -477,6 +494,28 @@ async function loadAndRenderServices() {
     renderServices();
 }
 
+// ========== CONTROLADOR MENÚ MÓVIL ==========
+function setupMobileMenuControler() {
+    const btnList = document.getElementById("mobile-btn-list");
+    const btnAdd = document.getElementById("mobile-btn-add");
+    
+    const mainContent = document.querySelector(".main-content");
+    const mobileMenu = document.querySelector("#mobile-menu-container");
+    
+    if (btnList) {
+        btnList.addEventListener('click', () => {
+            mainContent.classList.add('active');
+            mobileMenu.classList.add('active');
+        });
+    }
+    
+    if (btnAdd) {
+        btnAdd.addEventListener('click', () => {
+            openAddServiceModal();
+        });
+    }
+}
+
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', async () => {
     // Cargar servicios
@@ -484,6 +523,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Configurar búsqueda
     setupSearch();
+    
+    // Configurar menú móvil
+    setupMobileMenuControler();
     
     // Botón agregar servicio
     const openModalBtn = document.getElementById('open-modal-btn');
