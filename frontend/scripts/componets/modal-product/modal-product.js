@@ -1,14 +1,13 @@
 import { generateModalHTML } from './modal-template.js';
-import { setupModalEvents } from './modal-events.js';
-export { CATEGORIAS_PRODUCTOS } from './constants.js';
+import { setupModalEvents } from "./modal-event.js"; // ← QUITAR LA 'S'
 
-export function openModalForm(type = 'add', data = {}) {
+export async function openModalForm(type = 'add', id = null) {
   const modalContainer = document.getElementById('modal-container');
   if(!modalContainer) return;
   
-  modalContainer.innerHTML = generateModalHTML(type, data);
+  modalContainer.innerHTML = await generateModalHTML(type, id);
   document.body.style.overflow = 'hidden';
-  setupModalEvents();
+  setupModalEvents(type,id);
 }
 
 export function closeModalForm() {

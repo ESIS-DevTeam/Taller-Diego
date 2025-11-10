@@ -1,32 +1,26 @@
-import { createResource } from "../../data-manager.js";
+import { createResource, updateResource } from "../../data-manager.js";
 import { showNotification } from "../../utils/notification.js";
-import { closeModalForm } from "./modal-add-product.js";
+import { closeModalForm } from "./modal-product.js";
 
-
-
-
-export function setupModalEvents() {
+export function setupModalEvents(type = 'add', productId = null ) {
   const modalOverlay = document.querySelector(".modal-overlay");
   const form = document.getElementById('form-product');
   const btnCancel = document.querySelector('.btn-cancel'); 
   const btnClose = document.querySelector('.modal-close'); 
   const autopartCheckbox = document.getElementById('product-autopart');
 
-
-  setupCloseHandlers(btnCancel, btnClose);
-
-  seuptAutopartTogge(autopartCheckbox);
-
-  setupFormSubmit(form, autopartCheckbox);
+  setupCloseHandlers(modalOverlay, btnCancel, btnClose);
+  setupAutopartToggle(autopartCheckbox); 
+  setupFormSubmit(form, autopartCheckbox,type,productId);
 }
 
-function seuptAutopartTogge (autopartCheckbox) {
+function setupAutopartToggle(autopartCheckbox) { 
   const autopartFields = document.querySelector("[data-autopart-fields]");
   
+  
   const toggleAutopartFields = () => {
-    if(!autopartCheckbox) {
-      return;
-    }
+    if(!autopartCheckbox) return;
+    
     const show = autopartCheckbox.checked;
     autopartFields?.classList.toggle("is-visible", show);
 
@@ -36,18 +30,16 @@ function seuptAutopartTogge (autopartCheckbox) {
         input.value = "";
       }
     });
+  }
+  
 
-    if (autopartCheckbox) {
-      toggleAutopartFields();
-      autopartCheckbox.addEventListener("change", toggleAutopartFields);
-    }
-
-
+  if (autopartCheckbox) {
+    toggleAutopartFields();
+    autopartCheckbox.addEventListener("change", toggleAutopartFields);
   }
 }
 
-function setupCloseHandlers(btnCancel, btnClose) {
-  // Cerrar el modal
+function setupCloseHandlers(modalOverlay, btnCancel, btnClose) { 
   const closeHandlers = () => closeModalForm();
   btnClose?.addEventListener("click", closeHandlers);
   btnCancel?.addEventListener("click", closeHandlers);
@@ -67,12 +59,14 @@ function setupCloseHandlers(btnCancel, btnClose) {
   document.addEventListener("keydown", escapeHandler);
 }
 
-function setupFormSubmit (form, autopartCheckbox) {
+function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null) {
+  let isEdit = (type === 'edit' && productId !== null);
+  let endpoint = "productos";
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     // DATOS DEL FORMULARIO
-    const formData = {
+    let formData = {
       nombre: form['product-name'].value.trim(),
       marca: form['product-brand'].value.trim(),
       categoria: form['product-category'].value,
@@ -87,24 +81,24 @@ function setupFormSubmit (form, autopartCheckbox) {
 
     if(isAutopart) {
       formData.modelo = form['product-model'].value.trim();
-      formData.anio = form['product-year'].value.trim();
+      formData.anio = parseInt(form['product-year'].value, 10) || 0;
+      endpoint = "autopartes";
     }
-
-
 
     // ENVIO DE DATOS
     try {
       const endpoint = isAutopart ? 'autopartes' : 'productos';
-      const resultado = await createResource(endpoint, formData);
+      if(isEdit){
+        await updateResource(endpoint,productId, formData);
+      }else{
+        await createResource(endpoint,formData)
+      }
       
       showNotification("Producto agregado exitosamente", "success");
-      
       closeModalForm();
-      
       
     } catch (error) {
       console.error("Error al crear producto:", error);
-      // El error ya se maneja en handleApiError
     }
   });
 }

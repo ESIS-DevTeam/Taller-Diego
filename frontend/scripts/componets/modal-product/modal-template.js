@@ -1,3 +1,4 @@
+import { fetchFromApi } from '../../data-manager.js';
 import { CATEGORIAS_PRODUCTOS } from './constants.js';
 
 export function generateCategoryOptions(selectedCategory = '') {
@@ -6,12 +7,12 @@ export function generateCategoryOptions(selectedCategory = '') {
     ).join('');
 }
 
-export async function generateModalHTML(type = 'add', dataProduct = null) {
-  const isEdit = type === 'edit' && dataProduct !== null;
+export async function generateModalHTML(type = 'add', id = null) {
+  const isEdit = (type === 'edit' && id !== null);
   const title = isEdit ? "Editar" : "Agregar";
-  const required = isEdit ? '' : 'required'; // ← Sin required en modo edición
+  const required = isEdit ? '' : 'required';  
   
-  const data = dataProduct || {
+  let data = {
     nombre: '',
     marca: '',
     categoria: '',
@@ -23,7 +24,17 @@ export async function generateModalHTML(type = 'add', dataProduct = null) {
     modelo: '',
     anio: ''
   };
-
+  
+  if(isEdit) {
+    data = await fetchFromApi("productos", id);
+    if(data.tipo === "autoparte") {
+      let autoparte = await fetchFromApi("autopartes", id);
+      data.anio = autoparte.anio;
+      data.modelo = autoparte.modelo;
+    }
+  }
+  console.log(data);
+  
   const categoryOptions = generateCategoryOptions(data.categoria);
 
   return `
@@ -85,7 +96,7 @@ export async function generateModalHTML(type = 'add', dataProduct = null) {
               </div>
               <div class="autopart-toggle">
                   <label class="autopart-toggle-label">
-                      <input type="checkbox" id="product-autopart" ${data.modelo || data.anio ? 'checked' : ''}>
+                      <input type="checkbox" id="product-autopart" ${data.modelo || data.anio ? 'checked disabled' : ''}>
                       <span>Producto Autoparte</span>
                   </label>
               </div>
