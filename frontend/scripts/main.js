@@ -2,158 +2,179 @@
 // Script principal que manipula el DOM y obtiene datos dinámicos desde data-manager.js
 // Todas las funciones y textos están documentados en español.
 
-import { fetchFromApi, productUnderStock, countFromApi } from './data-manager.js';
+import { productUnderStock, countFromApi } from './data-manager.js';
 
-// Helpers de DOM
+// ========================================
+// HELPERS DE DOM
+// ========================================
+
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-// Elementos clave del DOM (si no existen, el script no fallará)
+// ========================================
+// SELECTORES DEL DOM
+// ========================================
+
 const selectors = {
-    welcomeTitle: '.welcome-alert h2',
-    alertText: '.welcome-alert .alert-content h3',
-    alertButton: '.welcome-alert .alert-content a',
-    cardGrid: '.dashboard-card-grid',
     cards: '.dashboard-card-grid .card',
     quickActionsList: '.quick-actions .list-action',
-    recentActivitiesList: '.list-recent-activities',
 };
 
-// Estado de la UI: utilidades para mostrar carga y errores
-function setLoading(el, isLoading) {
-    if (!el) return;
-    if (isLoading) el.classList.add('loading');
-    else el.classList.remove('loading');
-}
+// ========================================
+// FUNCIONES DE RENDERIZADO
+// ========================================
 
-function setText(selector, text) {
-    const el = $(selector);
-    if (el) el.textContent = text;
-}
-
-// Renderizadores básicos
+/**
+ * Renderiza la alerta de productos con bajo stock
+ * @param {number} count - Cantidad de productos con bajo stock
+ */
 function renderAlert(count) {
-    const alertTextEl = $(selectors.alertText);
-    const alertBtn = $(selectors.alertButton);
-    if (!alertTextEl || !alertBtn) return;
+    const alertContent = $('.welcome-alert .alert-content');
+    if (!alertContent) {
+        console.error('No se encontró el contenedor .alert-content');
+        return;
+    }
+
+    // Limpiar el contenido anterior
+    alertContent.innerHTML = '';
 
     if (count > 0) {
-        alertTextEl.textContent = `¡Hay ${count} productos por agotarse!`;
-        alertBtn.textContent = 'Ver productos';
-        alertBtn.href = '#/inventario';
-        alertBtn.style.display = 'inline-block';
+        // Crear elementos dinámicamente
+        const h3 = document.createElement('h3');
+        h3.textContent = `¡Hay ${count} producto${count > 1 ? 's' : ''} por agotarse!`;
+
+        const link = document.createElement('a');
+        link.textContent = 'Ver productos';
+        link.href = '#/inventario';
+
+        alertContent.appendChild(h3);
+        alertContent.appendChild(link);
+
+        console.log(`Alerta renderizada: ${count} productos con bajo stock`);
     } else {
-        alertTextEl.textContent = 'No hay productos con bajo stock.';
-        alertBtn.style.display = 'none';
+        const h3 = document.createElement('h3');
+        h3.textContent = '✅ Todos los productos tienen stock suficiente.';
+        alertContent.appendChild(h3);
+
+        console.log('Alerta renderizada: Sin productos con bajo stock');
     }
 }
 
-// Se espera que las tarjetas sigan el orden en el HTML actual: productos, ventas, servicios
+/**
+ * Renderiza una tarjeta del dashboard
+ * @param {HTMLElement} card - Elemento de la tarjeta
+ * @param {string} title - Título de la tarjeta
+ * @param {number} value - Valor numérico a mostrar
+ */
+function renderCard(card, title, value) {
+    if (!card) {
+        console.warn('Card element is null');
+        return;
+    }
+
+    console.log(`Renderizando tarjeta: ${title} = ${value}`);
+
+    const titleEl = $('h3', card);
+    const valueEl = $('p', card);
+
+    if (titleEl) titleEl.textContent = title;
+    if (valueEl) {
+        const icon = valueEl.querySelector('img');
+        console.log('Icon encontrado:', icon ? 'Sí' : 'No');
+        valueEl.textContent = `${value} `;
+        if (icon) valueEl.appendChild(icon);
+    }
+
+    console.log('Tarjeta renderizada exitosamente');
+}
+
+/**
+ * Renderiza todas las tarjetas del dashboard con datos de la BD
+ */
 async function renderCards() {
     const cards = $$(selectors.cards);
+    console.log('Total de tarjetas encontradas:', cards.length);
     if (!cards.length) return;
 
-    // Productos (card 0)
+    // Tarjeta 0: Productos en inventario
     try {
-        setLoading(cards[0], true);
-        const productos = await fetchFromApi('productos');
-        const productCount = Array.isArray(productos) ? productos.length : (productos?.count ?? 0);
-        const titleEl = $('h3', cards[0]);
-        const valueEl = $('p', cards[0]);
-        if (titleEl) titleEl.textContent = 'Productos en stock';
-        if (valueEl) valueEl.childNodes[0] && (valueEl.childNodes[0].nodeValue = `${productCount} `);
-    } catch (e) {
-        console.error('Error cargando productos:', e);
-    } finally {
-        setLoading(cards[0], false);
+        console.log('Cargando productos...');
+        const productCount = await countFromApi('productos');
+        console.log('Conteo de productos recibido:', productCount);
+        renderCard(cards[0], 'Productos en inventario', productCount);
+        console.log('Tarjeta de productos renderizada');
+    } catch (error) {
+        console.error('Error cargando productos:', error);
+        renderCard(cards[0], 'Productos en inventario', 0);
     }
 
-    // Ventas (card 1) — intento de cargar desde endpoint 'ventas' o mantener estático
+    // Tarjeta 1: Ventas recientes (mantener estático por ahora)
     try {
-        setLoading(cards[1], true);
-        const ventas = await fetchFromApi('ventas').catch(() => null);
-        const ventasText = ventas && ventas.total ? `\$${ventas.total}` : '$250.000';
         const titleEl = $('h3', cards[1]);
-        const valueEl = $('p', cards[1]);
         if (titleEl) titleEl.textContent = 'Ventas recientes';
-        if (valueEl) valueEl.textContent = ventasText;
-    } catch (e) {
-        console.error('Error cargando ventas:', e);
-    } finally {
-        setLoading(cards[1], false);
+    } catch (error) {
+        console.error('Error en tarjeta de ventas:', error);
     }
 
-    // Servicios (card 2)
+    // Tarjeta 2: Servicios activos
     try {
-        setLoading(cards[2], true);
-        const servicios = await fetchFromApi('servicios').catch(() => null);
-        const serviciosCount = Array.isArray(servicios) ? servicios.length : (servicios?.count ?? 3);
-        const titleEl = $('h3', cards[2]);
-        const valueEl = $('p', cards[2]);
-        if (titleEl) titleEl.textContent = 'Servicios activos';
-        if (valueEl) valueEl.childNodes[0] && (valueEl.childNodes[0].nodeValue = `${serviciosCount} `);
-    } catch (e) {
-        console.error('Error cargando servicios:', e);
-    } finally {
-        setLoading(cards[2], false);
+        console.log('Cargando servicios...');
+        const serviciosCount = await countFromApi('servicios');
+        console.log('Conteo de servicios recibido:', serviciosCount);
+        renderCard(cards[2], 'Servicios activos', serviciosCount);
+        console.log('Tarjeta de servicios renderizada');
+    } catch (error) {
+        console.error('Error cargando servicios:', error);
+        renderCard(cards[2], 'Servicios activos', 0);
     }
 }
 
-// Renderiza acciones rápidas: si las acciones deben obtenerse dinámicamente, se puede cambiar aquí
+/**
+ * Vincula eventos a las acciones rápidas
+ */
 function bindQuickActions() {
     const list = $(selectors.quickActionsList);
     if (!list) return;
 
-    // Delegación de eventos: si los botones existen, asigne acciones
     list.addEventListener('click', (ev) => {
         const li = ev.target.closest('li');
         if (!li) return;
         const text = li.textContent.trim();
-        // Placeholder: implementar las acciones reales (modales, rutas, etc.)
-        console.log('Acción rápida clicada:', text);
-        // Aquí puede abrir un modal o navegar a la página correspondiente
+        console.log('Acción rápida:', text);
+        // TODO: Implementar navegación o modales según la acción
     });
 }
 
-// Carga y render principal
+// ========================================
+// INICIALIZACIÓN
+// ========================================
+
+/**
+ * Inicializa el dashboard cargando todos los datos
+ */
 async function init() {
-    // Vincular acciones estáticas
-    bindQuickActions();
-
-    // Cargar conteo de productos por agotarse y renderizar alerta
+    console.log('=== Iniciando Dashboard ===');
     try {
-        const under = await productUnderStock().catch(() => 0);
-        renderAlert(under);
-    } catch (e) {
-        console.error('No se pudo calcular productos en bajo stock:', e);
-    }
+        // 1. Vincular eventos
+        console.log('1. Vinculando acciones rápidas...');
+        bindQuickActions();
 
-    // Cargar y renderizar tarjetas
-    await renderCards();
+        // 2. Cargar y renderizar alerta de bajo stock
+        console.log('2. Cargando productos con bajo stock...');
+        const lowStockCount = await productUnderStock();
+        console.log('Productos con bajo stock:', lowStockCount);
+        renderAlert(lowStockCount);
 
-    // Por defecto no cargamos actividades; si existe un endpoint 'actividades' podemos poblar la lista
-    const activitiesEl = $(selectors.recentActivitiesList);
-    if (activitiesEl) {
-        try {
-            const activities = await fetchFromApi('actividades').catch(() => null);
-            if (Array.isArray(activities)) {
-                activitiesEl.innerHTML = activities.map(a => `
-          <li class="item-recent-activities">
-            <img src="../assets/icons/checked.svg" class="checked" alt="ok">
-            <div class="item-recent-activities-text"><p>${a.text}</p><time>${a.time || ''}</time></div>
-          </li>
-        `).join('');
-            }
-        } catch (e) {
-            console.error('Error cargando actividades:', e);
-        }
+        // 3. Cargar y renderizar tarjetas
+        console.log('3. Renderizando tarjetas...');
+        await renderCards();
+
+        console.log('=== Dashboard inicializado correctamente ===');
+
+    } catch (error) {
+        console.error('Error inicializando dashboard:', error);
     }
 }
 
-// Inicializa cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    init().catch(err => console.error('Error inicializando main.js', err));
-});
-
-// Export para pruebas si fuera necesario
-export default { init };
+// Iniciar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', init);
