@@ -90,8 +90,9 @@ body li {
 
 .dashboard-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(200px, 280px));
+  gap: 50px;
+  justify-content: center;
 }
 @media (max-width: 768px) {
   .dashboard-card-grid {

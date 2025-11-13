@@ -134,8 +134,9 @@ body {
 
 .dashboard-card-grid {
   display: grid; // Activa CSS Grid
-  grid-template-columns: repeat(3, 1fr); // 3 columnas de igual tamaño
-  gap: 12px; // Espacio entre tarjetas
+  grid-template-columns: repeat(3, minmax(200px, 280px)); // 3 columnas con ancho controlado (min: 200px, max: 280px)
+  gap: 50px; // Espacio entre tarjetas (aumentado de 12px a 20px)
+  justify-content: center; // Centra las tarjetas en el contenedor
 
   // Diseño responsive: 2 columnas en tablets
   @media (max-width: 768px) {
