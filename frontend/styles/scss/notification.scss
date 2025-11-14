@@ -35,19 +35,19 @@
     // TIPOS DE NOTIFICACIÓN
     // ========================================
     &.success {
-      background-color: rgba(25, 114, 37, 0.07); // Verde claro
+      background-color: #ecf8ee;
       border-left-color: #3fb950; // Verde oscuro
     }
     &.warning {
-      background-color: rgba(247, 133, 57, 0.07); // Naranja claro
+      background-color: #fcf5e8;
       border-left-color: #d29922; // Naranja oscuro
     }
     &.error {
-      background-color: rgba(185, 32, 32, 0.07); // Rojo claro
+      background-color: #ffefee;
       border-left-color: #f85149; // Rojo oscuro
     }
     &.info {
-      background-color: rgba(31, 66, 112, 0.07); // Azul claro
+      background-color: #e3ecfd;
       border-left-color: #1951b9; // Azul oscuro
     }
 

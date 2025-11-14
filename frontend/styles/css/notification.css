@@ -19,19 +19,19 @@
   animation: slideIn 0.3s ease;
 }
 #notification-container .notification.success {
-  background-color: rgba(25, 114, 37, 0.07);
+  background-color: #ecf8ee;
   border-left-color: #3fb950;
 }
 #notification-container .notification.warning {
-  background-color: rgba(247, 133, 57, 0.07);
+  background-color: #fcf5e8;
   border-left-color: #d29922;
 }
 #notification-container .notification.error {
-  background-color: rgba(185, 32, 32, 0.07);
+  background-color: #ffefee;
   border-left-color: #f85149;
 }
 #notification-container .notification.info {
-  background-color: rgba(31, 66, 112, 0.07);
+  background-color: #e3ecfd;
   border-left-color: #1951b9;
 }
 #notification-container .notification p {
