@@ -18,14 +18,14 @@ function loadServiceMobileMenu() {
             <ul>
                 <li>
                     <button id="mobile-btn-list">
-                        <img src="../assets/icons/list.png" alt="Lista de servicios">
-                        <span>Servicios</span>
+                        <img src="../assets/icons/list.png" alt="Ver servicios">
+                        <span>Ver Servicio</span>
                     </button>
                 </li>
                 <li>
                     <button id="mobile-btn-add">
                         <img src="../assets/icons/add.png" alt="Agregar servicio">
-                        <span>Agregar servicio</span>
+                        <span>Agregar Nuevo Servicio</span>
                     </button>
                 </li>
             </ul>

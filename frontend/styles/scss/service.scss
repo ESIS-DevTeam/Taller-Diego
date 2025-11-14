@@ -325,60 +325,73 @@ body {
 
 /* ========== RESPONSIVE: MÓVILES ========== */
 @media (max-width: 768px) {
+  /* Ajustar container para header más pequeño */
+  .container {
+    margin-top: 60px; // 👈 Ajustado para header de 60px
+    height: calc(100vh - 60px);
+  }
+  
   /* Mostrar menú móvil */
   #mobile-menu-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    min-height: calc(100vh - 100px);
-    padding: 20px;
+    align-items: flex-start; // 👈 Alineación superior
+    height: calc(100vh - 60px); // 👈 Altura exacta, no mínima
+    width: 100%;
+    padding-top: 120px; // 👈 Padding superior para posición intermedia
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
 
     .mobile-actions-menu {
       width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
       
       ul {
         list-style: none;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 30px; // 👈 Más espacio entre botones
         width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
+        max-width: 280px; // 👈 Ancho más ajustado para centrar mejor
+        margin: 0;
         padding: 0;
 
         li {
           transition: all 0.3s ease;
 
           &:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
           }
 
           button {
-            aspect-ratio: 1;
             border-radius: 16px;
             background-color: $color-primary;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; // 👈 Icono arriba, texto abajo
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 100%;
+            min-height: 140px; // 👈 Más alto para acomodar el diseño vertical
             text-decoration: none;
             color: white;
-            gap: 10px;
-            padding: 15px;
+            gap: 15px; // 👈 Espacio entre icono y texto
+            padding: 25px;
             border: none;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
             img {
-              width: clamp(35px, 10vw, 50px);
-              height: clamp(35px, 10vw, 50px);
+              width: 60px; // 👈 Icono más grande
+              height: 60px;
               filter: brightness(0) invert(1);
             }
 
             span {
-              font-size: clamp(13px, 3vw, 16px);
-              font-weight: 500;
+              font-size: 16px;
+              font-weight: 600;
               text-align: center;
             }
           }
@@ -394,153 +407,231 @@ body {
       display: grid;
     }
 
-    /* ===== BOTÓN VOLVER MÓVIL ===== */
-    .mobile-back-btn {
-      display: block !important; // 👈 Mostrar en móvil
-      grid-column: span 12;
-      background-color: $color-primary;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 20px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 10px;
-      
-      &:hover {
-        background-color: darken($color-primary, 10%);
-      }
-      
-      &:active {
-        transform: scale(0.98);
-      }
+    /* ===== ENCABEZADO MÓVIL - Servicios ===== */
+    h1 {
+      display: block;
+      grid-column: span 6;
+      font-size: 22px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 0;
+      padding: 0 0 0 15px;
+      align-self: center;
     }
 
-    h1 {
-      grid-column: span 12;
-      text-align: center;
+    /* ===== BOTÓN VOLVER MÓVIL ===== */
+    .mobile-back-btn {
+      display: none !important;
     }
 
     .card {
-      grid-column: span 12;
+      grid-column: span 6;
+      margin: 0 15px 0 0;
+      position: relative;
+      bottom: auto;
+      right: auto;
+      width: auto;
+      max-width: 150px;
+      height: auto;
+      min-height: 40px;
+      border-radius: 8px;
+      z-index: auto;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background: #6c5ce7;
+      justify-self: end;
+      
+      a {
+        padding: 10px 14px;
+        display: block;
+        
+        p {
+          display: block;
+          color: white;
+          font-size: 13px;
+          font-weight: 600;
+          text-align: center;
+          white-space: nowrap;
+        }
+      }
     }
 
     .service-section {
       grid-column: span 12;
-      padding-bottom: 120px; // 👈 Más espacio para la barra de navegación inferior
+      padding: 0 15px;
+      background: transparent;
+      box-shadow: none;
+      gap: 0;
+      padding-bottom: 100px;
+      clear: both;
+      margin-top: 8px;
+      
+      /* Campo de búsqueda */
+      .search-box {
+        background: white;
+        border-radius: 8px;
+        margin: 0 0 8px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+        flex-direction: row-reverse;
+        
+        img {
+          order: -1;
+        }
+      }
     }
 
     .service-data {
-      /* Ocultar encabezado en móvil */
+      /* Encabezado en móvil - 3 columnas */
       .service-header {
-        display: none;
-      }
-
-      /* Lista de servicios con padding inferior */
-      .service-list {
-        padding-bottom: 95px; // 👈 Más padding adicional al final de la lista
+        display: grid;
+        grid-template-columns: 1fr 95px 100px;
+        background: $color-primary;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px 8px 0 0;
+        font-weight: 600;
+        margin: 0;
+        font-size: 13px;
+        gap: 16px;
+        align-items: center;
         
-        .service-row {
-          display: flex;
-          flex-direction: column;
-          gap: 12px; // 👈 Más espacio entre elementos
-          padding: 20px;
-          align-items: flex-start; // 👈 Alinear a la izquierda
-
-          /* Mostrar etiquetas en móvil */
-          .service-name {
-            white-space: normal; // 👈 Permitir múltiples líneas
-            font-size: 15px; // 👈 Tamaño uniforme
-            text-align: left; // 👈 Alinear a la izquierda
-            width: 100%; // 👈 Ancho completo
-            word-wrap: break-word; // 👈 Romper palabras largas
+        .grid-layout {
+          display: contents;
+        }
+        
+        .header-item {
+          font-size: 0;
+          
+          &:nth-child(1) {
+            text-align: left;
             
-            &::before {
-              content: "Servicio: ";
-              font-weight: 700;
-              color: #666;
-              display: block; // 👈 Etiqueta en su propia línea
-              margin-bottom: 4px;
+            &::after {
+              content: "Servicio";
+              font-size: 13px;
             }
           }
-
-          .service-description {
-            white-space: normal; // 👈 Permitir múltiples líneas
-            font-size: 15px; // 👈 Tamaño uniforme
-            text-align: left; // 👈 Alinear a la izquierda
-            width: 100%; // 👈 Ancho completo
-            word-wrap: break-word; // 👈 Romper palabras largas
-            overflow: hidden; // 👈 Ocultar desbordamiento
-            display: -webkit-box; // 👈 Formato de caja
-            -webkit-line-clamp: 3; // 👈 Máximo 3 líneas
-            line-clamp: 3; // 👈 Propiedad estándar
-            -webkit-box-orient: vertical; // 👈 Orientación vertical
-            line-height: 1.5; // 👈 Altura de línea
+          
+          &:nth-child(2) {
+            display: block !important;
+            text-align: left;
+            grid-column: 2;
             
-            &::before {
-              content: "Descripción: ";
-              font-weight: 700;
-              color: #666;
-              display: block; // 👈 Etiqueta en su propia línea
-              margin-bottom: 4px;
+            &::after {
+              content: "Precio";
+              font-size: 13px;
             }
+          }
+          
+          &:nth-child(3) {
+            display: none;
+          }
+          
+          &:nth-child(4) {
+            display: block !important;
+            text-align: center;
+            grid-column: 3;
+            padding-right: 0;
+            
+            &::after {
+              content: "Acciones";
+              font-size: 13px;
+            }
+          }
+        }
+      }
+
+      /* Lista de servicios */
+      .service-list {
+        padding: 0;
+        gap: 0;
+        background: white;
+        margin: 0;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        max-height: calc(100vh - 340px);
+        
+        .service-row {
+          display: grid;
+          grid-template-columns: 1fr 95px 100px;
+          align-items: center;
+          gap: 16px;
+          padding: 14px 16px;
+          background: transparent;
+          border-radius: 0;
+          box-shadow: none;
+          border-bottom: 1px solid #e0e0e0;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .service-name {
+            font-size: 14px;
+            font-weight: 400;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
+          }
+          
+          .service-description {
+            display: none;
           }
 
           .service-price {
-            font-size: 15px; // 👈 Tamaño uniforme
-            text-align: left; // 👈 Alinear a la izquierda
-            width: 100%; // 👈 Ancho completo
-            
-            &::before {
-              content: "Precio: ";
-              font-weight: 700;
-              color: #666;
-              display: inline; // 👈 En la misma línea
-              margin-right: 4px;
-            }
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            text-align: left;
+            white-space: nowrap;
+            min-width: 70px;
           }
 
           .service-actions {
-            justify-content: flex-start; // 👈 Alinear a la izquierda
-            padding-top: 10px;
-            padding-right: 0; // 👈 Resetear padding en móvil
-            border-top: 1px solid #e0e0e0;
-            width: 100%; // 👈 Ancho completo
-            gap: 12px; // 👈 Espacio entre botones
+            display: flex;
+            justify-content: flex-end;
+            padding: 0;
+            border: none;
+            width: auto;
+            gap: 8px;
+            margin: 0;
 
             button {
-              flex: 1; // 👈 Expandir botones proporcionalmente
-              justify-content: center;
-              max-width: none; // 👈 Sin límite de ancho
-              min-width: 100px; // 👈 Ancho mínimo
-              height: 45px; // 👈 Alto más grande
-              padding: 10px 20px; // 👈 Más padding
+              flex: 0;
+              width: 32px;
+              height: 32px;
+              padding: 6px;
+              border-radius: 0;
+              min-width: unset;
               
-              // Botón editar - fondo azul, icono blanco
               &:first-child {
-                background-color: #1976d2 !important; // 👈 Fondo azul
+                background-color: #1976d2 !important;
+                border: none;
                 
                 &:hover {
-                  background-color: #1565c0 !important; // 👈 Azul más oscuro
+                  background-color: darken(#1976d2, 10%) !important;
                 }
                 
                 .img-edit {
-                  filter: brightness(0) invert(1) !important; // 👈 Icono blanco
+                  filter: brightness(0) invert(1);
+                  width: 20px;
+                  height: 20px;
                 }
               }
               
-              // Botón eliminar - fondo rojo, icono blanco
               &:last-child {
-                background-color: #d32f2f !important; // 👈 Fondo rojo
+                background-color: #d32f2f !important;
+                border: none;
                 
                 &:hover {
-                  background-color: #c62828 !important; // 👈 Rojo más oscuro
+                  background-color: darken(#d32f2f, 10%) !important;
                 }
                 
                 .img-delete {
-                  filter: brightness(0) invert(1) !important; // 👈 Icono blanco
+                  filter: brightness(0) invert(1);
+                  width: 20px;
+                  height: 20px;
                 }
               }
             }
@@ -581,6 +672,12 @@ body {
   align-items: center;
   z-index: 10000;
   animation: fadeIn 0.2s ease;
+  
+  /* ===== VERSIÓN MÓVIL: SIN PADDING ===== */
+  @media (max-width: 768px) {
+    padding: 0;
+    align-items: flex-start;
+  }
 }
 
 .modal-content {
@@ -592,6 +689,16 @@ body {
   overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   animation: slideIn 0.3s ease;
+  
+  /* ===== VERSIÓN MÓVIL: PANTALLA COMPLETA ===== */
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+  }
 }
 
 .modal-header {

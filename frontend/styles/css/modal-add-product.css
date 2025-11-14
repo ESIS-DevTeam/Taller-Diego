@@ -1,3 +1,6 @@
+@charset "UTF-8";
+@use 'variables' as v;
+@use 'sass:color';
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -10,8 +13,7 @@
   align-items: center;
   z-index: 10000;
   padding: 10px;
-  box-sizing: border-box;
-}
+  box-sizing: border-box; }
 
 .modal-inventory-form {
   width: 650px;
@@ -24,171 +26,141 @@
   background-color: white;
   overflow-y: auto;
   position: relative;
-  z-index: 10001;
-}
-.modal-inventory-form .modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.modal-inventory-form .modal-header h2 {
-  font-size: 40px;
-}
-.modal-inventory-form .modal-header button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  border-radius: 50px;
-  background-color: white;
-  border: 1px solid #ddd;
-  cursor: pointer;
-}
-.modal-inventory-form .modal-header .modal-info {
-  border: none;
-  font-size: 30px;
-}
-.modal-inventory-form .form-product {
-  font-size: 25px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px 60px;
-}
-.modal-inventory-form .form-product .autopart-toggle {
-  grid-column: 1/-1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 18px;
-  border: 1px dashed #cbd4e1;
-  border-radius: 10px;
-  background: #f7f9fc;
-}
-.modal-inventory-form .form-product .autopart-toggle .autopart-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-.modal-inventory-form .form-product .autopart-toggle .autopart-toggle-label input[type=checkbox] {
-  width: 20px;
-  height: 20px;
-  accent-color: #1A242F;
-}
-.modal-inventory-form .form-product .autopart-toggle .autopart-toggle-label span {
-  font-size: 18px;
-  font-weight: 600;
-  color: #233043;
-}
-.modal-inventory-form .form-product .autopart-toggle .autopart-helper {
-  font-size: 14px;
-  color: #607089;
-}
-.modal-inventory-form .form-product .auto-part-fields {
-  grid-column: 1/-1;
-  display: none;
-  margin-top: -5px;
-}
-.modal-inventory-form .form-product .auto-part-fields.is-visible {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px 60px;
-}
-.modal-inventory-form .form-product .auto-part-fields .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.modal-inventory-form .form-product .auto-part-fields .form-group .form-label {
-  font-size: 20px;
-}
-.modal-inventory-form .form-product .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.modal-inventory-form .form-product .form-group .form-label {
-  font-size: 20px;
-}
-.modal-inventory-form .form-product .form-group input, .modal-inventory-form .form-product .form-group select, .modal-inventory-form .form-product .form-group textarea {
-  width: 100%;
-  height: 30px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-.modal-inventory-form .form-product .form-group textarea {
-  height: 80px;
-  resize: none;
-  font-family: inherit;
-}
-.modal-inventory-form .form-product .form-textarea {
-  grid-column: 1/-1;
-}
-.modal-inventory-form .form-product .form-actions {
-  grid-column: 1/-1;
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-}
-.modal-inventory-form .form-product .form-actions button {
-  flex: 1;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.modal-inventory-form .form-product .form-actions .btn-save {
-  background-color: #005bb6;
-  color: white;
-}
-.modal-inventory-form .form-product .form-actions .btn-save:hover {
-  background-color: #004a94;
-}
-.modal-inventory-form .form-product .form-actions .btn-cancel {
-  background-color: #e0e0e0;
-  color: #333;
-}
-.modal-inventory-form .form-product .form-actions .btn-cancel:hover {
-  background-color: #d0d0d0;
-}
+  z-index: 10001; }
+  .modal-inventory-form .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; }
+    .modal-inventory-form .modal-header h2 {
+      font-size: 40px; }
+    .modal-inventory-form .modal-header button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      border-radius: 50px;
+      background-color: white;
+      border: 1px solid #ddd;
+      cursor: pointer; }
+    .modal-inventory-form .modal-header .modal-info {
+      border: none;
+      font-size: 30px; }
+  .modal-inventory-form .form-product {
+    font-size: 25px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 60px; }
+    .modal-inventory-form .form-product .autopart-toggle {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border: 1px dashed #cbd4e1;
+      border-radius: 10px;
+      background: #f7f9fc; }
+      .modal-inventory-form .form-product .autopart-toggle .autopart-toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer; }
+        .modal-inventory-form .form-product .autopart-toggle .autopart-toggle-label input[type="checkbox"] {
+          width: 20px;
+          height: 20px;
+          accent-color: #005bb6; }
+        .modal-inventory-form .form-product .autopart-toggle .autopart-toggle-label span {
+          font-size: 18px;
+          font-weight: 600;
+          color: #233043; }
+      .modal-inventory-form .form-product .autopart-toggle .autopart-helper {
+        font-size: 14px;
+        color: #607089; }
+    .modal-inventory-form .form-product .auto-part-fields {
+      grid-column: 1 / -1;
+      display: none;
+      margin-top: -5px; }
+      .modal-inventory-form .form-product .auto-part-fields.is-visible {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 60px; }
+      .modal-inventory-form .form-product .auto-part-fields .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; }
+        .modal-inventory-form .form-product .auto-part-fields .form-group .form-label {
+          font-size: 20px; }
+    .modal-inventory-form .form-product .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px; }
+      .modal-inventory-form .form-product .form-group .form-label {
+        font-size: 20px; }
+      .modal-inventory-form .form-product .form-group input, .modal-inventory-form .form-product .form-group select, .modal-inventory-form .form-product .form-group textarea {
+        width: 100%;
+        height: 30px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        font-size: 16px;
+        box-sizing: border-box; }
+      .modal-inventory-form .form-product .form-group textarea {
+        height: 80px;
+        resize: none;
+        font-family: inherit; }
+    .modal-inventory-form .form-product .form-textarea {
+      grid-column: 1 / -1; }
+    .modal-inventory-form .form-product .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 15px;
+      margin-top: 20px; }
+      .modal-inventory-form .form-product .form-actions button {
+        flex: 1;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease; }
+      .modal-inventory-form .form-product .form-actions .btn-save {
+        background-color: #005bb6;
+        color: white; }
+      .modal-inventory-form .form-product .form-actions .btn-save:hover {
+        background-color: #004a94; }
+      .modal-inventory-form .form-product .form-actions .btn-cancel {
+        background-color: #e0e0e0;
+        color: #333; }
+      .modal-inventory-form .form-product .form-actions .btn-cancel:hover {
+        background-color: #d0d0d0; }
 
 .autopart-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-.autopart-toggle input[type=checkbox] {
-  width: 18px;
-  height: 18px;
-  accent-color: #1A242F;
-}
+  gap: 8px; }
+  .autopart-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #005bb6; }
 
 .auto-part-fields {
   display: none;
   flex-direction: column;
-  gap: 10px;
-}
-.auto-part-fields.is-visible {
-  display: flex;
-}
+  gap: 10px; }
+  .auto-part-fields.is-visible {
+    display: flex; }
 
 @media (max-width: 800px) {
   .modal-overlay {
     margin-bottom: 20px;
     padding: 10px;
     align-items: flex-start;
-    padding-top: 50px;
-  }
+    padding-top: 50px; }
+
   .modal-inventory-form {
     width: 100%;
     max-width: 100%;
@@ -197,55 +169,74 @@
     border-radius: 0;
     margin: 0;
     box-shadow: none;
-    max-height: calc(100vh - 20px);
-  }
-  .modal-inventory-form .modal-header h2 {
-    font-size: 22px;
-  }
-  .modal-inventory-form .form-product {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    font-size: 16px;
-  }
-  .modal-inventory-form .form-product .form-group .form-label {
-    font-size: 16px;
-  }
-  .modal-inventory-form .form-product .form-group input, .modal-inventory-form .form-product .form-group select, .modal-inventory-form .form-product .form-group textarea {
-    width: 100%;
-    height: 40px;
-    border-radius: 4px;
-    font-size: 16px;
-    padding: 10px 12px;
-    box-sizing: border-box;
-  }
-  .modal-inventory-form .form-product .form-group textarea {
-    height: 80px;
-    width: 100%;
-  }
-  .modal-inventory-form .form-product .form-actions {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
-  }
-  .modal-inventory-form .form-product .form-actions button {
-    padding: 12px 20px;
-    font-size: 16px;
-    width: 100%;
-  }
-}
+    max-height: calc(100vh - 20px); }
+    .modal-inventory-form .modal-header h2 {
+      font-size: 22px; }
+    .modal-inventory-form .form-product {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      font-size: 16px; }
+      .modal-inventory-form .form-product .form-group .form-label {
+        font-size: 16px; }
+      .modal-inventory-form .form-product .form-group input, .modal-inventory-form .form-product .form-group select, .modal-inventory-form .form-product .form-group textarea {
+        width: 100%;
+        height: 40px;
+        border-radius: 4px;
+        font-size: 16px;
+        padding: 10px 12px;
+        box-sizing: border-box; }
+      .modal-inventory-form .form-product .form-group textarea {
+        height: 80px;
+        width: 100%; }
+      .modal-inventory-form .form-product .form-actions {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px; }
+        .modal-inventory-form .form-product .form-actions button {
+          padding: 12px 20px;
+          font-size: 16px;
+          width: 100%; } }
 .form-product input::placeholder,
 .form-product textarea::placeholder,
 .form-product select::placeholder {
   font-size: 14px;
-  color: #999;
-}
+  color: #999; }
 .form-product input:focus::placeholder,
 .form-product textarea:focus::placeholder {
-  color: transparent;
-}
+  color: transparent; }
 
+/* ========== RESPONSIVE: MÓVILES ========== */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-start; }
+
+  .modal-inventory-form {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    padding: 20px;
+    overflow-y: auto; }
+    .modal-inventory-form .modal-header h2 {
+      font-size: 24px; }
+    .modal-inventory-form .modal-header button {
+      width: 32px;
+      height: 32px;
+      font-size: 16px; }
+    .modal-inventory-form .modal-header .modal-info {
+      font-size: 24px; }
+    .modal-inventory-form .form-product {
+      font-size: 16px;
+      grid-template-columns: 1fr;
+      gap: 15px; }
+      .modal-inventory-form .form-product .autopart-toggle .autopart-toggle-label span {
+        font-size: 14px; }
+      .modal-inventory-form .form-product .autopart-toggle .autopart-helper {
+        font-size: 12px; } }
 * {
-  box-sizing: border-box;
-}
+  box-sizing: border-box; }
 
 /*# sourceMappingURL=modal-add-product.css.map */

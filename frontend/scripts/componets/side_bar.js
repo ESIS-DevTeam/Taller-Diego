@@ -16,7 +16,7 @@ export function loadSideBar(){
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="service.html">
                             <img src="../assets/icons/toolbox.png" alt="Servicios">
                             <span>Servicios</span>
                         </a>

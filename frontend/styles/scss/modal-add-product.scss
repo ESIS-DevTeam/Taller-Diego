@@ -83,7 +83,7 @@
         input[type="checkbox"] {
           width: 20px;
           height: 20px;
-          accent-color: v.color("primary");
+          accent-color: #005bb6;
         }
 
         span {
@@ -195,7 +195,7 @@
   input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: v.color("primary");
+    accent-color: #005bb6;
   }
 }
 
@@ -287,6 +287,59 @@
   input:focus::placeholder,
   textarea:focus::placeholder {
     color: transparent;
+  }
+}
+
+/* ========== RESPONSIVE: MÓVILES ========== */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-start;
+  }
+  
+  .modal-inventory-form {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    padding: 20px;
+    overflow-y: auto;
+    
+    .modal-header {
+      h2 {
+        font-size: 24px;
+      }
+      
+      button {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+      
+      .modal-info {
+        font-size: 24px;
+      }
+    }
+    
+    .form-product {
+      font-size: 16px;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      
+      .autopart-toggle {
+        .autopart-toggle-label {
+          span {
+            font-size: 14px;
+          }
+        }
+        
+        .autopart-helper {
+          font-size: 12px;
+        }
+      }
+    }
   }
 }
 
