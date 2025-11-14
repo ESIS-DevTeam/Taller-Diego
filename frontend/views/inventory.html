@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +11,24 @@
     <link rel="stylesheet" href="../styles/css/modal-add-product.css">
     <link rel="stylesheet" href="../styles/css/modal-confirm.css">
     <link rel="stylesheet" href="../styles/css/product-details.css">
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+    <link rel="stylesheet" href="../styles/css/notification.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
 </head>
 <body>
     <div id="header"></div>
+    
+    <div id="mobile-menu-container"></div>
+    
     <div class="container">
         <div id="side-bar-container" class="side-bar-container"></div>
-        <div id="mobile-menu-container"></div>
 
         <main class="main-content">
+            <div class="mobile-back-wrapper">
+                <button id="inventory-mobile-back-btn" class="mobile-back-button">
+                    ← Volver
+                </button>
+            </div>
+
             <h1>Gestion de inventario</h1>
             <div class="card" id="open-modal-btn">
                 <a href="#">
@@ -32,7 +41,7 @@
                     <!-- Búsqueda -->
                     <div class="search-box">
                         <img src="../assets/icons/search.png" alt="Buscar">
-                        <input type="text" data-search-input placeholder="Buscar producto...">
+                        <input id="search" type="text" data-search-input placeholder="Buscar producto...">
                     </div>
 
                     <!-- Categorías -->
@@ -47,7 +56,7 @@
                         <h4>Stock</h4>
                         <ul>
                             <li>
-                                <label>
+                                <label class="low-stock">
                                     <input type="checkbox" name="stock" data-low-stock>
                                     Stock bajo
                                 </label>
@@ -64,10 +73,6 @@
                         </div>
                     </div>
 
-                    <!-- Botón limpiar -->
-                    <div class="filter-actions">
-                        <button type="button" data-clear-filters>Limpiar filtros</button>
-                    </div>
                 </form>
             </section>
 
@@ -81,7 +86,7 @@
                     <div class="header-item" role="columnheader">Acciones</div>
                 </div>
                 
-                <div class="product-list">
+                <div class="product-list" id="product-list">
                 </div>
             </section>
         </main>
