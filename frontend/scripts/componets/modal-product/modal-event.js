@@ -2,7 +2,7 @@ import { createResource, updateResource } from "../../data-manager.js";
 import { showNotification } from "../../utils/notification.js";
 import { closeModalForm } from "./modal-product.js";
 
-export function setupModalEvents(type = 'add', productId = null ) {
+export function setupModalEvents(type = 'add', productId = null) {
   const modalOverlay = document.querySelector(".modal-overlay");
   const form = document.getElementById('form-product');
   const btnCancel = document.querySelector('.btn-cancel'); 
@@ -11,6 +11,7 @@ export function setupModalEvents(type = 'add', productId = null ) {
 
   setupCloseHandlers(modalOverlay, btnCancel, btnClose);
   setupAutopartToggle(autopartCheckbox); 
+  setupPreviewImage('product-img', 'product-preview');
   setupFormSubmit(form, autopartCheckbox,type,productId);
 }
 
@@ -101,4 +102,54 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       console.error("Error al crear producto:", error);
     }
   });
+}
+
+
+function setupPreviewImage (inputId, previewId) {
+  const input = document.getElementById(inputId);
+  const previewImg = document.getElementById(previewId);
+  const fileNameSpan = document.getElementById('file-name');
+
+  if(!input || !previewId) {
+    showNotification("Elementos no encontrados: ", "warning");
+    return ;
+  }
+
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+
+    if (!file) {
+      previewImg.style.display = 'none';
+      previewImg.classList.remove('show');
+      fileNameSpan.textContent = 'Ningún archivo seleccionado';
+      return;
+    }
+
+    fileNameSpan.textContent = file.name;
+
+    const validTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp', ];
+    if (!validTypes.includes(file.type)) {
+      showNotification('Solo se permiten imágenes JPG, JPEG, PNG y "WEBP', "info");
+      input.value = '';
+      previewImg.style.display = 'none';
+      previewImg.classList.remove('show');
+      fileNameSpan.textContent = 'Ningún archivo seleccionado';
+      return;
+    }
+
+
+    const maxSize = 20 * 1024 * 1024; // 20MB
+    if (file.size > maxSize) {
+      showNotification('La imagen no debe superar 5MB', "error");
+      input.value = '';
+      previewImg.style.display = 'none';
+      previewImg.classList.remove('show');
+      fileNameSpan.textContent = 'Ningún archivo seleccionado';
+      return;
+    }
+
+    previewImg.src = URL.createObjectURL(file);
+    previewImg.style.display = 'block';
+    previewImg.classList.add('show');
+  })
 }

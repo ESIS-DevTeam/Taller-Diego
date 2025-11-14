@@ -32,7 +32,7 @@ export function setupProductActions() {
  * @param {number} productId - ID del producto a eliminar
  */
 async function handleDeleteProduct(productId) {
-  // ✅ USAR EL MODAL PERSONALIZADO EN VEZ DE confirm()
+
   const confirmed = await confirmDelete(productId);
   
   if (!confirmed) return;

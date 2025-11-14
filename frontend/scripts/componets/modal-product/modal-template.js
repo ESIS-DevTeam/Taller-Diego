@@ -114,6 +114,21 @@ export async function generateModalHTML(type = 'add', id = null) {
                              value="${data.anio || ''}">
                   </div>
               </div>
+              <div class = "form-img">
+                <label class="form-label">Imagen del producto</label>
+                <div class="image-upload-wrapper">
+                    <label class="custom-file-upload">
+                        <input type="file" id="product-img" name="product-img" accept="image/jpeg, image/jpg, image/png, image/webp">
+                        Seleccionar imagen
+                    </label>
+                    <span class="file-name" id="file-name">Ningún archivo seleccionado</span>
+                </div>
+                <img id="product-preview" class="product-preview" alt="Vista previa">
+                <div class="image-info">
+                    <span>Formatos permitidos: JPG, PNG, WEBP</span>
+                    <span>Tamaño máximo: 20 MB</span>
+                </div>
+              </div>
               <div class="form-actions">
                   <button type="submit" class="btn-save">${isEdit ? 'Actualizar' : 'Guardar'}</button>
                   <button type="button" class="btn-cancel">Cancelar</button>
