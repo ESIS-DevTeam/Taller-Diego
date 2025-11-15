@@ -1,231 +1,183 @@
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1'; 
+import { handleApiError } from "./utils/error-handlers.js";
 
-// data-manager.js
+/**
+ * URL base para la API
+ * @constant {string}
+ */
+const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
 
+// ========================================
+// FUNCIONES GENÉRICAS
+// ========================================
 
-// Funciones para manejar los datos
-export async function getProducts() {
-  try{
-    const response = await fetch(`${API_BASE_URL}/productos`)
-    if(!response.ok){
-      throw new Error("Network response was not ok");
-    }
-    return await response.json();
-  }catch (error){
-    console.error('Error fetching products: ',error);
-    throw error;
-  }
-}
-
-export async function getProductById(id) {
-    try{
-      const response = await fetch(`${API_BASE_URL}/productos/${id}`);
-      if(!response.ok){
-        throw new Error("Network response was not ok");
-      }
-      return await response.json();
-    }catch(error){
-      console.error(`Error fetching product ${id}`, error);
-       throw error;
-    }
-}
-
-// Añadir después de getProductById
-
-export async function getAutoparteByProductId(productId) {
+/**
+ * Realiza peticiones GET a la API.
+ * @param {string} endpoint - Ruta del endpoint (ej: 'productos', 'autopartes').
+ * @param {number|null} id - ID opcional para obtener un recurso específico.
+ * @returns {Promise<Object|Array>} Datos de la respuesta en formato JSON.
+ * @throws {Error} Si la petición falla.
+ */
+export async function fetchFromApi(endpoint, id = null) {
   try {
-    const response = await fetch(`${API_BASE_URL}/autopartes/${productId}`);
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        // No es una autoparte, retornar null
-        return null;
-      }
-      throw new Error(`Error ${response.status}`);
+    let apiUrl = `${API_BASE_URL}/${endpoint}`;
+    if (id !== null) {
+      apiUrl += `/${id}`;
     }
-    
+    const response = await fetch(apiUrl);
+    checkResponseStatus(response);
+
     return await response.json();
   } catch (error) {
-    console.error(`Error obteniendo autoparte para producto ${productId}:`, error);
-    return null;
+    handleApiError(error, {
+      endpoint,
+      method: 'GET',
+      id,
+    });
   }
 }
 
-export async function addProduct(nombre, descripcion, precioVenta, precioCompra, marca, categoria, stock, stockMin, codBarras, img, tipo) {
+/**
+ * Crea un recurso en la API mediante POST.
+ * @param {string} endpoint - Ruta del endpoint.
+ * @param {Object} data - Datos a enviar en el body.
+ * @returns {Promise<Object>} Recurso creado.
+ * @throws {Error} Si la petición falla.
+ */
+export async function createResource(endpoint, data) {
   try {
-    // Asegurarse que los datos tienen el formato esperado por el backend
-    const payload = {
-      nombre,
-      descripcion,
-      precioVenta: Number(precioVenta),
-      precioCompra: Number(precioCompra),
-      marca,
-      categoria,
-      stock: Number(stock),
-      stockMin: Number(stockMin),
-      codBarras: codBarras || null,
-      img: img || "",
-      tipo: tipo || "producto"
-    };
-    
-    console.log("Enviando datos:", payload);
-    
-    const response = await fetch(`${API_BASE_URL}/productos`, { // Sin barra al final
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(data),
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error ${response.status}: ${errorText}`);
-    }
-
+    
+    checkResponseStatus(response);
+    
     return await response.json();
   } catch (error) {
-    console.error('Error creando producto:', error);
-    throw error;
-  }
-}
-
-// Mejora la función addAutoparte para manejar mejor los errores
-
-export async function addAutoparte(productoId, modelo, anio, datosProducto = {}) {
-  try {
-    // Asegurarse que los tipos de datos son correctos
-    const payload = {
-      productoId: Number(productoId),
-      modelo: modelo || "",
-      anio: Number(anio) || new Date().getFullYear(),
-      // Campos requeridos de ProductoBase
-      nombre: datosProducto.nombre || "",
-      descripcion: datosProducto.descripcion || "",
-      precioCompra: Number(datosProducto.precioCompra) || 0,
-      precioVenta: Number(datosProducto.precioVenta) || 0,
-      marca: datosProducto.marca || "",
-      categoria: datosProducto.categoria || "",
-      stock: Number(datosProducto.stock) || 0,
-      stockMin: Number(datosProducto.stockMin) || 0,
-      codBarras: datosProducto.codBarras || null,
-      img: datosProducto.img || null,
-      tipo: "autoparte"
-    };
-    
-    console.log("Enviando datos de autoparte:", payload);
-    
-    const response = await fetch(`${API_BASE_URL}/autopartes/`, {
+    handleApiError(error, {
+      endpoint, 
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
+      data,
     });
-
-    const responseData = await response.text();
-    console.log(`Respuesta del servidor (${response.status}):`, responseData);
-
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${responseData}`);
-    }
-
-    return JSON.parse(responseData);
-  } catch (error) {
-    console.error('Error creando autoparte:', error);
-    throw error;
   }
 }
 
-// Función todo-en-uno para productos con posibilidad de ser autopartes
-export async function saveProductWithDetails(productData) {
+/**
+ * Actualiza un recurso en la API mediante PUT.
+ * @param {string} endpoint - Ruta del endpoint.
+ * @param {number} id - ID del recurso a actualizar.
+ * @param {Object} data - Datos actualizados en formato JSON.
+ * @returns {Promise<Object>} Recurso actualizado.
+ * @throws {Error} Si la petición falla.
+ */
+export async function updateResource(endpoint, id, data) {
   try {
-    // 1. Crear el producto básico primero
-    const productResponse = await addProduct(
-      productData.name,
-      productData.description,
-      productData.sellingPrice,
-      productData.purchasePrice,
-      productData.brand,
-      productData.category,
-      productData.stock,
-      productData.minStock,
-      productData.barcode || null,
-      productData.image || "",
-      productData.type || "producto"
-    );
-    
-    // 2. Si es autoparte y tiene datos específicos, crear la entrada en autopartes
-    if (productData.isAutoparte && productData.model && productData.year) {
-      await addAutoparte(
-        productResponse.id, 
-        productData.model,
-        productData.year
-      );
-    }
-    
-    return productResponse;
-  } catch (error) {
-    console.error("Error guardando producto con detalles:", error);
-    throw error;
-  }
-}
-
-
-
-export async function updateProduct(id, updatedProduct) {
-  try{
-    const response = await fetch(`${API_BASE_URL}/productos/${id}`,{
+    const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        nombre: updatedProduct.nombre,
-        descripcion: updatedProduct.descripcion,
-        precioVenta: updatedProduct.precioVenta,
-        precioCompra: updatedProduct.precioCompra,
-        marca: updatedProduct.marca,
-        categoria: updatedProduct.categoria,
-        stock: updatedProduct.stock,
-        stockMin: updatedProduct.stockMin,
-        img: updatedProduct.img,
-        codBarras: updatedProduct.codBarras ?? null,
-        tipo: updatedProduct.tipo
-      })
+      body: JSON.stringify(data),
     });
-    if(!response.ok){
-      throw new Error("Network response was not ok");
-    }
+
+    checkResponseStatus(response);
+
     return await response.json();
-  }catch(error){
-    console.error(`Error update product`,error);
-    throw error;
+  } catch (error) {
+    handleApiError(error, {
+      endpoint,
+      method: 'PUT',
+      id,
+      data,
+    });
   }
 }
 
-
-
-export async function deleteProduct(id) {
+/**
+ * Elimina un recurso de la API mediante DELETE.
+ * @param {string} endpoint - Ruta del endpoint.
+ * @param {number} id - ID del recurso a eliminar.
+ * @returns {Promise<Object>} Respuesta del servidor.
+ * @throws {Error} Si la petición falla.
+ */
+export async function deleteResource(endpoint, id) {
   try {
-    console.log(`Eliminando producto ${id}...`);
-    const response = await fetch(`${API_BASE_URL}/productos/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
       method: 'DELETE',
     });
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error ${response.status}: ${errorText}`);
-    }
+    checkResponseStatus(response);
     
     return await response.json();
   } catch (error) {
-    console.error('Error eliminando producto:', error);
-    throw error;
+    handleApiError(error, {
+      endpoint,
+      method: 'DELETE',
+      id,
+    });
   }
 }
 
-export async function getProductsByCategory(category) {
-  const data = await getProducts();
-  return data.filter(product => product.categoria === category.toLowerCase());
+/**
+ * Cuenta elementos de un endpoint.
+ * @param {string} endpoint - Ruta del endpoint a contar elementos.
+ * @returns {Promise<number>} Cantidad de elementos.
+ */
+export async function countFromApi(endpoint) {
+  try {
+    const object = await fetchFromApi(endpoint);
+    if (!Array.isArray(object)) {
+      console.error('La respuesta no es un array');
+      return 0;
+    }
+    return object.length;
+  } catch (error) {
+    handleApiError(error, {
+      endpoint,
+      method: 'GET',
+    });
+    return 0;
+  }
+}
+
+// ========================================
+// FUNCIONES ESPECÍFICAS - PRODUCTOS
+// (Provisionales hasta implementación en backend)
+// ========================================
+
+/**
+ * Cuenta productos con stock menor o igual al mínimo.
+ * @returns {Promise<number>} Cantidad de productos en bajo stock.
+ */
+export async function productUnderStock() {
+  try {
+    const products = await fetchFromApi('productos');
+    const amount = products.reduce((count, product) => {
+      return count + (product.stock <= product.stockMin ? 1 : 0);
+    }, 0);
+
+    return amount;
+  } catch (error) {
+    handleApiError(error, {
+      endpoint: 'productos',
+      method: 'GET',
+    });
+    return 0;
+  }
+}
+
+/**
+ * Verifica el estado de la respuesta HTTP y lanza error si no es exitosa.
+ * @param {Response} response - Objeto Response de fetch.
+ * @throws {Error} Error con status HTTP si la respuesta no es exitosa.
+ */
+function checkResponseStatus(response) {
+  if (!response.ok) {
+    const error = new Error(`Error HTTP: ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
 }

@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, DateTime
-from db.base import Base
 from sqlalchemy.orm import relationship
+from db.base import Base
+
+
 
 class Venta(Base):
     __tablename__ = "ventas"

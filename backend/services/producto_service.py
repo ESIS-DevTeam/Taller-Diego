@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from repositories.producto_repo import ProductoRepository
 from schemas.producto_schema import ProductoCreate
 
+
+
 class ProductoService:
 
     def __init__(self, db: Session):
