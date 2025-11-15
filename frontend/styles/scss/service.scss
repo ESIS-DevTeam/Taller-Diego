@@ -60,19 +60,6 @@ body {
     font-weight: 700;
   }
 
-  /* ===== BOTÓN AGREGAR SERVICIO ===== */
-  .card {
-    grid-column: span 3;
-    min-height: 50px;
-    background: #005bb6;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    }
 
     a {
       display: flex;
@@ -166,7 +153,7 @@ body {
     /* Grid layout para las filas */
     .grid-layout {
       display: grid;
-      grid-template-columns: 2fr 3fr 1fr 1.2fr;
+      grid-template-columns: 2fr 3fr 1.2fr;
       gap: 15px;
       align-items: center;
     }
@@ -182,7 +169,7 @@ body {
       /* Fila de servicio individual */
       .service-row {
         display: grid;
-        grid-template-columns: 2fr 3fr 1fr 1.2fr;
+        grid-template-columns: 2fr 3fr 1.2fr;
         gap: 15px;
         align-items: center;
         background: white;
@@ -212,12 +199,6 @@ body {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-        }
-
-        .service-price {
-          font-weight: 700;
-          color: #27ae60;
-          font-size: 18px; // 👈 Aumentado de 16px a 18px
         }
 
         /* Botones de acción */
@@ -313,11 +294,11 @@ body {
 
     .service-data {
       .grid-layout {
-        grid-template-columns: 2fr 2.5fr 1fr 1.2fr;
+        grid-template-columns: 2fr 2.5fr 1.2fr;
       }
 
       .service-list .service-row {
-        grid-template-columns: 2fr 2.5fr 1fr 1.2fr;
+        grid-template-columns: 2fr 2.5fr 1.2fr;
       }
     }
   }
@@ -485,20 +466,6 @@ body {
               color: #666;
               display: block; // 👈 Etiqueta en su propia línea
               margin-bottom: 4px;
-            }
-          }
-
-          .service-price {
-            font-size: 15px; // 👈 Tamaño uniforme
-            text-align: left; // 👈 Alinear a la izquierda
-            width: 100%; // 👈 Ancho completo
-            
-            &::before {
-              content: "Precio: ";
-              font-weight: 700;
-              color: #666;
-              display: inline; // 👈 En la misma línea
-              margin-right: 4px;
             }
           }
 
@@ -676,6 +643,13 @@ body {
       max-height: 200px; // 👈 Altura máxima para evitar que crezca demasiado
       overflow-y: auto; // 👈 Scroll si excede la altura máxima
     }
+  }
+
+  .form-hint {
+    margin-top: -10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #666;
   }
 
   .modal-actions {

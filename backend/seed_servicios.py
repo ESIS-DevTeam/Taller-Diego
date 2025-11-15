@@ -14,28 +14,23 @@ Base.metadata.create_all(bind=engine)
 servicios_ejemplo = [
     {
         "nombre": "Cambio de Aceite",
-        "descripcion": "Cambio de aceite y filtro",
-        "precio": 40000
+        "descripcion": "Cambio de aceite y filtro"
     },
     {
         "nombre": "Alineación y Balanceo",
-        "descripcion": "Alineación y balanceo de ruedas",
-        "precio": 35000
+        "descripcion": "Alineación y balanceo de ruedas"
     },
     {
         "nombre": "Revisión de Frenos",
-        "descripcion": "Revisión completa del sistema de frenos",
-        "precio": 20000
+        "descripcion": "Revisión completa del sistema de frenos"
     },
     {
         "nombre": "Diagnóstico Computarizado",
-        "descripcion": "Escaneo computarizado del vehículo",
-        "precio": 15000
+        "descripcion": "Escaneo computarizado del vehículo"
     },
     {
         "nombre": "Cambio de Bujías",
-        "descripcion": "Cambio de bujías y revisión de sistema de encendido",
-        "precio": 30000
+        "descripcion": "Cambio de bujías y revisión de sistema de encendido"
     }
 ]
 
@@ -68,7 +63,7 @@ def seed_servicios():
         # Mostrar servicios creados
         print("\nServicios creados:")
         for servicio in db.query(Servicio).all():
-            print(f"  - {servicio.id}: {servicio.nombre} - ${servicio.precio}")
+            print(f"  - {servicio.id}: {servicio.nombre}")
             
     except Exception as e:
         print(f"❌ Error: {e}")

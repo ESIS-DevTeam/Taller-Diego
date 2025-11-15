@@ -168,7 +168,6 @@ function renderServices(servicesToRender = filteredServices) {
         <div class="service-row" data-service-id="${service.id}">
             <div class="service-name" title="${service.nombre}">${truncate(service.nombre, 50)}</div>
             <div class="service-description" title="${service.descripcion}">${truncate(service.descripcion, 100)}</div>
-            <div class="service-price">$${Number(service.precio).toLocaleString('es-CL')}</div>
             <div class="service-actions">
                 <button class="btn-edit" data-id="${service.id}" title="Editar">
                     <img class="img-edit" src="../assets/icons/edit.png" alt="Editar">
@@ -241,20 +240,7 @@ function openAddServiceModal() {
                             required
                         ></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="service-price">Precio: <small>(Máx. $9,999,999)</small></label>
-                        <input 
-                            type="number" 
-                            id="service-price" 
-                            name="precio" 
-                            placeholder="0.00"
-                            step="0.01"
-                            min="0"
-                            max="9999999"
-                            required
-                        />
-                    </div>
+                    <p class="form-hint">El precio del servicio se define al agregarlo a una orden.</p>
                     
                     <div class="modal-actions">
                         <button type="submit" class="btn-primary">Agregar</button>
@@ -328,20 +314,7 @@ function openEditServiceModal(serviceId) {
                             required
                         >${service.descripcion}</textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="service-price">Precio: <small>(Máx. $9,999,999)</small></label>
-                        <input 
-                            type="number" 
-                            id="service-price" 
-                            name="precio" 
-                            value="${service.precio}"
-                            step="0.01"
-                            min="0"
-                            max="9999999"
-                            required
-                        />
-                    </div>
+                    <p class="form-hint">El precio se asigna directamente en la orden que use este servicio.</p>
                     
                     <div class="modal-actions">
                         <button type="submit" class="btn-primary">Modificar</button>
@@ -428,8 +401,7 @@ async function handleAddService(e) {
     const formData = new FormData(e.target);
     const serviceData = {
         nombre: formData.get('nombre'),
-        descripcion: formData.get('descripcion'),
-        precio: parseFloat(formData.get('precio'))
+        descripcion: formData.get('descripcion')
     };
     
     try {
@@ -447,8 +419,7 @@ async function handleEditService(e, serviceId) {
     const formData = new FormData(e.target);
     const serviceData = {
         nombre: formData.get('nombre'),
-        descripcion: formData.get('descripcion'),
-        precio: parseFloat(formData.get('precio'))
+        descripcion: formData.get('descripcion')
     };
     
     try {

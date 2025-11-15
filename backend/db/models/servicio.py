@@ -1,24 +1,12 @@
-"""
-Modelo de datos para Servicio.
-
-Define la entidad Servicio que representa los servicios mecánicos
-ofrecidos por el taller (cambio de aceite, alineación, etc.).
-"""
-
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String
 from db.base import Base
-
+from sqlalchemy.orm import relationship
 
 class Servicio(Base):
-    """
-    Modelo de Servicio del taller.
-    
-    Representa un servicio mecánico que se puede ofrecer a los clientes,
-    con su nombre, descripción y precio.
-    """
     __tablename__ = "servicios"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
     nombre = Column(String, nullable=False, unique=True)
-    descripcion = Column(String, nullable=False)
-    precio = Column(Float, nullable=False)
+    descripcion = Column(String, nullable=False, default="")
+
+    ordenes = relationship("OrdenServicio", back_populates="servicio")
