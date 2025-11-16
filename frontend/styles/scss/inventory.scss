@@ -37,31 +37,18 @@ body {
   width: 100%;
   padding: 12px 16px;
   background: white !important;
-  border: 1px solid #ddd !important;
-  border-radius: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   font-size: 14px;
   color: #333 !important;
-  transition: all 0.2s;
   text-align: left;
+  z-index: 2000 ; 
 
-  &:hover {
-    border-color: #666 !important;
-    background: #f8f9fa !important;
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
 
   .dropdown-arrow {
-    font-size: 10px;
-    transition: transform 0.2s;
     margin-left: 8px;
-    color: #666 !important;
   }
 }
 
@@ -72,14 +59,12 @@ body {
   right: 0;
   background: white !important;
   border: 1px solid #ddd !important;
-  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   max-height: 0;
   overflow: hidden;
   opacity: 0;
   transform: translateY(-10px);
   transition: all 0.3s ease;
-  z-index: 1000;
 
   &.show {
     max-height: 400px;
@@ -94,12 +79,10 @@ body {
 
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 8px;
   }
 
   &::-webkit-scrollbar-thumb {
     background: #888;
-    border-radius: 8px;
 
     &:hover {
       background: #555;
@@ -634,15 +617,65 @@ input[type="number"] {
 
 @media (max-width: 768px) {
   body {
-    overflow-y: auto;
+    overflow-y: hidden !important;
+    height: 100vh;
+    
   }
+  body.inventory-open {
+    background-color: #ffffff !important;
+    min-height: 100vh;
+  }
+  .main-content,
+  .main-content.active {
+    gap: 0px !important;
+    margin: 0;
+    padding: 0;
+    grid-template-rows: auto !important;
+  }
+  .main-content h1 {
+    margin: 70px 0 0 0 !important;
+    padding: 0 ;
+    font-size: 20px ;
+  }
+  .main-content {
+    background-color: white;
+    gap: 0; // base sin separación
+    grid-template-rows: auto;
+    grid-auto-rows: auto;
+
+    &.active {
+      gap: 0; // evitar que el grid reintroduzca el espacio
+    }
+
+    h1 {
+      margin-bottom: 4px; // microespacio controlado
+    }
+
+    .form-inventary {
+      margin-top: 0 ;
+      padding: 0 ;
+    }
+
+    .inventary-data {
+      margin-top: 12px; // solo la tabla necesita respiración
+    }
+
+    .card {
+      display: none ; // no ocupa lugar en el grid
+    }
+  }
+
 
   .container {
     margin-top: 0;
-    padding: 10px;
+    padding: 0;
     margin-top: 35px;
-    height: auto;
-    min-height: calc(100vh - 80px);
+    padding-bottom: 250px !important;
+    height: 100vh;
+    &.active {
+      display: grid;
+      padding: 0 10px; // Solo padding lateral mínimo
+    }
   }
 
   // Mostrar dropdown, ocultar checkboxes
@@ -660,28 +693,37 @@ input[type="number"] {
     display: flex;
     inset: 0;
     justify-content: center;
-    align-items: flex-start;
-    min-height: calc(100vh - 80px);
+    align-items: center;
+    min-height: 60vh;
     padding: 20px;
     margin-top: 80px;
 
     .mobile-actions-menu {
-      display: block;
+      display: flex;
       width: 100%;
-      max-width: 500px;
+      height: max-content;
+      justify-content: center;
+      align-items: center;
 
       ul {
         list-style: none;
         padding: 0;
-        margin: 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        display: flex;
+        flex-direction: column;
         gap: 15px;
+        justify-items: center ; 
+        align-items: center ;
+        gap: 12px ;
+        width: 200px;
+        height: 200px;
+        padding: 0 8px;
 
         li {
           transition: all 0.3s ease;
-
-          &:active {
+           width: 100%;
+            display: flex;
+            justify-content: center;
+          &:active {  
             transform: scale(0.95);
           }
 
@@ -703,13 +745,13 @@ input[type="number"] {
             cursor: pointer;
 
             img {
-              width: clamp(35px, 10vw, 50px);
-              height: clamp(35px, 10vw, 50px);
+              width: 40px;
+              height: 40px;
               filter: brightness(0) invert(1);
             }
 
             span {
-              font-size: clamp(13px, 3vw, 16px);
+              font-size: 15px;
               font-weight: 500;
               text-align: center;
             }
@@ -733,10 +775,13 @@ input[type="number"] {
   }
   // Contenido principal oculto por defecto
   .main-content {
-    display: none;
-
+    display: none;;
+    gap: 0;
+    margin: 0;
+    padding: 0;
     &.active {
       display: grid;
+      gap: 15px;
     }
 
     // Mostrar botón volver
@@ -770,37 +815,53 @@ input[type="number"] {
     h1 {
       grid-column: span 12;
       font-size: 20px;
+      margin-bottom: 0;
     }
 
     .card {
-      grid-column: span 12;
-      display: none;
+      display: none !important;
     }
 
     .form-inventary {
       grid-column: span 12;
       order: 1;
       max-height: none;
-      padding: 15px;
+      padding: 15px 15px 0 15px;
+      box-shadow: none;
+      gap: 12px;
+      overflow: visible; 
+      position: relative;
+      z-index: 100;
+      margin-top: 0;
 
       h2 {
-        font-size: 18px;
+        display: none !important;
       }
 
       .inventory-form {
-        gap: 12px;
-
-        .search-box input {
-          padding: 10px 12px 10px 35px;
-          font-size: 14px;
-        }
+        display: grid;
+        grid-template-columns: repeat(5,1fr);
+        overflow: visible;
+        .search-box{
+          grid-column: span 5;
+          input {
+            padding: 10px 12px 10px 35px;
+            font-size: 14px;
+          }
+        } 
 
         .section-filter {
+          
+          border-radius: 12px;
+          padding: 0px;
+          gap: 12px;
           h4 {
+            display: none;
             font-size: 16px;
           }
 
           ul label {
+            padding: 8px 10px;
             font-size: 14px;
             padding: 5px 6px;
           }
@@ -809,6 +870,18 @@ input[type="number"] {
             padding: 8px;
             font-size: 13px;
           }
+        }
+
+        .category {
+          grid-column: span 3 !important;
+        }
+
+        .low-stock {
+          grid-column: span 2 !important;
+        }
+
+        .price-range {
+          display: none;
         }
 
         button {
@@ -821,10 +894,10 @@ input[type="number"] {
     .inventary-data {
       grid-column: span 12;
       order: 2;
-      max-height: none;
-
+      height: 55vh;
+      max-height: 57vh;
       .inventory-header {
-        grid-template-columns: 2fr 0.8fr 1fr 1fr;
+        grid-template-columns: 2fr 1fr 1fr ;
         padding: 12px 8px;
         gap: 8px;
 
@@ -833,7 +906,8 @@ input[type="number"] {
           padding: 0 4px;
 
           &:nth-child(2),
-          &:nth-child(4) {
+          &:nth-child(4),  
+          &:nth-child(5){
             display: none;
           }
 
@@ -844,15 +918,16 @@ input[type="number"] {
       }
 
       .product-list {
-        max-height: 500px;
+        max-width: auto;
 
         .product-item {
-          grid-template-columns: 2fr 0.8fr 1fr 1fr;
+          grid-template-columns: 2fr 1fr 1fr;
           padding: 10px 8px;
           gap: 8px;
 
           .product-desc,
-          .product-purchase-price {
+          .product-purchase-price,
+          .product-selling-price {
             display: none;
           }
 
@@ -862,15 +937,21 @@ input[type="number"] {
           }
 
           .product-name {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
             font-size: 13px;
-            line-height: 1.3;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word; 
           }
 
           .product-stock {
             font-size: 12px;
-            padding: 5px 4px;
+            padding: 5px 10px;
             text-align: center;
             white-space: nowrap;
+
           }
 
           .product-selling-price {
@@ -886,8 +967,8 @@ input[type="number"] {
               height: 28px;
 
               img {
-                width: 14px;
-                height: 14px;
+                width: 18px;
+                height: 18px;
               }
             }
           }
@@ -1028,13 +1109,13 @@ input[type="number"] {
         }
       }
     }
+    
   }
 
   // Menú móvil en landscape
   #mobile-menu-container {
     margin-top: 60px;
     padding: 15px;
-
     .mobile-actions-menu ul {
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
@@ -1293,3 +1374,4 @@ input[type="number"] {
     }
   }
 }
+

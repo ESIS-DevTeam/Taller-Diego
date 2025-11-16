@@ -23,11 +23,6 @@
         <div id="side-bar-container" class="side-bar-container"></div>
 
         <main class="main-content">
-            <div class="mobile-back-wrapper">
-                <button id="inventory-mobile-back-btn" class="mobile-back-button">
-                    ← Volver
-                </button>
-            </div>
 
             <h1>Gestion de inventario</h1>
             <div class="card" id="open-modal-btn">
@@ -45,14 +40,14 @@
                     </div>
 
                     <!-- Categorías -->
-                    <div class="section-filter">
+                    <div class="section-filter category">
                         <h4>Categorías</h4>
                         <ul class="category-option">
                         </ul>
                     </div>
 
                     <!-- Stock bajo -->
-                    <div class="section-filter">
+                    <div class="section-filter low-stock">
                         <h4>Stock</h4>
                         <ul>
                             <li>
@@ -64,7 +59,7 @@
                         </ul>
                     </div>
 
-                    <div class="section-filter">
+                    <div class="section-filter price-range">
                         <h4>Rango de precios</h4>
                         <div class="price-range">
                             <input type="number" placeholder="Mínimo" data-min-price>
@@ -92,7 +87,7 @@
         </main>
         
     </div>
-    <div id="modal-container"></div>
-    <script type="module" src="../scripts/inventory.js"></script>
-</body>
+  </body>
+  <div id="modal-container"></div>
+  <script type="module" src="../scripts/inventory.js"></script>
 </html>

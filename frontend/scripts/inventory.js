@@ -24,26 +24,20 @@ async function initializeInventory() {
   try {
     const products = await fetchFromApi('productos');
     
-    // ✅ 1. PRIMERO cargar UI (crea checkboxes y dropdown)
     loadFilterUI();
     
-    // ✅ 2. DESPUÉS configurar eventos (ahora los elementos existen)
     setupFilterEvents();
     
-    // ✅ 3. Inicializar búsqueda
     initializeSearch(products);
     
-    // ✅ 4. Renderizar productos
     await renderProducts();
     
-    // ✅ 5. Configurar acciones
     setupProductActions();
   } catch (error) {
     console.error('Error al inicializar inventario:', error);
   }
 }
 
-// Configurar menú móvil
 function setupMobileInventoryMenu() {
   const mobileMenu = document.getElementById("mobile-menu-container");
   const btnList = document.getElementById("inventory-mobile-btn-list");
@@ -53,28 +47,47 @@ function setupMobileInventoryMenu() {
 
   const safeAdd = (el, handler) => {
     if (!el) return;
-    // usar pointerup (compatible touch/mouse). sin preventDefault para evitar efectos raros
-    el.addEventListener("pointerup", (ev) => {
-      handler(ev);
-    }, { passive: true });
+    el.addEventListener("click", handler, { passive: false });
   };
 
-  // toggle para que no haga falta presionar dos veces
+  // Ver inventario
   safeAdd(btnList, () => {
     if (!mobileMenu || !mainContent) return;
-    mobileMenu.classList.toggle("active");
-    mainContent.classList.toggle("active");
+    mobileMenu.classList.add("active"); // oculta menú
+    mainContent.classList.add("active"); // muestra inventario
+    document.body.classList.remove("menu-open");
+    document.body.classList.add("inventory-open"); 
   });
 
-  safeAdd(btnAdd, () => {
-    openModalForm("add");
+  // Agregar producto - SOLO abre modal, NO muestra inventario
+  safeAdd(btnAdd, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Ocultar menú móvil pero NO mostrar inventario
+    if (mobileMenu && mainContent) {
+      mobileMenu.classList.add("active"); // oculta menú
+      mainContent.classList.add("active"); // muestra inventario
+      document.body.classList.remove("menu-open");
+      document.body.classList.add("inventory-open"); 
+    }
+    
+    // Abrir modal
+    setTimeout(() => {
+      openModalForm("add");
+    }, 100);
   });
 
+  // Volver al menú
   safeAdd(btnBack, () => {
     if (!mobileMenu || !mainContent) return;
-    mobileMenu.classList.add("active");
+    mobileMenu.classList.remove("active");
     mainContent.classList.remove("active");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.body.classList.add("menu-open");
+    document.body.classList.remove("inventory-open"); 
+    if (mobileMenu) {
+      mobileMenu.style.display = 'flex';
+    }
   });
 }
 
