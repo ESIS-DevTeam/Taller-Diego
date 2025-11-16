@@ -13,6 +13,11 @@ export function setupModalEvents(type = 'add', productId = null) {
   const btnClose = document.querySelector('.modal-close'); 
   const autopartCheckbox = document.getElementById('product-autopart');
 
+  //Seguridad de datos de entrada
+  setupInputNumber();
+  setupInputNumberWithCustomLimits();
+
+
   setupCloseHandlers(modalOverlay, btnCancel, btnClose);
   setupAutopartToggle(autopartCheckbox); 
   setupPreviewImage('product-img', 'product-preview');
@@ -176,3 +181,90 @@ function setupPreviewImage (inputId, previewId) {
     previewImg.classList.add('show');
   })
 }
+
+
+
+function setupInputNumber() {
+  const numberInputs = document.querySelectorAll('input[type="number"]');
+
+  numberInputs.forEach(input => {
+    // Validar en el evento "input"
+    input.addEventListener('input', (e) => {
+      const value = e.target.value;
+
+
+      const sanitizedValue = value.replace(/[^0-9.]/g, ''); // Eliminar caracteres no numéricos
+      const parts = sanitizedValue.split('.'); // Dividir por el punto decimal
+
+      e.target.value = parts.length > 2
+        ? `${parts[0]}.${parts.slice(1).join('')}`
+        : sanitizedValue;
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const allowedKeys = [
+        'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter', // Teclas de navegación
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' // Números y punto decimal
+      ];
+
+      // Prevenir teclas no permitidas
+      if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+      }
+
+      // Prevenir múltiples puntos decimales
+      if (e.key === '.' && e.target.value.includes('.')) {
+        e.preventDefault();
+      }
+    });
+  });
+}
+
+
+function setupInputNumberWithCustomLimits() {
+  // Configurar límites específicos para cada campo
+  const fieldLimits = {
+    'product-stock': 1000, // Límite máximo para el stock
+    'product-purchase-price': 5000000, // Límite máximo para el precio de compra
+    'product-selling-price': 5000000 // Límite máximo para el precio de venta
+  };
+
+  // Seleccionar todos los campos de tipo number
+  const numberInputs = document.querySelectorAll('input[type="number"]');
+
+  numberInputs.forEach(input => {
+    const maxValue = fieldLimits[input.id]; // Obtener el límite según el id del campo
+
+    if (maxValue) {
+      // Validar en el evento "input"
+      input.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value);
+
+        // Si el valor supera el máximo, ajustarlo al máximo permitido
+        if (value > maxValue) {
+          e.target.value = maxValue;
+          showNotification(`El valor no puede ser mayor a ${maxValue}`, "warning");
+        }
+      });
+
+      // Validar en el evento "keydown"
+      input.addEventListener('keydown', (e) => {
+        const allowedKeys = [
+          'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter', // Teclas de navegación
+          '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' // Números y punto decimal
+        ];
+
+        // Prevenir teclas no permitidas
+        if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+        }
+
+        // Prevenir múltiples puntos decimales
+        if (e.key === '.' && e.target.value.includes('.')) {
+          e.preventDefault();
+        }
+      });
+    }
+  });
+}
+
