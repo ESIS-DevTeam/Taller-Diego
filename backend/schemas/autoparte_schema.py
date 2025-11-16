@@ -8,13 +8,13 @@ class AutoparteBase(ProductoBase):
 
 
 class AutoparteCreate(AutoparteBase):
-    cod_barras: str | None = None
+    codBarras: str | None = None
     img: str | None = None
 
 
 class AutoparteResponse(AutoparteBase):
     id: int
-    cod_barras: str | None = None
+    codBarras: str | None = None
     img: str | None = None
 
     class Config:

@@ -37,6 +37,24 @@ export function setupViewProduct(){
       openModalForm('view',idProduct);
 
     });
+
+    const actionButtons = product.querySelectorAll('.product-actions button');
+    actionButtons.forEach(button => {
+      button.addEventListener('click', (event) => {
+        const idStr = button.getAttribute("data-id");
+        const idProduct = parseInt(idStr); 
+        event.stopPropagation(); // Detiene el clic en el botón de propagarse al contenedor
+        // Aquí puedes manejar el evento del botón (editar, eliminar, etc.)
+        
+        if(button.dataset.action === 'edit'){
+          openModalForm('edit',idProduct);
+        } 
+        if(button.dataset.action === 'delete') {
+          handleDeleteProduct(idProduct);
+        }
+      });
+    });
+
   });
 }
 

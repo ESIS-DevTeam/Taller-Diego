@@ -17,7 +17,7 @@ export function loadSideBar() {
                 
                 <!-- Opción de navegación: Inventario -->
                 <li>
-                    <a href="inventary.html">
+                    <a href="inventory.html">
                         <img src="../assets/icons/package.png" alt="Inventario" class="icon">
                         <span>Inventario</span>
                     </a>
@@ -25,7 +25,7 @@ export function loadSideBar() {
                 
                 <!-- Opción de navegación: Servicios -->
                 <li>
-                    <a href="#">
+                    <a href="service.html">
                         <img src="../assets/icons/toolbox.png" alt="Servicios" class="icon">
                         <span>Servicios</span>
                     </a>
