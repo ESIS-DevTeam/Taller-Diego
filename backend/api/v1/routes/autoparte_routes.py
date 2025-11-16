@@ -6,12 +6,16 @@ from services.autoparte_service import AutoparteService
 
 router = APIRouter(tags=["Autopartes"])
 
+
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+ 
 
 def get_autoparte_service(db: Session = Depends(get_db)) -> AutoparteService:
     return AutoparteService(db)
@@ -23,11 +27,13 @@ def create_autoparte(
 ):
     return service.create_autoparte(data)
 
+
 @router.get("/", response_model=list[AutoparteResponse])
 def list_autopartes(
     service: AutoparteService = Depends(get_autoparte_service)
 ):
     return service.list_autopartes()
+
 
 @router.get("/{id}", response_model=AutoparteResponse)
 def get_autoparte(id: int, service: AutoparteService = Depends(get_autoparte_service)):
@@ -35,6 +41,7 @@ def get_autoparte(id: int, service: AutoparteService = Depends(get_autoparte_ser
     if not autoparte:
         raise HTTPException(status_code=404, detail="Autoparte no encontrada")
     return autoparte
+
 
 @router.put("/{id}", response_model=AutoparteResponse)
 def update_autoparte(
@@ -46,6 +53,7 @@ def update_autoparte(
     if not autoparte:
         raise HTTPException(status_code=404, detail="Autoparte no encontrada")
     return autoparte
+
 
 @router.delete("/{id}")
 def delete_autoparte(id: int, service: AutoparteService = Depends(get_autoparte_service)):
@@ -61,6 +69,7 @@ def get_autopartes_by_modelo(
     service: AutoparteService = Depends(get_autoparte_service)
 ):
     return service.get_by_modelo(modelo)
+
 
 @router.get("/anio/{anio}", response_model=list[AutoparteResponse])
 def get_autopartes_by_anio(

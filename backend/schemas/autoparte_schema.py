@@ -1,16 +1,20 @@
 from .producto_schema import ProductoBase
 
+
+
 class AutoparteBase(ProductoBase):
     modelo: str
     anio: int
 
+
 class AutoparteCreate(AutoparteBase):
-    codBarras: str | None = None
+    cod_barras: str | None = None
     img: str | None = None
+
 
 class AutoparteResponse(AutoparteBase):
     id: int
-    codBarras: str | None = None
+    cod_barras: str | None = None
     img: str | None = None
 
     class Config:
