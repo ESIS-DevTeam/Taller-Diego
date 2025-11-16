@@ -1,117 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taller de Mecánica Diego</title>
-    <link rel="stylesheet" href="../styles/main.css"> 
+
+    <!-- Hojas de estilo CSS -->
+    <link rel="stylesheet" href="../styles/css/main.css"> <!-- Estilos del dashboard -->
+    <link rel="stylesheet" href="../styles/css/side_bar.css"> <!-- Estilos del menú lateral -->
+    <link rel="stylesheet" href="../styles/css/header.css"> <!-- Estilos del encabezado -->
 </head>
+
 <body>
+    <!-- Menú lateral de navegación (se carga dinámicamente con JavaScript) -->
+    <aside id="side-bar" class="side-bar-container">
+    </aside>
+
+    <!-- Encabezado superior con logo y título (se carga dinámicamente con JavaScript) -->
     <header id="header">
-        <div class="header-container">
-            <img src="../assets/images/logo.svg" alt="Logo Taller Diego" class="logo">
-            <h1>Taller Diego</h1>
-        </div>
     </header>
 
-    <div class="container">
-        <aside id="sidebar" class="sidebar">
-            <nav class="sidebar-nav">
-                <ul>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/home.png" alt="Home" class="icon">
-                            <span>Inicio</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/package.png" alt="Inventario" class="icon">
-                            <span>Inventario</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/toolbox.png" alt="Servicios" class="icon">
-                            <span>Servicios</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/checklist.png" alt="Orden de servicio" class="icon">
-                            <span>Orden</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/leader.png" alt="Personal" class="icon">
-                            <span>Personal</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-        <main class="main-content">
+    <!-- Contenedor principal del dashboard -->
+    <div class="main-content">
+        <div class="content">
+            <!-- Sección de bienvenida y alertas -->
             <section class="welcome-alert">
-                <h2>Bienvenido Diego</h2>
+                <h2>¡Bienvenido Diego!</h2>
+                <!-- Alerta de productos con bajo stock (se carga dinámicamente) -->
                 <div class="alert-content">
-                    <h3>¡5 Productos a punto de acabarse!</h3>
-                    <a href="#">Ver productos</a>
+                    <!-- Los datos se cargan dinámicamente desde main.js -->
                 </div>
             </section>
 
-            <section class="dashboard-cards">
+            <!-- Grid de tarjetas con estadísticas principales -->
+            <section class="dashboard-card-grid">
+                <!-- Tarjeta: Total de productos en inventario (se carga dinámicamente) -->
                 <article class="card">
                     <h3>Productos en inventario</h3>
-                    <p>180</p>
-                    <a href="#">Ver productos <img src="../assets/icons/right-arrow.png" alt=""></a>
+                    <p><!-- Los datos se cargan dinámicamente desde main.js --></p>
+                    <a href="#">Ver inventario <img src="../assets/icons/right-arrow.png" alt="" class="arrow"></a>
                 </article>
+
+                <!-- Tarjeta: Total de ventas recientes -->
                 <article class="card">
                     <h3>Ventas recientes</h3>
                     <p>$250.000</p>
-                    <a href="#">Ver reportes <img src="../assets/icons/right-arrow.png" alt=""></a>
+                    <a href="#">Ver reporte <img src="../assets/icons/right-arrow.png" alt="" class="arrow"></a>
                 </article>
+
+                <!-- Tarjeta: Servicios activos (se carga dinámicamente) -->
                 <article class="card">
                     <h3>Servicios activos</h3>
-                    <p>3</p>
-                    <a href="#">Gestionar <img src="../assets/icons/right-arrow.png" alt=""></a>
+                    <p><!-- Los datos se cargan dinámicamente desde main.js --></p>
+                    <a href="#">Gestionar <img src="../assets/icons/right-arrow.png" alt="" class="arrow"></a>
                 </article>
             </section>
 
-            <section class="quick-actions">
-                <h3>Acciones rápidas</h3>
-                <ul>
-                    <li><a href="#">+ Nuevo servicio</a></li>
-                    <li><a href="#">+ Agregar producto</a></li>
-                    <li><a href="#">+ Orden de servicio</a></li>
-                    <li><a href="#">+ Registro de personal</a></li>
-                    <li>
-                        <a href="#">
-                            <img src="../assets/icons/report.png" alt="Generar reporte">
-                            <span>Generar reporte</span>
-                        </a>
-                    </li>
-                </ul>
-            </section>
+            <!-- Sección inferior con acciones rápidas y actividades recientes -->
+            <section class="botton-actions">
+                <!-- Sección izquierda: Acciones rápidas -->
+                <section class="quick-actions">
+                    <h3 class="title-h3">Acciones rápidas</h3>
+                    <ul class="list-action">
+                        <!-- Botones de acciones principales -->
+                        <li class="card-action"><a href="#"><span>+ Nuevo servicio</span></a></li>
+                        <li class="card-action"><a href="#"><span>+ Agregar producto</span></a></li>
+                        <li class="card-action"><a href="#"><span>+ Orden de servicio</span></a></li>
+                        <li class="card-action"><a href="#"><span>+ Registrar personal</span></a></li>
+                        <li class="card-action"><a href="#"><span>📄 Generar reporte</span></a></li>
+                    </ul>
+                </section>
 
-            <section class="recent-activities">
-                <h2>Actividades recientes</h2>
-                <ul>
-                    <li>
-                        <p>Se realizó el cambio de aceite</p>
-                        <time datetime="2025-09-27T12:00">Hace 5 horas</time>
-                    </li>
-                    <li>
-                        <p>Nuevo servicio programado de Alex</p>
-                        <time datetime="2025-09-26T18:00">Hace 23 horas</time>
-                    </li>
-                    <li>
-                        <p>Se realizó un cambio de bujía a Fabián</p>
-                        <time datetime="2025-09-27T07:00">Hace 10 horas</time>
-                    </li>
-                </ul>
+                <!-- Sección derecha: Actividades recientes -->
+                <section class="recent-activities">
+                    <h3 class="title-h3">Actividades recientes</h3>
+                    <ul class="list-recent-activities">
+                        <!-- Actividad 1: Servicio completado -->
+                        <li class="item-recent-activities">
+                            <img src="../assets/icons/checked.svg" alt="" class="checked">
+                            <div class="item-recent-activities-text">
+                                <p>Se completó el servicio de "Cambio de Frenos" para Juan Pérez.</p>
+                                <time datetime="2025-11-03T12:00">Hace 2 horas</time>
+                            </div>
+                        </li>
+
+                        <!-- Actividad 2: Producto añadido al inventario -->
+                        <li class="item-recent-activities">
+                            <img src="../assets/icons/checked.svg" alt="" class="checked">
+                            <div class="item-recent-activities-text">
+                                <p>Se añadió "Aceite Sintético 5W-30" al inventario.</p>
+                                <time datetime="2025-11-03T07:00">Hace 5 horas</time>
+                            </div>
+                        </li>
+
+                        <!-- Actividad 3: Nuevo servicio programado -->
+                        <li class="item-recent-activities">
+                            <img src="../assets/icons/checked.svg" alt="" class="checked">
+                            <div class="item-recent-activities-text">
+                                <p>Nuevo servicio programado para María López: "Revisión de motor".</p>
+                                <time datetime="2025-11-02">Ayer</time>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
             </section>
-        </main>
+        </div>
     </div>
+
+    <!-- Script para cargar dinámicamente el menú lateral -->
+    <script type="module">
+        import { loadSideBar } from '../scripts/componets/side_bar.js';
+        document.getElementById('side-bar').innerHTML = loadSideBar();
+    </script>
+
+    <!-- Script para cargar dinámicamente el encabezado -->
+    <script type="module">
+        import { loadHeader } from '../scripts/componets/header.js';
+        document.getElementById('header').innerHTML = loadHeader();
+    </script>
+
+    <!-- Script principal: maneja DOM y carga datos dinámicos desde data-manager.js -->
+    <script type="module" src="../scripts/main.js"></script>
 </body>
+
 </html>

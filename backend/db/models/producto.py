@@ -23,6 +23,7 @@ class Producto(Base):
     ventas = relationship("VentaProducto", back_populates="producto")
 
     __mapper_args__ = {
-        'polymorphic_identity': 'producto',
+        'polymorphic_identity': 'producto', # solo acepta 'producto' como tipo base
         'polymorphic_on': tipo,
+        'with_polymorphic': '*'  # Permite cargar todos los tipos
     }

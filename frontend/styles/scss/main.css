@@ -34,6 +34,7 @@ body li {
   background-color: white;
   width: 100%;
   max-width: 1280px;
+  height: -moz-fit-content;
   height: fit-content;
   min-height: 100%;
   padding: 18px 25px;
@@ -90,9 +91,8 @@ body li {
 
 .dashboard-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(200px, 280px));
-  gap: 50px;
-  justify-content: center;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 @media (max-width: 768px) {
   .dashboard-card-grid {
@@ -668,6 +668,4 @@ li {
     height: 20px;
     min-width: 20px;
   }
-}
-
-/*# sourceMappingURL=main.css.map */
+}/*# sourceMappingURL=main.css.map */
