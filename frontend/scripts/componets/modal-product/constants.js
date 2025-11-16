@@ -1,5 +1,5 @@
 export const CATEGORIAS_PRODUCTOS = [
-    'Aceites y Lubricantes',
+    'Aceites',
     'Filtros',
     'Frenos',
     'Suspensión',

@@ -1,6 +1,6 @@
 import { createResource, updateResource } from "../../data-manager.js";
 import { showNotification } from "../../utils/notification.js";
-import { uploadImage,updateImage } from "../../utils/store/manager-image.js";
+import { uploadImage,updateImage, compressImage } from "../../utils/store/manager-image.js";
 import { closeModalForm } from "./modal-product.js";
 import { renderProducts } from "../product-list/product-list.js";
 
@@ -14,14 +14,18 @@ export function setupModalEvents(type = 'add', productId = null) {
   const autopartCheckbox = document.getElementById('product-autopart');
 
   //Seguridad de datos de entrada
+  
+  
   setupInputNumber();
   setupInputNumberWithCustomLimits();
-
-
   setupCloseHandlers(modalOverlay, btnCancel, btnClose);
   setupAutopartToggle(autopartCheckbox); 
   setupPreviewImage('product-img', 'product-preview');
-  setupFormSubmit(form, autopartCheckbox,type,productId);
+  
+  // Solo configurar submit si NO es modo view
+  if (type !== 'view') {
+    setupFormSubmit(form, autopartCheckbox, type, productId);
+  }
 }
 
 function setupAutopartToggle(autopartCheckbox) { 
@@ -97,25 +101,28 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
 
     // ENVIO DE DATOS
     try {
+      const imgInput = document.getElementById('product-img');
+      const imageFile = imgInput?.files[0];
+      const imageCompress = await compressImage(imageFile, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 0.8,
+        maxSizeBytes: 5 * 1024 * 1024
+      })
       if(isEdit){
         await updateResource(endpoint,productId, formData);
         
-        const imgInput = document.getElementById('product-img');
-        const imageFile = imgInput?.files[0];
 
         if(imageFile) {
-          const imgName =await updateImage(productId, imageFile,'productos','productos');
+          const imgName =await updateImage(productId, imageCompress,'productos','productos');
           formData.img = imgName;
           await updateResource(endpoint,productId,formData);
         }
         showNotification("Producto actualizado exitosamente", "success");
       }else{
         const newProduct = await createResource(endpoint,formData);
-        
-        const imgInput = document.getElementById('product-img');
-        const imgFile = imgInput?.files[0];
-        if(imgFile){
-          const imgName = await uploadImage(imgFile, newProduct.id , 'productos');
+        if(imageCompress){
+          const imgName = await uploadImage(imageCompress, newProduct.id , 'productos');
           formData.img = imgName;
           await updateResource(endpoint, newProduct.id,formData);
 
@@ -133,55 +140,60 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
 }
 
 
-function setupPreviewImage (inputId, previewId) {
+async function setupPreviewImage (inputId, previewId) {
   const input = document.getElementById(inputId);
   const previewImg = document.getElementById(previewId);
   const fileNameSpan = document.getElementById('file-name');
 
-  if(!input || !previewId) {
-    showNotification("Elementos no encontrados: ", "warning");
+  if(!input || !previewImg) {
     return ;
   }
 
-  input.addEventListener('change', () => {
+  input.addEventListener('change', async () => {
     const file = input.files[0];
 
     if (!file) {
       previewImg.style.display = 'none';
       previewImg.classList.remove('show');
-      fileNameSpan.textContent = 'Ningún archivo seleccionado';
+      if (fileNameSpan) fileNameSpan.textContent = 'Ningún archivo seleccionado';
       return;
     }
 
-    fileNameSpan.textContent = file.name;
-
-    const validTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp', ];
+    const validTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      showNotification('Solo se permiten imágenes JPG, JPEG, PNG y "WEBP', "info");
+      showNotification('Solo se permiten imágenes JPG, JPEG, PNG y WEBP', "info");
       input.value = '';
       previewImg.style.display = 'none';
       previewImg.classList.remove('show');
-      fileNameSpan.textContent = 'Ningún archivo seleccionado';
+      if (fileNameSpan) fileNameSpan.textContent = 'Ningún archivo seleccionado';
       return;
     }
-
 
     const maxSize = 5 * 1024 * 1024; // 5MB
+    let fileToShow = file;
+
     if (file.size > maxSize) {
-      showNotification('La imagen no debe superar 5MB', "error");
-      input.value = '';
-      previewImg.style.display = 'none';
-      previewImg.classList.remove('show');
-      fileNameSpan.textContent = 'Ningún archivo seleccionado';
-      return;
+      showNotification('La imagen supera 5MB, se comprimirá automáticamente para vista previa', 'info');
+      try {
+        fileToShow = await compressImage(file, {
+          maxWidth: 1200,
+          maxHeight: 1200,
+          quality: 0.75,
+          maxSizeBytes: maxSize
+        });
+      } catch (err) {
+        showNotification('Error al comprimir imagen', 'error');
+        input.value = '';
+        return;
+      }
     }
 
-    previewImg.src = URL.createObjectURL(file);
+    if (fileNameSpan) fileNameSpan.textContent = fileToShow.name || file.name;
+    previewImg.src = URL.createObjectURL(fileToShow);
     previewImg.style.display = 'block';
     previewImg.classList.add('show');
-  })
+  });
 }
-
 
 
 function setupInputNumber() {
@@ -267,4 +279,3 @@ function setupInputNumberWithCustomLimits() {
     }
   });
 }
-

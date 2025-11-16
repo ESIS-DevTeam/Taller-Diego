@@ -95,3 +95,109 @@ export function fetchFromImagen(fileName, bucket = 'productos') {
   const { data } = SUPABASE.storage.from(bucket).getPublicUrl(fileName);
   return data?.publicUrl || '';
 }
+
+
+
+/**
+ * Comprime / redimensiona una imagen File y devuelve un nuevo File (o Blob).
+ * @param {File} file - archivo de imagen original
+ * @param {Object} options
+ *   - maxWidth {number} ancho máximo (px). Default 1200
+ *   - maxHeight {number} alto máximo (px). Default 1200
+ *   - quality {number} 0..1 para JPEG/WEBP. Default 0.8
+ *   - mimeType {string} 'image/jpeg'|'image/webp' etc. Default preserve or 'image/jpeg'
+ *   - maxSizeBytes {number} si se alcanza, intenta comprimir; si null siempre intenta
+ * @returns {Promise<File>} archivo comprimido
+ */
+export async function compressImage(file, options = {}) {
+  if (!file || !file.type.startsWith('image/')) return file;
+
+  const {
+    maxWidth = 1200,
+    maxHeight = 1200,
+    quality = 0.8,
+    mimeType = (file.type === 'image/png' ? 'image/png' : 'image/jpeg'),
+    maxSizeBytes = null
+  } = options;
+
+  // Si el archivo ya es pequeño y existe un límite, devuelve original
+  if (maxSizeBytes && file.size <= maxSizeBytes) return file;
+
+  // Crear bitmap (mejor rendimiento que Image())
+  let imgBitmap;
+  try {
+    imgBitmap = await createImageBitmap(file);
+  } catch (err) {
+    // fallback a Image() si createImageBitmap no está disponible
+    const dataUrl = await new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.onerror = rej;
+      fr.readAsDataURL(file);
+    });
+    imgBitmap = await new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        // crear canvas y dibujar
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => {
+          createImageBitmap(blob).then(res).catch(rej);
+        }, mimeType, quality);
+      };
+      img.onerror = rej;
+      img.src = dataUrl;
+    });
+  }
+
+  const { width: srcW, height: srcH } = imgBitmap;
+  let targetW = srcW;
+  let targetH = srcH;
+
+  // calcular escala manteniendo relación de aspecto
+  const ratio = Math.min(1, maxWidth / srcW, maxHeight / srcH);
+  targetW = Math.round(srcW * ratio);
+  targetH = Math.round(srcH * ratio);
+
+  // dibujar en canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext('2d');
+
+  // opcional: fondo blanco para PNG transparentes si quieres JPG
+  if (mimeType === 'image/jpeg') {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, targetW, targetH);
+  }
+
+  ctx.drawImage(imgBitmap, 0, 0, targetW, targetH);
+
+  // convertir a blob con calidad
+  const blob = await new Promise((res) => {
+    canvas.toBlob((b) => res(b), mimeType, quality);
+  });
+
+  // Si se pidió un límite de tamaño y aún lo supera, intentar recortar quality
+  if (maxSizeBytes && blob.size > maxSizeBytes) {
+    let q = quality;
+    let compressed = blob;
+    // reducir calidad progresivamente
+    while (compressed.size > maxSizeBytes && q > 0.3) {
+      q -= 0.1;
+      // eslint-disable-next-line no-await-in-loop
+      compressed = await new Promise((res) => canvas.toBlob((b) => res(b), mimeType, q));
+    }
+    // si aún supera, devolver lo mejor que tenemos
+    if (compressed) {
+      const newFile = new File([compressed], file.name, { type: compressed.type });
+      return newFile;
+    }
+  }
+
+  const newFile = new File([blob], file.name, { type: blob.type });
+  return newFile;
+}
