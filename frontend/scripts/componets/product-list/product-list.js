@@ -1,6 +1,6 @@
 import { fetchFromApi } from "../../data-manager.js";
 import { handleApiError } from "../../utils/error-handlers.js";
-import { setupProductActions } from "./product-actions.js";
+import { setupProductActions, setupViewProduct } from "./product-actions.js";
 import { generateProductCard } from "./product-card.js";
 
 const ENDPOINT = "productos"; 
@@ -29,6 +29,7 @@ export async function renderProducts () {
     ).join('');
     
     setupProductActions();
+    setupViewProduct();
     
   } catch (error) {
     console.error("Error al cargar productos:", error);

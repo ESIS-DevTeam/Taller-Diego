@@ -28,6 +28,18 @@ export function setupProductActions() {
   });
 }
 
+export function setupViewProduct(){
+  const items = document.querySelectorAll('.product-item');
+  items.forEach(product => {
+    product.addEventListener('click' ,() =>{
+      const idStr = product.getAttribute("data-product-id");
+      const idProduct = parseInt(idStr);
+      openModalForm('view',idProduct);
+
+    });
+  });
+}
+
 /**
  * Maneja la eliminación de un producto
  * @param {number} productId - ID del producto a eliminar
