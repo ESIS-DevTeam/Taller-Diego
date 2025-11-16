@@ -45,32 +45,37 @@ async function initializeInventory() {
 
 // Configurar menú móvil
 function setupMobileInventoryMenu() {
+  const mobileMenu = document.getElementById("mobile-menu-container");
   const btnList = document.getElementById("inventory-mobile-btn-list");
   const btnAdd = document.getElementById("inventory-mobile-btn-add");
   const btnBack = document.getElementById("inventory-mobile-back-btn");
   const mainContent = document.querySelector(".main-content");
-  const mobileMenu = document.getElementById("mobile-menu-container");
 
-  if (btnList) {
-    btnList.addEventListener("click", () => {
-      mainContent?.classList.add("is-visible");
-      mobileMenu?.classList.add("is-hidden");
-    });
-  }
+  const safeAdd = (el, handler) => {
+    if (!el) return;
+    // usar pointerup (compatible touch/mouse). sin preventDefault para evitar efectos raros
+    el.addEventListener("pointerup", (ev) => {
+      handler(ev);
+    }, { passive: true });
+  };
 
-  if (btnAdd) {
-    btnAdd.addEventListener("click", () => {
-      openModalForm("add");
-    });
-  }
+  // toggle para que no haga falta presionar dos veces
+  safeAdd(btnList, () => {
+    if (!mobileMenu || !mainContent) return;
+    mobileMenu.classList.toggle("active");
+    mainContent.classList.toggle("active");
+  });
 
-  if (btnBack) {
-    btnBack.addEventListener("click", () => {
-      mainContent?.classList.remove("is-visible");
-      mobileMenu?.classList.remove("is-hidden");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  }
+  safeAdd(btnAdd, () => {
+    openModalForm("add");
+  });
+
+  safeAdd(btnBack, () => {
+    if (!mobileMenu || !mainContent) return;
+    mobileMenu.classList.add("active");
+    mainContent.classList.remove("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 }
 
 // Botón agregar producto (desktop)
@@ -81,6 +86,10 @@ document.getElementById("open-modal-btn")?.addEventListener("click", (e) => {
 
 // Inicializar cuando cargue el DOM
 document.addEventListener('DOMContentLoaded', async () => {
+  const mobileMenuContainer = document.getElementById("mobile-menu-container");
+  if (mobileMenuContainer) {
+    mobileMenuContainer.innerHTML = loadInventoryMobileMenu();
+  }
   await initializeInventory();
   setupMobileInventoryMenu();
 });
