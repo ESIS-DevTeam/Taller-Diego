@@ -1,4 +1,5 @@
 import { fetchFromApi } from '../../data-manager.js';
+import { fetchFromImagen } from '../../utils/store/manager-image.js';
 import { CATEGORIAS_PRODUCTOS } from './constants.js';
 
 export function generateCategoryOptions(selectedCategory = '') {
@@ -124,7 +125,7 @@ export async function generateModalHTML(type = 'add', id = null) {
                     </label>
                     <span class="file-name" id="file-name">Ningún archivo seleccionado</span>
                 </div>
-                ${ (isEdit && data.img) ? `<img id="product-preview" class="product-preview show" alt="Vista previa" src="${data.img}" style="display:block;max-width:100%;height:auto">` : `<img id="product-preview" class="product-preview" alt="Vista previa" style="display:none">`
+                ${ (isEdit && data.img) ? `<img id="product-preview" class="product-preview show" alt="Vista previa" src="${fetchFromImagen(data.img,'productos')}" style="display:block;max-width:100%;height:auto">` : `<img id="product-preview" class="product-preview" alt="Vista previa" style="display:none">`
                }
                 <div class="image-info">
                     <span>Formatos permitidos: JPG, PNG, WEBP</span>

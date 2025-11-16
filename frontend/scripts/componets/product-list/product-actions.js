@@ -1,8 +1,9 @@
 import { openModalForm } from '../modal-product/modal-product.js';
-import { deleteResource } from '../../data-manager.js';
+import { deleteResource, fetchFromApi } from '../../data-manager.js';
 import { showNotification } from '../../utils/notification.js';
 import { renderProducts } from './product-list.js';
 import { confirmDelete } from '../modal-confirm.js';
+import { deleteImage } from '../../utils/store/manager-image.js';
 /**
  * Configura los eventos de las acciones de productos
  */
@@ -38,7 +39,11 @@ async function handleDeleteProduct(productId) {
   if (!confirmed) return;
   
   try {
+    const product = await fetchFromApi('productos', productId);
     await deleteResource('productos', productId);
+
+
+    await deleteImage(product.img,'productos');
     showNotification('Producto eliminado exitosamente', 'success');
     
     // Recargar la lista

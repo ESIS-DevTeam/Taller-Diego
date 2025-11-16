@@ -1,5 +1,5 @@
 import { generateModalHTML } from './modal-template.js';
-import { setupModalEvents } from "./modal-event.js"; // ← QUITAR LA 'S'
+import { setupModalEvents } from "./modal-event.js"; 
 
 export async function openModalForm(type = 'add', id = null) {
   const modalContainer = document.getElementById('modal-container');

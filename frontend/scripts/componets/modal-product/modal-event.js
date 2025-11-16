@@ -1,7 +1,10 @@
 import { createResource, updateResource } from "../../data-manager.js";
 import { showNotification } from "../../utils/notification.js";
-import { uploadImage } from "../../utils/store/update-image.js";
+import { uploadImage,updateImage } from "../../utils/store/manager-image.js";
 import { closeModalForm } from "./modal-product.js";
+import { renderProducts } from "../product-list/product-list.js";
+
+
 
 export function setupModalEvents(type = 'add', productId = null) {
   const modalOverlay = document.querySelector(".modal-overlay");
@@ -89,18 +92,34 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
 
     // ENVIO DE DATOS
     try {
-      const endpoint = isAutopart ? 'autopartes' : 'productos';
       if(isEdit){
-        
         await updateResource(endpoint,productId, formData);
+        
+        const imgInput = document.getElementById('product-img');
+        const imageFile = imgInput?.files[0];
+
+        if(imageFile) {
+          const imgName =await updateImage(productId, imageFile,'productos','productos');
+          formData.img = imgName;
+          await updateResource(endpoint,productId,formData);
+        }
+        showNotification("Producto actualizado exitosamente", "success");
       }else{
-        const nameProduct = await uploadImage('product-img', formData.nombre.trim().replace(/\s+/g, "-"), 'product')
-        formData.img = nameProduct; 
-        await createResource(endpoint,formData)
+        const newProduct = await createResource(endpoint,formData);
+        
+        const imgInput = document.getElementById('product-img');
+        const imgFile = imgInput?.files[0];
+        if(imgFile){
+          const imgName = await uploadImage(imgFile, newProduct.id , 'productos');
+          formData.img = imgName;
+          await updateResource(endpoint, newProduct.id,formData);
+
+        }
+        showNotification("Producto agregado exitosamente", "success");
       }
       
-      showNotification("Producto agregado exitosamente", "success");
       closeModalForm();
+      await renderProducts();
       
     } catch (error) {
       console.error("Error al crear producto:", error);
