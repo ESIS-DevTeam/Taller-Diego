@@ -14,9 +14,10 @@ export function initializeSearch(products) {
   }
   
   fuse = new Fuse(products, {
-    keys: ['nombre'],
-    threshold: 0.4,
-    ignoreLocation: true
+    keys: ['nombre', 'descripcion'],
+    threshold: 0.3,
+    ignoreLocation: true,
+    ignoreLocation: false,
   });
 }
 
