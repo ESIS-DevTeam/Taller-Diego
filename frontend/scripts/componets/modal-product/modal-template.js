@@ -32,6 +32,7 @@ export async function generateModalHTML(type = 'add', id = null) {
       data.anio = autoparte.anio;
       data.modelo = autoparte.modelo;
     }
+
   }
   console.log(data);
   
@@ -123,7 +124,8 @@ export async function generateModalHTML(type = 'add', id = null) {
                     </label>
                     <span class="file-name" id="file-name">Ningún archivo seleccionado</span>
                 </div>
-                <img id="product-preview" class="product-preview" alt="Vista previa">
+                ${ (isEdit && data.img) ? `<img id="product-preview" class="product-preview show" alt="Vista previa" src="${data.img}" style="display:block;max-width:100%;height:auto">` : `<img id="product-preview" class="product-preview" alt="Vista previa" style="display:none">`
+               }
                 <div class="image-info">
                     <span>Formatos permitidos: JPG, PNG, WEBP</span>
                     <span>Tamaño máximo: 20 MB</span>

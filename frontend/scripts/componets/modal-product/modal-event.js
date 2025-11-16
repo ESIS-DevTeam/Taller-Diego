@@ -1,5 +1,6 @@
 import { createResource, updateResource } from "../../data-manager.js";
 import { showNotification } from "../../utils/notification.js";
+import { uploadImage } from "../../utils/store/update-image.js";
 import { closeModalForm } from "./modal-product.js";
 
 export function setupModalEvents(type = 'add', productId = null) {
@@ -90,8 +91,11 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
     try {
       const endpoint = isAutopart ? 'autopartes' : 'productos';
       if(isEdit){
+        
         await updateResource(endpoint,productId, formData);
       }else{
+        const nameProduct = await uploadImage('product-img', formData.nombre.trim().replace(/\s+/g, "-"), 'product')
+        formData.img = nameProduct; 
         await createResource(endpoint,formData)
       }
       
@@ -138,7 +142,7 @@ function setupPreviewImage (inputId, previewId) {
     }
 
 
-    const maxSize = 20 * 1024 * 1024; // 20MB
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       showNotification('La imagen no debe superar 5MB', "error");
       input.value = '';

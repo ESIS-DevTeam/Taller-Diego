@@ -1,9 +1,15 @@
 export function generateProductCard (product) {
+  let classStock = 'product-stock'; 
+  if(product.stockMin > product.stock) {
+    classStock += ' low-stock';
+  }else{
+    classStock += ' normal-stock';
+  }
   return `
   <div class="product-item" data-product-id="${product.id}">
     <div class="product-name">${product.nombre}</div>
     <div class="product-desc">${product.descripcion || 'Sin descripcion'}</div>
-    <div class="product-stock">${product.stock}</div>
+    <div class="${classStock}">${product.stock}</div>
     <div class="product-purchase-price">$${product.precioVenta}</div>
     <div class="product-selling-price">$${product.precioCompra}</div>
     <div class="product-actions">
