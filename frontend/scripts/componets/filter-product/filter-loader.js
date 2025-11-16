@@ -29,12 +29,12 @@ function createMobileDropdown() {
   const dropdownHTML = `
     <div class="category-dropdown">
       <button type="button" class="category-dropdown-toggle">
-        <span class="dropdown-text">Todas las categorías</span>
+        <span class="dropdown-text">Categorías</span>
         <span class="dropdown-arrow">▼</span>
       </button>
       <div class="category-dropdown-menu">
         <button type="button" class="category-dropdown-item active" data-category="">
-          Todas las categorías
+          Categorías
         </button>
         ${CATEGORIAS_PRODUCTOS.map(categoria => `
           <button type="button" class="category-dropdown-item" data-category="${categoria}">

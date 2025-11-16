@@ -24,6 +24,9 @@ function setupCategoryFilters() {
   });
 }
 
+
+
+
 function setupSearchFilter(){
   const searchInput = document.querySelector('[data-search-input]');
   
@@ -82,7 +85,7 @@ function setupClearFilters() {
     const firstItem = document.querySelector('.category-dropdown-item[data-category=""]');
     firstItem?.classList.add('active');
     const dropdownText = document.querySelector('.dropdown-text');
-    if (dropdownText) dropdownText.textContent = 'Todas las categorías';
+    if (dropdownText) dropdownText.textContent = 'Categorías';
     
     updateFilterState('selectedCategories', []);
     updateFilterState('lowStock', false);
