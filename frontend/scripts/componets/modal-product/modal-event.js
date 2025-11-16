@@ -236,9 +236,10 @@ function setupInputNumber() {
 function setupInputNumberWithCustomLimits() {
   // Configurar límites específicos para cada campo
   const fieldLimits = {
-    'product-stock': 1000, // Límite máximo para el stock
-    'product-purchase-price': 5000000, // Límite máximo para el precio de compra
-    'product-selling-price': 5000000 // Límite máximo para el precio de venta
+    'product-stock': 1000,
+    'product-min-stock':1000, // Límite máximo para el stock
+    'product-purchase-price': 10000000, // Límite máximo para el precio de compra
+    'product-selling-price': 10000000 // Límite máximo para el precio de venta
   };
 
   // Seleccionar todos los campos de tipo number
