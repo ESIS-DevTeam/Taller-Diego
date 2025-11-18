@@ -3,7 +3,7 @@
 // Todas las funciones y textos están documentados en español.
 
 import { productUnderStock, countFromApi } from './data-manager.js';
-
+import { bindAddProductButton } from './componets/modal-product/modal-product.js';
 // ========================================
 // HELPERS DE DOM
 // ========================================
