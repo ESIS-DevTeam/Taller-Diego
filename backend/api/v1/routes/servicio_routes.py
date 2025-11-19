@@ -30,7 +30,6 @@ def list_servicios(
     nombre: str = Query(None, description="Buscar por nombre (opcional)"),
     service: ServicioService = Depends(get_servicio_service)
 ):
-    """Obtiene servicios paginados con búsqueda opcional por nombre"""
     return service.list_servicios_paginados(pagina, cantidad, nombre)
 
 @router.get("/{id}", response_model=ServicioResponse)

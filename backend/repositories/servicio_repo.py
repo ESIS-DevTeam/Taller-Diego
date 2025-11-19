@@ -25,25 +25,13 @@ class ServicioRepository:
         return self.db.query(Servicio).filter(Servicio.nombre == nombre).first()
 
     def get_paginated(self, pagina: int = 1, cantidad_por_pagina: int = 10, nombre: str = None):
-        """Obtiene servicios paginados con búsqueda opcional por nombre"""
         query = self.db.query(Servicio)
-        
-        # Filtrar por nombre si se proporciona
         if nombre:
             query = query.filter(Servicio.nombre.ilike(f"%{nombre}%"))
-        
-        # Contar total de registros
         total = query.count()
-        
-        # Calcular skip y limit
         skip = (pagina - 1) * cantidad_por_pagina
-        
-        # Obtener servicios paginados
         servicios = query.offset(skip).limit(cantidad_por_pagina).all()
-        
-        # Calcular cantidad de páginas
         cantidad_paginas = (total + cantidad_por_pagina - 1) // cantidad_por_pagina
-        
         return {
             "data": servicios,
             "total": total,

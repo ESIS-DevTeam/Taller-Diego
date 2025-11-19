@@ -17,7 +17,6 @@ class ServicioResponse(ServicioBase):
 
 
 class ServicioPaginado(BaseModel):
-    """Schema para respuesta paginada de servicios"""
     data: list[ServicioResponse]
     total: int
     pagina: int
