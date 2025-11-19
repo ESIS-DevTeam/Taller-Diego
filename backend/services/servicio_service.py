@@ -17,6 +17,18 @@ class ServicioService:
     def list_servicios(self):
         return self.repo.get_all()
     
+    def list_servicios_paginados(self, pagina: int = 1, cantidad_por_pagina: int = 10, nombre: str = None):
+        """Retorna servicios paginados con búsqueda opcional"""
+        # Validar que pagina sea mayor a 0
+        if pagina < 1:
+            pagina = 1
+        
+        # Validar cantidad_por_pagina
+        if cantidad_por_pagina < 1 or cantidad_por_pagina > 100:
+            cantidad_por_pagina = 10
+        
+        return self.repo.get_paginated(pagina, cantidad_por_pagina, nombre)
+    
     def get_by_id(self, id: int):
         return self.repo.get_by_id(id)
     

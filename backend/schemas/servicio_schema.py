@@ -14,3 +14,12 @@ class ServicioResponse(ServicioBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ServicioPaginado(BaseModel):
+    """Schema para respuesta paginada de servicios"""
+    data: list[ServicioResponse]
+    total: int
+    pagina: int
+    cantidad_paginas: int
+    cantidad_por_pagina: int
