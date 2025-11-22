@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js';
-export const URL_STORE = "https://faxgvryumrbseucrcumv.supabase.co";
-export const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZheGd2cnl1bXJic2V1Y3JjdW12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3ODg1NjYsImV4cCI6MjA3NTM2NDU2Nn0.AMvkvHRC0ri51haShSxooMT7DQ21-LuQZE2Z1VpSFwQ";
+export const URL_STORE = "https://ybtvelrvaqlrbwcxuyqz.supabase.co";
+export const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidHZlbHJ2YXFscmJ3Y3h1eXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2NjE3NTMsImV4cCI6MjA3NzIzNzc1M30.5sEFdKQcIJqVpnjjV18W-hlIhJ5Y95WztW4Z1AEm7yA";
 
 
-export const SUPABASE = createClient(URL_STORE,ANON_KEY);
+export const SUPABASE = createClient(URL_STORE, ANON_KEY);
