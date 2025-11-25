@@ -25,14 +25,14 @@ def create_producto(
     data: ProductoCreate,
     service: ProductoService = Depends(get_producto_service)
 ):
-    return service.create_producto(data)
+    return service.create(data)
 
 
 @router.get("/", response_model=list[ProductoResponse])
 def list_productos(
     service: ProductoService = Depends(get_producto_service)
 ):
-    return service.list_productos()
+    return service.get_all()
 
 
 @router.get("/{id}", response_model=ProductoResponse)
@@ -49,7 +49,7 @@ def update_producto(
     data: ProductoCreate,
     service: ProductoService = Depends(get_producto_service)
 ):
-    producto = service.update_producto(id, data)
+    producto = service.update(id, data)
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return producto
@@ -57,7 +57,7 @@ def update_producto(
 
 @router.delete("/{id}")
 def delete_producto(id: int, service: ProductoService = Depends(get_producto_service)):
-    producto = service.delete_producto(id)
+    result = service.delete(id)
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return {"detail": "Producto eliminado"}

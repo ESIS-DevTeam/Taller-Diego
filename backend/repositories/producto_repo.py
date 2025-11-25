@@ -1,44 +1,53 @@
+"""
+Repositorio de Productos - Refactorizado con Genéricos
+Ahora hereda de BaseRepository eliminando TODO el código CRUD duplicado.
+Solo contiene métodos específicos del dominio de Producto.
+"""
 from sqlalchemy.orm import Session
 from db.models import Producto
-from schemas.producto_schema import ProductoCreate
+from repositories.base_repository import BaseRepository
 
 
-
-class ProductoRepository:
-
+class ProductoRepository(BaseRepository[Producto]):
+    """
+    Repositorio específico para Productos.
+    
+    Hereda automáticamente de BaseRepository:
+    - create(entity)
+    - get_all()
+    - get_by_id(id)
+    - update(entity)
+    - delete(id)
+    - get_by_field(field_name, value)
+    - exists(id)
+    - count()
+    
+    Solo agregamos métodos específicos de negocio si son necesarios.
+    """
+    
     def __init__(self, db: Session):
-        self.db = db
+        # Llamamos al constructor del padre pasando el modelo Producto
+        super().__init__(Producto, db)
     
-    def create(self, producto_data: ProductoCreate):
-        producto = Producto(**producto_data.model_dump())
-        self.db.add(producto)
-        self.db.commit()
-        self.db.refresh(producto)
-        return producto
-
-    def get_all(self):
-        return self.db.query(Producto).all()
+    def get_by_nombre(self, nombre: str):
+        """
+        Busca un producto por nombre.
+        Método específico del dominio de Producto.
+        """
+        return self.get_by_field("nombre", nombre)
     
-    def get_by_id(self, id: int):
-        return self.db.query(Producto).filter(Producto.id == id).first()
+    def get_by_categoria(self, categoria: str):
+        """
+        Busca productos por categoría.
+        Ejemplo de método específico de negocio.
+        """
+        return self.get_many_by_field("categoria", categoria)
     
-    def get_by_name(self, nombre: str):
-        return self.db.query(Producto).filter(Producto.nombre == nombre).first()
-
-    def update(self, id: int, producto_data: ProductoCreate):
-        producto = self.get_by_id(id)
-        if not producto:
-            return None
-        data = producto_data.model_dump(exclude_unset=True)
-        for key, value in data.items():
-            setattr(producto, key, value)
-        self.db.commit()
-        self.db.refresh(producto)
-        return producto
-    
-    def delete(self, id: int):
-        producto = self.get_by_id(id)
-        if producto:
-            self.db.delete(producto)
-            self.db.commit()
-        return producto
+    def get_productos_bajo_stock(self):
+        """
+        Obtiene productos con stock menor al mínimo.
+        Lógica específica de negocio que no está en BaseRepository.
+        """
+        return self.db.query(Producto).filter(
+            Producto.stock < Producto.stockMin
+        ).all()

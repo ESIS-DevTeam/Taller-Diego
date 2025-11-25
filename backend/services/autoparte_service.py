@@ -1,44 +1,35 @@
+"""Servicio de Autopartes - Refactorizado con Genéricos"""
 from sqlalchemy.orm import Session
 from repositories.autoparte_repo import AutoparteRepository
 from schemas.autoparte_schema import AutoparteCreate
+from services.base_service import BaseService
+from db.models.autoparte import Autoparte
 
 
-
-class AutoparteService:
+class AutoparteService(BaseService[Autoparte, AutoparteCreate, AutoparteCreate]):
+    """
+    Servicio específico para Autopartes.
+    Hereda toda la funcionalidad CRUD de BaseService.
+    """
 
     def __init__(self, db: Session):
-        self.repo = AutoparteRepository(db)
+        repository = AutoparteRepository(db)
+        super().__init__(Autoparte, repository)
+        self.repo = repository
     
-    def create_autoparte(self, data: AutoparteCreate):
-        if self.repo.get_by_name(data.nombre):
+    def _validate_create(self, data: AutoparteCreate) -> None:
+        """Valida que no exista una autoparte con el mismo nombre."""
+        if self.repo.get_by_nombre(data.nombre):
             raise ValueError("Ya existe una autoparte con ese nombre")
-        autoparte_data = data
-        autoparte = self.repo.create(autoparte_data)
-        return autoparte
     
-    def list_autopartes(self):
-        return self.repo.get_all()
-    
-    def get_by_id(self, id: int):
-        return self.repo.get_by_id(id)
-    
-    def get_by_name(self, nombre: str):
-        return self.repo.get_by_name(nombre)
-    
-    def update_autoparte(self, id: int, data: AutoparteCreate):
-        autoparte = self.repo.get_by_id(id)
-        if not autoparte:
-            raise ValueError("La autoparte no existe")
-        return self.repo.update(id, data)
-    
-    def delete_autoparte(self, id: int):
-        autoparte = self.repo.get_by_id(id)
-        if not autoparte:
-            raise ValueError("La autoparte no existe")
-        return self.repo.delete(id)
+    def get_by_nombre(self, nombre: str):
+        """Busca una autoparte por nombre."""
+        return self.repo.get_by_nombre(nombre)
     
     def get_by_modelo(self, modelo: str):
+        """Busca autopartes por modelo de vehículo."""
         return self.repo.get_by_modelo(modelo)
     
     def get_by_anio(self, anio: int):
+        """Busca autopartes por año."""
         return self.repo.get_by_anio(anio)

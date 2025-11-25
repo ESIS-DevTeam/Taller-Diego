@@ -1,19 +1,25 @@
+"""Repositorio de Órdenes - Refactorizado con Genéricos"""
 from sqlalchemy.orm import Session
 from db.models import Orden
 from sqlalchemy import Date, cast
 from db.models import OrdenServicio, Servicio
 from db.models import OrdenEmpleado, Empleado
+from repositories.base_repository import BaseRepository
 
-class OrdenRepository:
+
+class OrdenRepository(BaseRepository[Orden]):
+    """
+    Repositorio específico para Órdenes.
+    Hereda operaciones CRUD básicas y agrega lógica compleja de transacciones.
+    """
+    
     def __init__(self, db: Session):
-        self.db = db
+        super().__init__(Orden, db)
 
-    def create(self, garantia: int, estadoPago: str, precio: int, fecha):
+    def create_simple(self, garantia: int, estadoPago: str, precio: int, fecha):
+        """Crea una orden simple sin servicios ni empleados."""
         orden = Orden(garantia=garantia, estadoPago=estadoPago, precio=precio, fecha=fecha)
-        self.db.add(orden)
-        self.db.commit()
-        self.db.refresh(orden)
-        return orden
+        return super().create(orden)
 
     def create_with_services(self, garantia: int, estadoPago: str, precio: int, fecha, servicios: list[dict], empleados: list[dict] | None = None):
         orden = Orden(garantia=garantia, estadoPago=estadoPago, precio=precio, fecha=fecha)
@@ -57,20 +63,6 @@ class OrdenRepository:
         except Exception:
             self.db.rollback()
             raise
-
-    def get_all(self):
-        return self.db.query(Orden).all()
-
-    def get_by_id(self, id: int):
-        return self.db.query(Orden).filter(Orden.id == id).first()
-
-    def delete(self, id: int):
-        orden = self.get_by_id(id)
-        if orden:
-            self.db.delete(orden)
-            self.db.commit()
-            return True
-        return False
 
     def get_by_fecha(self, fecha):
         return self.db.query(Orden).filter(

@@ -1,51 +1,27 @@
+"""Repositorio de Autopartes - Refactorizado con Genéricos"""
 from sqlalchemy.orm import Session
 from db.models.autoparte import Autoparte
-from schemas.autoparte_schema import AutoparteCreate
+from repositories.base_repository import BaseRepository
 
 
-
-class AutoparteRepository:
-
+class AutoparteRepository(BaseRepository[Autoparte]):
+    """
+    Repositorio específico para Autopartes.
+    Hereda toda la funcionalidad CRUD de BaseRepository.
+    """
+    
     def __init__(self, db: Session):
-        self.db = db
+        super().__init__(Autoparte, db)
     
-    def create(self, autoparte_data: AutoparteCreate):
-        autoparte = Autoparte(**autoparte_data.model_dump())
-        self.db.add(autoparte)
-        self.db.commit()
-        self.db.refresh(autoparte)
-        return autoparte
-
-    def get_all(self):
-        return self.db.query(Autoparte).all()
+    def get_by_nombre(self, nombre: str):
+        """Busca una autoparte por nombre."""
+        return self.get_by_field("nombre", nombre)
     
-    def get_by_id(self, id: int):
-        return self.db.query(Autoparte).filter(Autoparte.id == id).first()
-    
-    def get_by_name(self, nombre: str):
-        return self.db.query(Autoparte).filter(Autoparte.nombre == nombre).first()
-
-    def update(self, id: int, autoparte_data: AutoparteCreate):
-        autoparte = self.get_by_id(id)
-        if not autoparte:
-            return None
-        data = autoparte_data.model_dump(exclude_unset=True)
-        for key, value in data.items():
-            setattr(autoparte, key, value)
-        self.db.commit()
-        self.db.refresh(autoparte)
-        return autoparte
-    
-    def delete(self, id: int):
-        autoparte = self.get_by_id(id)
-        if autoparte:
-            self.db.delete(autoparte)
-            self.db.commit()
-        return autoparte
-
     # Métodos específicos para autopartes
     def get_by_modelo(self, modelo: str):
-        return self.db.query(Autoparte).filter(Autoparte.modelo == modelo).all()
+        """Busca autopartes por modelo de vehículo."""
+        return self.get_many_by_field("modelo", modelo)
     
     def get_by_anio(self, anio: int):
-        return self.db.query(Autoparte).filter(Autoparte.anio == anio).all()
+        """Busca autopartes por año de fabricación."""
+        return self.get_many_by_field("anio", anio)

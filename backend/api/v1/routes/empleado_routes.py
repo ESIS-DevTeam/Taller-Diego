@@ -21,13 +21,13 @@ def create_empleado(
     data: EmpleadoCreate,
     service: EmpleadoService = Depends(get_empleado_service)
 ):
-    return service.create_empleado(data)
+    return service.create(data)
 
 @router.get("/", response_model=list[EmpleadoResponse])
 def list_empleados(
     service: EmpleadoService = Depends(get_empleado_service)
 ):
-    return service.list_empleados()
+    return service.get_all()
 
 @router.get("/{id}", response_model=EmpleadoResponse)
 def get_empleado(id: int, service: EmpleadoService = Depends(get_empleado_service)):
@@ -42,14 +42,14 @@ def update_empleado(
     data: EmpleadoCreate,
     service: EmpleadoService = Depends(get_empleado_service)
 ):
-    empleado = service.update_empleado(id, data)
+    empleado = service.update(id, data)
     if not empleado:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
     return empleado
 
 @router.delete("/{id}")
 def delete_empleado(id: int, service: EmpleadoService = Depends(get_empleado_service)):
-    empleado = service.delete_empleado(id)
-    if not empleado:
+    result = service.delete(id)
+    if not result:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
     return {"detail": "Empleado eliminado"}

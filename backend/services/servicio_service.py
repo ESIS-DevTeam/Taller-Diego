@@ -1,30 +1,31 @@
+"""Servicio de Servicios - Refactorizado con Genéricos"""
 from sqlalchemy.orm import Session
 from repositories.servicio_repo import ServicioRepository
 from schemas.servicio_schema import ServicioCreate
+from services.base_service import BaseService
+from db.models import Servicio
 
-class ServicioService:
+
+class ServicioService(BaseService[Servicio, ServicioCreate, ServicioCreate]):
+    """
+    Servicio específico para Servicios del taller.
+    Hereda toda la funcionalidad CRUD de BaseService.
+    """
 
     def __init__(self, db: Session):
-        self.repo = ServicioRepository(db)
+        repository = ServicioRepository(db)
+        super().__init__(Servicio, repository)
+        self.repo = repository
     
-    def create_servicio(self, data: ServicioCreate):
-        if self.repo.get_by_name(data.nombre):
+    def _validate_create(self, data: ServicioCreate) -> None:
+        """Valida que no exista un servicio con el mismo nombre."""
+        if self.repo.get_by_nombre(data.nombre):
             raise ValueError("Ya existe un servicio con ese nombre")
-        servicio_data = data
-        servicio = self.repo.create(servicio_data)
-        return servicio
     
-    def list_servicios(self):
-        return self.repo.get_all()
+    def get_by_nombre(self, nombre: str):
+        """Busca un servicio por nombre."""
+        return self.repo.get_by_nombre(nombre)
     
-    def get_by_id(self, id: int):
-        return self.repo.get_by_id(id)
-    
-    def get_by_name(self, nombre: str):
-        return self.repo.get_by_name(nombre)
-    
-    def update_servicio(self, id: int, data: ServicioCreate):
-        return self.repo.update(id, data)
-    
-    def delete_servicio(self, id: int):
-        return self.repo.delete(id)
+    def get_servicios_activos(self):
+        """Obtiene los servicios disponibles/activos."""
+        return self.repo.get_servicios_activos()

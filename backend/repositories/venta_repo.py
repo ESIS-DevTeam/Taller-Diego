@@ -1,3 +1,4 @@
+"""Repositorio de Ventas - Refactorizado con Genéricos"""
 from datetime import datetime
 
 from sqlalchemy import Date, cast
@@ -6,20 +7,22 @@ from sqlalchemy.orm import Session
 from db.models import Venta
 from db.models import VentaProducto
 from db.models import Producto
+from repositories.base_repository import BaseRepository
 
 
-
-class VentaRepository:
+class VentaRepository(BaseRepository[Venta]):
+    """
+    Repositorio específico para Ventas.
+    Hereda operaciones CRUD básicas y agrega lógica compleja de transacciones.
+    """
+    
     def __init__(self, db: Session):
-        self.db = db
+        super().__init__(Venta, db)
 
-    def create(self, fecha: datetime):
-        # Backwards-compatible create (no products)
+    def create_simple(self, fecha: datetime):
+        """Crea una venta simple sin productos (backwards-compatible)."""
         venta = Venta(fecha=fecha)
-        self.db.add(venta)
-        self.db.commit()
-        self.db.refresh(venta)
-        return venta
+        return super().create(venta)
 
     def create_with_products(self, fecha: datetime, productos: list[dict]):
 
@@ -56,20 +59,6 @@ class VentaRepository:
         except Exception:
             self.db.rollback()
             raise
-
-    def get_all(self):
-        return self.db.query(Venta).all()
-
-    def get_by_id(self, id: int):
-        return self.db.query(Venta).filter(Venta.id == id).first()
-
-    def delete(self, id: int):
-        venta = self.get_by_id(id)
-        if venta:
-            self.db.delete(venta)
-            self.db.commit()
-            return True
-        return False
 
     def get_by_fecha(self, fecha: datetime):
         return self.db.query(Venta).filter(

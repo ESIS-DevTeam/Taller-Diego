@@ -21,13 +21,13 @@ def create_servicio(
     data: ServicioCreate,
     service: ServicioService = Depends(get_servicio_service)
 ):
-    return service.create_servicio(data)
+    return service.create(data)
 
 @router.get("/", response_model=list[ServicioResponse])
 def list_servicios(
     service: ServicioService = Depends(get_servicio_service)
 ):
-    return service.list_servicios()
+    return service.get_all()
 
 @router.get("/{id}", response_model=ServicioResponse)
 def get_servicio(id: int, service: ServicioService = Depends(get_servicio_service)):
@@ -42,14 +42,14 @@ def update_servicio(
     data: ServicioCreate,
     service: ServicioService = Depends(get_servicio_service)
 ):
-    servicio = service.update_servicio(id, data)
+    servicio = service.update(id, data)
     if not servicio:
         raise HTTPException(status_code=404, detail="Servicio no encontrado")
     return servicio
 
 @router.delete("/{id}")
 def delete_servicio(id: int, service: ServicioService = Depends(get_servicio_service)):
-    servicio = service.delete_servicio(id)
-    if not servicio:
+    result = service.delete(id)
+    if not result:
         raise HTTPException(status_code=404, detail="Servicio no encontrado")
     return {"detail": "Servicio eliminado"}

@@ -25,14 +25,14 @@ def create_autoparte(
     data: AutoparteCreate,
     service: AutoparteService = Depends(get_autoparte_service)
 ):
-    return service.create_autoparte(data)
+    return service.create(data)
 
 
 @router.get("/", response_model=list[AutoparteResponse])
 def list_autopartes(
     service: AutoparteService = Depends(get_autoparte_service)
 ):
-    return service.list_autopartes()
+    return service.get_all()
 
 
 @router.get("/{id}", response_model=AutoparteResponse)
@@ -49,7 +49,7 @@ def update_autoparte(
     data: AutoparteCreate,
     service: AutoparteService = Depends(get_autoparte_service)
 ):
-    autoparte = service.update_autoparte(id, data)
+    autoparte = service.update(id, data)
     if not autoparte:
         raise HTTPException(status_code=404, detail="Autoparte no encontrada")
     return autoparte
@@ -57,8 +57,8 @@ def update_autoparte(
 
 @router.delete("/{id}")
 def delete_autoparte(id: int, service: AutoparteService = Depends(get_autoparte_service)):
-    autoparte = service.delete_autoparte(id)
-    if not autoparte:
+    result = service.delete(id)
+    if not result:
         raise HTTPException(status_code=404, detail="Autoparte no encontrada")
     return {"detail": "Autoparte eliminada"}
 
