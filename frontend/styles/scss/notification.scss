@@ -1,0 +1,111 @@
+// ========================================
+// NOTIFICACIONES - ESTILOS PRINCIPALES
+// ========================================
+// Este archivo define los estilos para las notificaciones flotantes,
+// incluyendo animaciones de entrada y salida, colores por tipo,
+// y diseño responsive.
+
+// ========================================
+// CONTENEDOR DE NOTIFICACIONES
+// ========================================
+#notification-container {
+  position: fixed; // Fijo para que siempre esté visible
+  z-index: 9999; // Prioridad alta para que esté encima de otros elementos
+  right: 20px; // Ubicación en la esquina superior derecha
+  top: 20px;
+  gap: 15px; // Espaciado entre notificaciones
+  display: flex;
+  flex-direction: column; // Apiladas verticalmente
+
+  // ========================================
+  // NOTIFICACIÓN INDIVIDUAL
+  // ========================================
+  .notification {
+    color: black; // Texto negro para mejor legibilidad
+    padding: 14px 20px; // Espaciado interno
+    border-radius: 8px; // Bordes redondeados
+    border-left: 4px solid; // Indicador de tipo con color
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); // Sombra para destacar
+    transition: all 0.3s ease; // Transición para cambios suaves
+    font-size: 18px; // Tamaño de fuente
+    min-width: 300px; // Ancho mínimo para consistencia
+    animation: slideIn 0.3s ease; // Animación de entrada
+
+    // ========================================
+    // TIPOS DE NOTIFICACIÓN
+    // ========================================
+    &.success {
+      background-color: #ecf8ee;
+      border-left-color: #3fb950; // Verde oscuro
+    }
+    &.warning {
+      background-color: #fcf5e8;
+      border-left-color: #d29922; // Naranja oscuro
+    }
+    &.error {
+      background-color: #ffefee;
+      border-left-color: #f85149; // Rojo oscuro
+    }
+    &.info {
+      background-color: #e3ecfd;
+      border-left-color: #1951b9; // Azul oscuro
+    }
+
+    // ========================================
+    // TEXTO DE LA NOTIFICACIÓN
+    // ========================================
+    p {
+      margin: 0; // Eliminar márgenes para alineación perfecta
+    }
+
+    // ========================================
+    // ANIMACIÓN DE SALIDA
+    // ========================================
+    &.hiding {
+      animation: slideOut 0.3s ease forwards; // Animación de salida
+    }
+  }
+}
+
+// ========================================
+// ANIMACIONES
+// ========================================
+// Animación de entrada: desliza desde la derecha
+@keyframes slideIn {
+  from {
+    transform: translateX(400px); // Fuera de la pantalla
+    opacity: 0; // Invisible
+  }
+  to {
+    transform: translateX(0); // Posición inicial
+    opacity: 1; // Totalmente visible
+  }
+}
+
+// Animación de salida: desliza hacia la derecha
+@keyframes slideOut {
+  from {
+    transform: translateX(0); // Posición inicial
+    opacity: 1; // Totalmente visible
+  }
+  to {
+    transform: translateX(400px); // Fuera de la pantalla
+    opacity: 0; // Invisible
+  }
+}
+
+// ========================================
+// DISEÑO RESPONSIVE
+// ========================================
+@media (max-width: 600px) {
+  #notification-container {
+    right: 10px; // Reducir margen derecho
+    top: 10px; // Reducir margen superior
+    align-items: center; // Centrar notificaciones
+  }
+
+  .notification {
+    font-size: 16px; // Reducir tamaño de fuente
+    max-width: calc(100vw - 20px); // Ajustar ancho al viewport
+  }
+}

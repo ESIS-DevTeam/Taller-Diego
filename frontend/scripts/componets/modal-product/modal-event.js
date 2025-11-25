@@ -1,0 +1,282 @@
+import { createResource, updateResource } from "../../data-manager.js";
+import { showNotification } from "../../utils/notification.js";
+import { uploadImage,updateImage, compressImage } from "../../utils/store/manager-image.js";
+import { closeModalForm } from "./modal-product.js";
+import { renderProducts } from "../product-list/product-list.js";
+
+
+
+export function setupModalEvents(type = 'add', productId = null) {
+  const modalOverlay = document.querySelector(".modal-overlay");
+  const form = document.getElementById('form-product');
+  const btnCancel = document.querySelector('.btn-cancel'); 
+  const btnClose = document.querySelector('.modal-close'); 
+  const autopartCheckbox = document.getElementById('product-autopart');
+
+  //Seguridad de datos de entrada
+  
+  
+  setupInputNumber();
+  setupInputNumberWithCustomLimits();
+  setupCloseHandlers(modalOverlay, btnCancel, btnClose);
+  setupAutopartToggle(autopartCheckbox); 
+  setupPreviewImage('product-img', 'product-preview');
+  
+  // Solo configurar submit si NO es modo view
+  if (type !== 'view') {
+    setupFormSubmit(form, autopartCheckbox, type, productId);
+  }
+}
+
+function setupAutopartToggle(autopartCheckbox) { 
+  const autopartFields = document.querySelector("[data-autopart-fields]");
+  
+  
+  const toggleAutopartFields = () => {
+    if(!autopartCheckbox) return;
+    
+    const show = autopartCheckbox.checked;
+    autopartFields?.classList.toggle("is-visible", show);
+
+    autopartFields?.querySelectorAll("input").forEach((input) => {
+      input.disabled = !show;
+      if(!show) {
+        input.value = "";
+      }
+    });
+  }
+  
+
+  if (autopartCheckbox) {
+    toggleAutopartFields();
+    autopartCheckbox.addEventListener("change", toggleAutopartFields);
+  }
+}
+
+function setupCloseHandlers(modalOverlay, btnCancel, btnClose) { 
+  const closeHandlers = () => closeModalForm();
+  btnClose?.addEventListener("click", closeHandlers);
+  btnCancel?.addEventListener("click", closeHandlers);
+
+  modalOverlay?.addEventListener("click", (event) => {
+    if (event.target === modalOverlay) {
+      closeHandlers();
+    }
+  });
+
+  const escapeHandler = (event) => {
+    if(event.key === "Escape") {
+      closeHandlers();
+      document.removeEventListener("keydown", escapeHandler);
+    }
+  }
+  document.addEventListener("keydown", escapeHandler);
+}
+
+function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null) {
+  let isEdit = (type === 'edit' && productId !== null);
+  let endpoint = "productos";
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // DATOS DEL FORMULARIO
+    let formData = {
+      nombre: form['product-name'].value.trim(),
+      marca: form['product-brand'].value.trim(),
+      categoria: form['product-category'].value,
+      stock: parseInt(form['product-stock'].value) || 0,
+      stockMin: parseInt(form['product-min-stock'].value) || 0,
+      precioCompra: parseFloat(form['product-purchase-price'].value) || 0,
+      precioVenta: parseFloat(form['product-selling-price'].value) || 0, 
+      descripcion: form['product-description'].value.trim(),
+    }
+    
+    const isAutopart = autopartCheckbox?.checked ?? false;
+
+    if(isAutopart) {
+      formData.modelo = form['product-model'].value.trim();
+      formData.anio = parseInt(form['product-year'].value, 10) || 0;
+      endpoint = "autopartes";
+    }
+
+    // ENVIO DE DATOS
+    try {
+      const imgInput = document.getElementById('product-img');
+      const imageFile = imgInput?.files[0];
+      const imageCompress = await compressImage(imageFile, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 0.8,
+        maxSizeBytes: 5 * 1024 * 1024
+      })
+      if(isEdit){
+        await updateResource(endpoint,productId, formData);
+        
+
+        if(imageFile) {
+          const imgName =await updateImage(productId, imageCompress,'productos','productos');
+          formData.img = imgName;
+          await updateResource(endpoint,productId,formData);
+        }
+        showNotification("Producto actualizado exitosamente", "success");
+      }else{
+        const newProduct = await createResource(endpoint,formData);
+        if(imageCompress){
+          const imgName = await uploadImage(imageCompress, newProduct.id , 'productos');
+          formData.img = imgName;
+          await updateResource(endpoint, newProduct.id,formData);
+
+        }
+        showNotification("Producto agregado exitosamente", "success");
+      }
+      
+      closeModalForm();
+      await renderProducts();
+      
+    } catch (error) {
+      console.error("Error al crear producto:", error);
+    }
+  });
+}
+
+
+async function setupPreviewImage (inputId, previewId) {
+  const input = document.getElementById(inputId);
+  const previewImg = document.getElementById(previewId);
+  const fileNameSpan = document.getElementById('file-name');
+
+  if(!input || !previewImg) {
+    return ;
+  }
+
+  input.addEventListener('change', async () => {
+    const file = input.files[0];
+
+    if (!file) {
+      previewImg.style.display = 'none';
+      previewImg.classList.remove('show');
+      if (fileNameSpan) fileNameSpan.textContent = 'Ningún archivo seleccionado';
+      return;
+    }
+
+    const validTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      showNotification('Solo se permiten imágenes JPG, JPEG, PNG y WEBP', "info");
+      input.value = '';
+      previewImg.style.display = 'none';
+      previewImg.classList.remove('show');
+      if (fileNameSpan) fileNameSpan.textContent = 'Ningún archivo seleccionado';
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    let fileToShow = file;
+
+    if (file.size > maxSize) {
+      showNotification('La imagen supera 5MB, se comprimirá automáticamente para vista previa', 'info');
+      try {
+        fileToShow = await compressImage(file, {
+          maxWidth: 1200,
+          maxHeight: 1200,
+          quality: 0.75,
+          maxSizeBytes: maxSize
+        });
+      } catch (err) {
+        showNotification('Error al comprimir imagen', 'error');
+        input.value = '';
+        return;
+      }
+    }
+
+    if (fileNameSpan) fileNameSpan.textContent = fileToShow.name || file.name;
+    previewImg.src = URL.createObjectURL(fileToShow);
+    previewImg.style.display = 'block';
+    previewImg.classList.add('show');
+  });
+}
+
+
+function setupInputNumber() {
+  const numberInputs = document.querySelectorAll('input[type="number"]');
+
+  numberInputs.forEach(input => {
+    // Validar en el evento "input"
+    input.addEventListener('input', (e) => {
+      const value = e.target.value;
+
+
+      const sanitizedValue = value.replace(/[^0-9.]/g, ''); // Eliminar caracteres no numéricos
+      const parts = sanitizedValue.split('.'); // Dividir por el punto decimal
+
+      e.target.value = parts.length > 2
+        ? `${parts[0]}.${parts.slice(1).join('')}`
+        : sanitizedValue;
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const allowedKeys = [
+        'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter', // Teclas de navegación
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' // Números y punto decimal
+      ];
+
+      // Prevenir teclas no permitidas
+      if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+      }
+
+      // Prevenir múltiples puntos decimales
+      if (e.key === '.' && e.target.value.includes('.')) {
+        e.preventDefault();
+      }
+    });
+  });
+}
+
+
+function setupInputNumberWithCustomLimits() {
+  // Configurar límites específicos para cada campo
+  const fieldLimits = {
+    'product-stock': 1000,
+    'product-min-stock':1000, // Límite máximo para el stock
+    'product-purchase-price': 10000000, // Límite máximo para el precio de compra
+    'product-selling-price': 10000000 // Límite máximo para el precio de venta
+  };
+
+  // Seleccionar todos los campos de tipo number
+  const numberInputs = document.querySelectorAll('input[type="number"]');
+
+  numberInputs.forEach(input => {
+    const maxValue = fieldLimits[input.id]; // Obtener el límite según el id del campo
+
+    if (maxValue) {
+      // Validar en el evento "input"
+      input.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value);
+
+        // Si el valor supera el máximo, ajustarlo al máximo permitido
+        if (value > maxValue) {
+          e.target.value = maxValue;
+          showNotification(`El valor no puede ser mayor a ${maxValue}`, "warning");
+        }
+      });
+
+      // Validar en el evento "keydown"
+      input.addEventListener('keydown', (e) => {
+        const allowedKeys = [
+          'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter', // Teclas de navegación
+          '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' // Números y punto decimal
+        ];
+
+        // Prevenir teclas no permitidas
+        if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+        }
+
+        // Prevenir múltiples puntos decimales
+        if (e.key === '.' && e.target.value.includes('.')) {
+          e.preventDefault();
+        }
+      });
+    }
+  });
+}
