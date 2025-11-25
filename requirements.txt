@@ -5,3 +5,5 @@ pydantic-settings
 sqlalchemy
 python-multipart
 psycopg2-binary
+sphinx
+sphinx-rtd-theme

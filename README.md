@@ -63,6 +63,39 @@ python .\backend\database.py
 ```bash
 uvicorn main:app --reload
 ```
+
+---
+
+## 📚 Documentación del Backend
+
+El backend incluye **documentación automática con Sphinx**.
+
+### Generar Documentación HTML
+
+**Windows:**
+```bash
+./generate-docs.bat
+```
+
+**Linux/Mac:**
+```bash
+./generate-docs.sh
+```
+
+Luego abre: `docs/_build/html/index.html`
+
+### Características de la Documentación
+
+✅ Docstrings completos en formato PEP 257/Sphinx  
+✅ Diagramas de arquitectura  
+✅ Referencia de APIs  
+✅ Ejemplos de uso  
+✅ Tema responsive (Read the Docs)
+
+Ver: [docs/README.md](docs/README.md)
+
+---
+
 ### 🗂️ Estructura del proyecto
 
 ```plaintext
