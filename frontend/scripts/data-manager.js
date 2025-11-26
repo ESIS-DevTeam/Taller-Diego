@@ -4,7 +4,7 @@ import { handleApiError } from "./utils/error-handlers.js";
  * URL base para la API
  * @constant {string}
  */
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+const API_BASE_URL = '/api/v1';
 
 // ========================================
 // FUNCIONES GENÉRICAS
