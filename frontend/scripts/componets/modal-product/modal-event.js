@@ -3,27 +3,43 @@ import { showNotification } from "../../utils/notification.js";
 import { uploadImage, updateImage, compressImage } from "../../utils/store/manager-image.js";
 import { closeModalForm } from "./modal-product.js";
 import { renderProducts } from "../product-list/product-list.js";
+import { generateBarcodeImage, downloadBarcodeImage, isValidBarcode } from "../../utils/codbarra.js";
 
 // ========================================
 // GENERADOR DE CÓDIGOS DE BARRAS
 // ========================================
 
 /**
- * Genera un código de barras único con el formato: TALLER-XXXXX-CAT
+ * Genera un código de barras único con el formato: T-A001-CAT (Base-26 alfanumérica)
  * Verifica que no exista en la base de datos antes de retornarlo
+ * 
+ * Formato: T-[LETRAS][NÚMEROS]-[CATEGORÍA]
+ * - T: Prefijo del taller
+ * - A-ZZ: Secuencia alfanumérica base-26 (A, B, ..., Z, AA, AB, ..., ZZ)
+ * - 001-999: Número secuencial con padding de 3 dígitos
+ * - CAT: Código de 3 letras de la categoría
+ * 
+ * Capacidad: 675,999 combinaciones (26 letras simples + 676 letras dobles × 999 números)
+ * 
+ * Secuencia de ejemplo:
+ * - A001 a A999 (999 productos)
+ * - B001 a Z999 (25 × 999 = 24,975 productos)
+ * - AA001 a AZ999 (26 × 999 = 25,974 productos)
+ * - BA001 a ZZ999 (650 × 999 = 649,350 productos)
  * 
  * @param {string} categoria - Categoría del producto (ej: "Filtros", "Aceites")
  * @param {number} lastId - Último ID registrado en la base de datos
  * @param {Array} existingBarcodes - Array de códigos existentes para verificar unicidad
- * @returns {string} Código de barras único generado (ej: "TALLER-00001-FIL")
+ * @returns {string} Código de barras único generado (ej: "T-A001-FIL")
  * 
  * @example
- * generateBarcode("Filtros", 45, ["TALLER-00046-ACE"]) // "TALLER-00046-FIL"
- * generateBarcode("Aceites", 0, [])  // "TALLER-00001-ACE"
+ * generateBarcode("Filtros", 0, [])    // "T-A001-FIL"
+ * generateBarcode("Aceites", 999, [])  // "T-B001-ACE"
+ * generateBarcode("Filtros", 25999, []) // "T-AA001-FIL"
  */
 function generateBarcode(categoria, lastId, existingBarcodes = []) {
   // Prefijo fijo del taller
-  const prefix = "TALLER";
+  const prefix = "T";
 
   // Generar sufijo de 3 letras basado en la categoría
   const categorySuffix = getCategorySuffix(categoria);
@@ -33,11 +49,14 @@ function generateBarcode(categoria, lastId, existingBarcodes = []) {
 
   // Intentar generar un código único
   while (attempts < maxAttempts) {
-    // Generar número correlativo con padding de 5 dígitos
-    const nextNumber = (lastId + 1 + attempts).toString().padStart(5, '0');
+    const totalNumber = lastId + 1 + attempts;
 
-    // Formato final: TALLER-00001-FIL
-    const barcode = `${prefix}-${nextNumber}-${categorySuffix}`;
+    // Convertir a sistema base-26 alfanumérico
+    // Secuencia: A001-A999, B001-B999, ..., Z001-Z999, AA001-AA999, ..., ZZ999
+    const lettersAndNumber = convertToBase26(totalNumber);
+
+    // Formato final: T-A001-FIL
+    const barcode = `${prefix}-${lettersAndNumber}-${categorySuffix}`;
 
     // Verificar si el código ya existe
     if (!existingBarcodes.includes(barcode)) {
@@ -50,10 +69,53 @@ function generateBarcode(categoria, lastId, existingBarcodes = []) {
   }
 
   // Si después de 100 intentos no se encuentra un código único, agregar timestamp
-  const timestamp = Date.now().toString().slice(-4);
-  const fallbackBarcode = `${prefix}-${timestamp}-${categorySuffix}`;
+  const timestamp = Date.now().toString().slice(-3);
+  const randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  const fallbackBarcode = `${prefix}-${randomLetter}${timestamp}-${categorySuffix}`;
   console.error(`❌ No se pudo generar código único, usando timestamp: ${fallbackBarcode}`);
   return fallbackBarcode;
+}
+
+/**
+ * Convierte un número a formato base-26 alfanumérico (A001-ZZ999)
+ * 
+ * @param {number} num - Número a convertir (1-675999)
+ * @returns {string} Código en formato base-26 (ej: "A001", "B342", "AA001", "ZZ999")
+ * 
+ * @example
+ * convertToBase26(1)     // "A001"
+ * convertToBase26(999)   // "A999"
+ * convertToBase26(1000)  // "B001"
+ * convertToBase26(25999) // "Z999"
+ * convertToBase26(26000) // "AA001"
+ */
+function convertToBase26(num) {
+  // Cada letra cubre 999 números
+  const numbersPerLetter = 999;
+
+  // Calcular índice de letra (0-based)
+  const letterIndex = Math.floor((num - 1) / numbersPerLetter);
+
+  // Calcular el número dentro del grupo (1-999)
+  const numberPart = ((num - 1) % numbersPerLetter) + 1;
+
+  // Convertir índice a letras (A, B, ..., Z, AA, AB, ..., ZZ)
+  let letters = '';
+  if (letterIndex < 26) {
+    // Letras simples: A-Z (índices 0-25)
+    letters = String.fromCharCode(65 + letterIndex);
+  } else {
+    // Letras dobles: AA-ZZ (índices 26+)
+    const doubleIndex = letterIndex - 26;
+    const firstLetter = String.fromCharCode(65 + Math.floor(doubleIndex / 26));
+    const secondLetter = String.fromCharCode(65 + (doubleIndex % 26));
+    letters = firstLetter + secondLetter;
+  }
+
+  // Formatear número con padding de 3 dígitos
+  const formattedNumber = numberPart.toString().padStart(3, '0');
+
+  return `${letters}${formattedNumber}`;
 }
 
 /**
@@ -189,12 +251,16 @@ export function setupModalEvents(type = 'add', productId = null) {
 
   //Seguridad de datos de entrada
 
-
   setupInputNumber();
   setupInputNumberWithCustomLimits();
   setupCloseHandlers(modalOverlay, btnCancel, btnClose);
   setupAutopartToggle(autopartCheckbox);
   setupPreviewImage('product-img', 'product-preview');
+
+  // Configurar código de barras si existe (solo en modo view/edit)
+  if (type === 'view' || type === 'edit') {
+    setupBarcodeDisplay(productId);
+  }
 
   // Solo configurar submit si NO es modo view
   if (type !== 'view') {
@@ -495,3 +561,47 @@ function setupInputNumberWithCustomLimits() {
     }
   });
 }
+
+// ========================================
+// CONFIGURACIÓN DE CÓDIGO DE BARRAS
+// ========================================
+
+/**
+ * Configura la visualización y descarga del código de barras en el modal
+ * Solo se ejecuta si el producto tiene código asignado
+ * 
+ * @param {number} productId - ID del producto
+ */
+async function setupBarcodeDisplay(productId) {
+  try {
+    if (typeof JsBarcode === 'undefined') {
+      console.warn('⚠️ JsBarcode no está disponible');
+      return;
+    }
+
+    const producto = await fetchFromApi('productos', productId);
+    if (!producto || !producto.codBarras) return;
+
+    console.log(`🔖 Configurando código de barras: ${producto.codBarras}`);
+
+    if (!isValidBarcode(producto.codBarras)) {
+      console.error('❌ Código no válido');
+      return;
+    }
+
+    generateBarcodeImage('product-barcode', producto.codBarras, producto.nombre);
+
+    const container = document.getElementById('barcode-container');
+    if (container) {
+      container.addEventListener('click', async () => {
+        const downloaded = await downloadBarcodeImage(producto.codBarras, producto.nombre);
+        if (downloaded) {
+          showNotification(`Código descargado: ${producto.codBarras}`, 'success');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('❌ Error:', error);
+  }
+}
+
