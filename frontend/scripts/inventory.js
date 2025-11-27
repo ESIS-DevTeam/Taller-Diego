@@ -63,10 +63,11 @@ async function initializeInventory() {
 }
 
 function setupMobileInventoryMenu() {
-  const mobileMenu = document.getElementById("mobile-menu-container");
+  const mobileMenu = document.querySelector("#mobile-menu-container");
   const btnList = document.getElementById("inventory-mobile-btn-list");
   const btnAdd = document.getElementById("inventory-mobile-btn-add");
   const btnBack = document.getElementById("inventory-mobile-back-btn");
+  const btnBackMenu = document.querySelector(".btn-back-menu"); // ← NUEVO: botón volver al menú
   const mainContent = document.querySelector(".main-content");
 
   const safeAdd = (el, handler) => {
@@ -102,8 +103,20 @@ function setupMobileInventoryMenu() {
     }, 100);
   });
 
-  // Volver al menú
+  // Volver al menú desde el botón de la parte superior
   safeAdd(btnBack, () => {
+    if (!mobileMenu || !mainContent) return;
+    mobileMenu.classList.remove("active");
+    mainContent.classList.remove("active");
+    document.body.classList.add("menu-open");
+    document.body.classList.remove("inventory-open");
+    if (mobileMenu) {
+      mobileMenu.style.display = 'flex';
+    }
+  });
+
+  // Volver al menú desde el botón dentro del formulario (NUEVO)
+  safeAdd(btnBackMenu, () => {
     if (!mobileMenu || !mainContent) return;
     mobileMenu.classList.remove("active");
     mainContent.classList.remove("active");
