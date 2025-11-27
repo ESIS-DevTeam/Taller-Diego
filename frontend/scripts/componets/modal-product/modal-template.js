@@ -3,52 +3,52 @@ import { fetchFromImagen } from '../../utils/store/manager-image.js';
 import { CATEGORIAS_PRODUCTOS } from './constants.js';
 
 export function generateCategoryOptions(selectedCategory = '', disabled = false) {
-    return CATEGORIAS_PRODUCTOS.map(cat => 
+    return CATEGORIAS_PRODUCTOS.map(cat =>
         `<option value="${cat}" ${selectedCategory === cat ? 'selected' : ''} ${disabled ? 'disabled' : ''}>${cat}</option>`
     ).join('');
 }
 
 export async function generateModalHTML(type = 'add', id = null) {
-  const isEdit = (type === 'edit' && id !== null);
-  const isView = (type === 'view' && id !== null);
-  const isReadOnly = isView;
-  
-  let title = 'Agregar';
-  if (isEdit) title = 'Editar';
-  if (isView) title = 'Detalles del';
-  
-  const required = (isEdit || isView) ? '' : 'required';
-  const disabled = isReadOnly ? 'disabled' : '';
-  const readonly = isReadOnly ? 'readonly' : '';
-  
-  let data = {
-    nombre: '',
-    marca: '',
-    categoria: '',
-    stock: '',
-    stockMin: '',
-    precioCompra: '',
-    precioVenta: '',
-    descripcion: '',
-    modelo: '',
-    anio: '',
-    img: '',
-    tipo: ''
-  };
-  
-  if(isEdit || isView) {
-    data = await fetchFromApi("productos", id);
-    if(data.tipo === "autoparte") {
-      let autoparte = await fetchFromApi("autopartes", id);
-      data.anio = autoparte.anio;
-      data.modelo = autoparte.modelo;
-    }
-  }
-  
-  const categoryOptions = generateCategoryOptions(data.categoria, isReadOnly);
-  const isAutoparte = data.tipo === 'autoparte' || data.modelo || data.anio;
+    const isEdit = (type === 'edit' && id !== null);
+    const isView = (type === 'view' && id !== null);
+    const isReadOnly = isView;
 
-  return `
+    let title = 'Agregar';
+    if (isEdit) title = 'Editar';
+    if (isView) title = 'Detalles del';
+
+    const required = (isEdit || isView) ? '' : 'required';
+    const disabled = isReadOnly ? 'disabled' : '';
+    const readonly = isReadOnly ? 'readonly' : '';
+
+    let data = {
+        nombre: '',
+        marca: '',
+        categoria: '',
+        stock: '',
+        stockMin: '',
+        precioCompra: '',
+        precioVenta: '',
+        descripcion: '',
+        modelo: '',
+        anio: '',
+        img: '',
+        tipo: ''
+    };
+
+    if (isEdit || isView) {
+        data = await fetchFromApi("productos", id);
+        if (data.tipo === "autoparte") {
+            let autoparte = await fetchFromApi("autopartes", id);
+            data.anio = autoparte.anio;
+            data.modelo = autoparte.modelo;
+        }
+    }
+
+    const categoryOptions = generateCategoryOptions(data.categoria, isReadOnly);
+    const isAutoparte = data.tipo === 'autoparte' || data.modelo || data.anio;
+
+    return `
   <div class="modal-overlay">
       <div class="modal-inventory-form ${isView ? 'view-mode' : ''}">
           <div class="modal-header">
@@ -100,6 +100,7 @@ export async function generateModalHTML(type = 'add', id = null) {
                          step="0.01" placeholder="${isEdit || isView ? data.precioVenta : 'Ej: 200.00'}"
                          value="${data.precioVenta}" ${required} min="0" ${readonly}>
               </div>
+
               <div class="form-group">
                   <label for="product-description" class="form-label">Descripción</label>
                   <textarea id="product-description" name="product-description" 
@@ -140,10 +141,10 @@ export async function generateModalHTML(type = 'add', id = null) {
                     <span class="file-name" id="file-name">Ningún archivo seleccionado</span>
                 </div>
                 ` : ''}
-                ${(isEdit || isView) && data.img ? 
-                  `<img id="product-preview" class="product-preview show" alt="Vista previa" src="${fetchFromImagen(data.img,'productos')}" style="display:block;max-width:100%;height:auto;border-radius:8px;margin-top:12px;">` : 
-                  `<img id="product-preview" class="product-preview" alt="Vista previa" style="display:none">`
-                }
+                ${(isEdit || isView) && data.img ?
+            `<img id="product-preview" class="product-preview show" alt="Vista previa" src="${fetchFromImagen(data.img, 'productos')}" style="display:block;max-width:100%;height:auto;border-radius:8px;margin-top:12px;">` :
+            `<img id="product-preview" class="product-preview" alt="Vista previa" style="display:none">`
+        }
                 ${!isView ? `
                 <div class="image-info">
                     <span>Formatos permitidos: JPG, PNG, WEBP</span>
@@ -152,6 +153,21 @@ export async function generateModalHTML(type = 'add', id = null) {
                 ` : ''}
               </div>
               
+              <! -- Código de barras -->
+              ${(isEdit || isView) && data.codBarras ? `
+              <div class="form-group barcode-group">
+                  <label class="form-label">Código de barras</label>
+                  <div class="barcode-container" id="barcode-container" 
+                       title="Haz clic para descargar la imagen"
+                       style="cursor: pointer; padding: 4px; border: 1px solid #ddd; border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                      <svg id="product-barcode"></svg>
+                      <p style="margin: 0; font-size: 12px; color: #3498db; font-weight: 500; white-space: nowrap;">
+                        Haz clic para<br>descargar
+                      </p>
+                  </div>
+              </div>
+              ` : ''}
+
               <div class="form-actions">
                   ${!isView ? `
                   <button type="submit" class="btn-save">${isEdit ? 'Actualizar' : 'Guardar'}</button>
