@@ -263,6 +263,9 @@ body {
   color: #2c3e50;
   font-weight: 700;
 }
+.main-content .form-inventary .btn-back-menu {
+  display: none;
+}
 .main-content .form-inventary .inventory-form {
   display: flex;
   flex-direction: column;
@@ -440,23 +443,15 @@ body {
   justify-content: center;
   font-weight: 200;
 }
-.main-content .inventary-data .product-list .product-item .product-name {
+.main-content .inventary-data .product-list .product-item .product-name,
+.main-content .inventary-data .product-list .product-item .product-desc {
   color: #1a1a1a;
   justify-content: flex-start;
   white-space: nowrap;
   text-overflow: ellipsis;
-  overflow: hidden;
   max-width: 100%;
   display: block;
-}
-.main-content .inventary-data .product-list .product-item .product-desc {
-  color: #555;
-  justify-content: flex-start;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 100%;
-  display: block;
 }
 .main-content .inventary-data .product-list .product-item .product-stock {
   font-size: 16px;
@@ -603,8 +598,9 @@ input[type=number] {
 }
 @media (max-width: 768px) {
   body {
-    overflow-y: hidden !important;
-    height: 100vh;
+    overflow-y: auto !important;
+    height: auto;
+    min-height: 100dvh;
   }
   body.inventory-open {
     background-color: #ffffff !important;
@@ -638,6 +634,14 @@ input[type=number] {
     margin-top: 0;
     padding: 0;
   }
+  .main-content .form-inventary .btn-back-menu {
+    display: block;
+    color: white;
+    padding: 10px 15px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: none;
+  }
   .main-content .inventary-data {
     margin-top: 12px;
   }
@@ -646,10 +650,11 @@ input[type=number] {
   }
   .container {
     margin-top: 0;
-    padding: 0;
-    margin-top: 35px;
+    padding: 90px 15px 40px 15px;
+    min-height: 100dvh;
     padding-bottom: 250px !important;
-    height: 100vh;
+    height: auto;
+    display: none;
   }
   .container.active {
     display: grid;
@@ -665,35 +670,35 @@ input[type=number] {
   #mobile-menu-container {
     display: flex;
     inset: 0;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-    padding: 20px;
-    margin-top: 80px;
+    min-height: 100vh;
+    padding: 16vh 30px 0 30px;
   }
   #mobile-menu-container .mobile-actions-menu {
     display: flex;
     width: 100%;
-    height: max-content;
+    height: 100%;
     justify-content: center;
     align-items: center;
   }
   #mobile-menu-container .mobile-actions-menu ul {
     list-style: none;
-    padding: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 15px;
     justify-items: center;
     align-items: center;
-    gap: 12px;
-    width: 200px;
-    height: 200px;
-    padding: 0 8px;
+    justify-content: center;
+    gap: 15px;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
   }
   #mobile-menu-container .mobile-actions-menu ul li {
     transition: all 0.3s ease;
     width: 100%;
+    height: 100%;
+    max-width: 250px;
+    max-height: 250px;
     display: flex;
     justify-content: center;
   }
@@ -839,13 +844,17 @@ input[type=number] {
   .main-content .inventary-data {
     grid-column: span 12;
     order: 2;
-    height: 55vh;
-    max-height: 57vh;
+    height: auto;
+    min-height: 200;
+    max-height: none;
+    margin-bottom: 20px;
+    top: 80px;
   }
   .main-content .inventary-data .inventory-header {
     grid-template-columns: 2fr 1fr 1fr;
     padding: 12px 8px;
     gap: 8px;
+    flex-shrink: 0;
   }
   .main-content .inventary-data .inventory-header .header-item {
     font-size: 13px;
@@ -858,7 +867,9 @@ input[type=number] {
     justify-content: flex-start;
   }
   .main-content .inventary-data .product-list {
-    max-width: auto;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 200px;
   }
   .main-content .inventary-data .product-list .product-item {
     grid-template-columns: 2fr 1fr 1fr;
@@ -875,10 +886,9 @@ input[type=number] {
     font-size: 13px;
   }
   .main-content .inventary-data .product-list .product-item .product-name {
-    display: -webkit-box;
+    display: block;
     -webkit-box-orient: vertical;
     font-size: 13px;
-    -webkit-line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
@@ -1189,28 +1199,6 @@ input[type=number] {
   }
   .category-option li {
     display: block !important;
-  }
-}
-@media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-  #mobile-menu-container {
-    padding: 15px;
-  }
-  #mobile-menu-container .mobile-actions-menu ul {
-    gap: 12px;
-    max-width: 400px;
-  }
-}
-@media (max-width: 375px) {
-  #mobile-menu-container .mobile-actions-menu ul {
-    max-width: 320px;
-    gap: 10px;
-  }
-  #mobile-menu-container .mobile-actions-menu ul li button {
-    gap: 8px;
-    padding: 12px;
   }
 }
 
