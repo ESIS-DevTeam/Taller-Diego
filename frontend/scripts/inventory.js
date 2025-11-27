@@ -21,20 +21,44 @@ if (mobileMenuContainer) {
 
 // Inicializar inventario
 async function initializeInventory() {
+  const perfStart = performance.now();
+
   try {
+    // 1. Cargar productos del API (una sola vez)
+    const fetchStart = performance.now();
     const products = await fetchFromApi('productos');
-    
+    const fetchEnd = performance.now();
+
+    // 2. Cargar UI de filtros (categorías)
+    const filterUIStart = performance.now();
     loadFilterUI();
-    
+    const filterUIEnd = performance.now();
+
+    // 3. Configurar eventos de filtros
+    const eventsStart = performance.now();
     setupFilterEvents();
-    
+    const eventsEnd = performance.now();
+
+    // 4. Inicializar búsqueda con Fuse.js
+    const searchStart = performance.now();
     initializeSearch(products);
-    
-    await renderProducts();
-    
+    const searchEnd = performance.now();
+
+    // 5. Renderizar productos (pasa los productos ya cargados)
+    const renderStart = performance.now();
+    await renderProducts(products);
+    const renderEnd = performance.now();
+
+    // 6. Configurar acciones de productos  
+    const actionsStart = performance.now();
     setupProductActions();
+    const actionsEnd = performance.now();
+
+    const perfEnd = performance.now();
+    const totalTime = perfEnd - perfStart;
+
   } catch (error) {
-    console.error('Error al inicializar inventario:', error);
+    console.error('❌ Error al inicializar inventario:', error);
   }
 }
 
@@ -56,22 +80,22 @@ function setupMobileInventoryMenu() {
     mobileMenu.classList.add("active"); // oculta menú
     mainContent.classList.add("active"); // muestra inventario
     document.body.classList.remove("menu-open");
-    document.body.classList.add("inventory-open"); 
+    document.body.classList.add("inventory-open");
   });
 
   // Agregar producto - SOLO abre modal, NO muestra inventario
   safeAdd(btnAdd, (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Ocultar menú móvil pero NO mostrar inventario
     if (mobileMenu && mainContent) {
       mobileMenu.classList.add("active"); // oculta menú
       mainContent.classList.add("active"); // muestra inventario
       document.body.classList.remove("menu-open");
-      document.body.classList.add("inventory-open"); 
+      document.body.classList.add("inventory-open");
     }
-    
+
     // Abrir modal
     setTimeout(() => {
       openModalForm("add");
@@ -84,7 +108,7 @@ function setupMobileInventoryMenu() {
     mobileMenu.classList.remove("active");
     mainContent.classList.remove("active");
     document.body.classList.add("menu-open");
-    document.body.classList.remove("inventory-open"); 
+    document.body.classList.remove("inventory-open");
     if (mobileMenu) {
       mobileMenu.style.display = 'flex';
     }
