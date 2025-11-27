@@ -11,6 +11,7 @@ import { showSuccess, showError, showWarning } from "./utils/notification.js";
 
 const API_BASE_URL = 'http://127.0.0.1:8080/api/v1';
 
+
 // ========== MENÚ MÓVIL PARA SERVICIOS ==========
 function loadServiceMobileMenu() {
   return `
