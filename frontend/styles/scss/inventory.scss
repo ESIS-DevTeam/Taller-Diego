@@ -420,11 +420,21 @@ body {
         .product-name {
           color: #1a1a1a;
           justify-content: flex-start;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          max-width: 100%;
+          display: block;
         }
 
         .product-desc {
           color: #555;
           justify-content: flex-start;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          max-width: 100%;
+          display: block;
         }
 
         .product-stock {

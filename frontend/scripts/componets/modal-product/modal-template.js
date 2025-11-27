@@ -3,24 +3,24 @@ import { fetchFromImagen } from '../../utils/store/manager-image.js';
 import { CATEGORIAS_PRODUCTOS } from './constants.js';
 
 export function generateCategoryOptions(selectedCategory = '', disabled = false) {
-    return CATEGORIAS_PRODUCTOS.map(cat => 
-        `<option value="${cat}" ${selectedCategory === cat ? 'selected' : ''} ${disabled ? 'disabled' : ''}>${cat}</option>`
-    ).join('');
+  return CATEGORIAS_PRODUCTOS.map(cat =>
+    `<option value="${cat}" ${selectedCategory === cat ? 'selected' : ''} ${disabled ? 'disabled' : ''}>${cat}</option>`
+  ).join('');
 }
 
 export async function generateModalHTML(type = 'add', id = null) {
   const isEdit = (type === 'edit' && id !== null);
   const isView = (type === 'view' && id !== null);
   const isReadOnly = isView;
-  
+
   let title = 'Agregar';
   if (isEdit) title = 'Editar';
   if (isView) title = 'Detalles del';
-  
+
   const required = (isEdit || isView) ? '' : 'required';
   const disabled = isReadOnly ? 'disabled' : '';
   const readonly = isReadOnly ? 'readonly' : '';
-  
+
   let data = {
     nombre: '',
     marca: '',
@@ -35,16 +35,16 @@ export async function generateModalHTML(type = 'add', id = null) {
     img: '',
     tipo: ''
   };
-  
-  if(isEdit || isView) {
+
+  if (isEdit || isView) {
     data = await fetchFromApi("productos", id);
-    if(data.tipo === "autoparte") {
+    if (data.tipo === "autoparte") {
       let autoparte = await fetchFromApi("autopartes", id);
       data.anio = autoparte.anio;
       data.modelo = autoparte.modelo;
     }
   }
-  
+
   const categoryOptions = generateCategoryOptions(data.categoria, isReadOnly);
   const isAutoparte = data.tipo === 'autoparte' || data.modelo || data.anio;
 
@@ -59,13 +59,13 @@ export async function generateModalHTML(type = 'add', id = null) {
           <form class="form-product" id="form-product" name="form-product">
               <div class="form-group">
                   <label for="product-name" class="form-label">Nombre del producto</label>
-                  <input type="text" id="product-name" name="product-name" 
+                  <input maxlength="50" type="text" id="product-name" name="product-name" 
                          placeholder="${isEdit || isView ? data.nombre : 'Ej: Filtro de aceite'}"
                          value="${data.nombre}" ${required} ${readonly}>
               </div>
               <div class="form-group">
                   <label for="product-brand" class="form-label">Marca</label>
-                  <input type="text" id="product-brand" name="product-brand" 
+                  <input maxlength="40" type="text" id="product-brand" name="product-brand" 
                          placeholder="${isEdit || isView ? data.marca : 'Ej: Toyota'}"
                          value="${data.marca}" ${readonly}>
               </div>
@@ -102,7 +102,7 @@ export async function generateModalHTML(type = 'add', id = null) {
               </div>
               <div class="form-group">
                   <label for="product-description" class="form-label">Descripción</label>
-                  <textarea id="product-description" name="product-description" 
+                  <textarea maxlength="500" id="product-description" name="product-description" 
                             placeholder="${isEdit || isView ? data.descripcion : 'Descripción del producto...'}" ${readonly}>${data.descripcion}</textarea>
               </div>
               ${!isView ? `
@@ -117,13 +117,13 @@ export async function generateModalHTML(type = 'add', id = null) {
               <div class="auto-part-fields ${isAutoparte ? 'is-visible' : ''}" data-autopart-fields>
                   <div class="form-group">
                       <label for="product-model" class="form-label">Modelo compatible</label>
-                      <input type="text" id="product-model" name="product-model" 
+                      <input maxlength="100" type="text" id="product-model" name="product-model" 
                              placeholder="${isEdit || isView ? data.modelo : 'Ej: Toyota Corolla'}"
                              value="${data.modelo || ''}" ${readonly}>
                   </div>
                   <div class="form-group">
                       <label for="product-year" class="form-label">Año compatible</label>
-                      <input type="text" id="product-year" name="product-year" 
+                      <input maxlength="40" type="text" id="product-year" name="product-year" 
                              placeholder="${isEdit || isView ? data.anio : 'Ej: 2022, 2023'}"
                              value="${data.anio || ''}" ${readonly}>
                   </div>
@@ -140,10 +140,10 @@ export async function generateModalHTML(type = 'add', id = null) {
                     <span class="file-name" id="file-name">Ningún archivo seleccionado</span>
                 </div>
                 ` : ''}
-                ${(isEdit || isView) && data.img ? 
-                  `<img id="product-preview" class="product-preview show" alt="Vista previa" src="${fetchFromImagen(data.img,'productos')}" style="display:block;max-width:100%;height:auto;border-radius:8px;margin-top:12px;">` : 
-                  `<img id="product-preview" class="product-preview" alt="Vista previa" style="display:none">`
-                }
+                ${(isEdit || isView) && data.img ?
+      `<img id="product-preview" class="product-preview show" alt="Vista previa" src="${fetchFromImagen(data.img, 'productos')}" style="display:block;max-width:100%;height:auto;border-radius:8px;margin-top:12px;">` :
+      `<img id="product-preview" class="product-preview" alt="Vista previa" style="display:none">`
+    }
                 ${!isView ? `
                 <div class="image-info">
                     <span>Formatos permitidos: JPG, PNG, WEBP</span>

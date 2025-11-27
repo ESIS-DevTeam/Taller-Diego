@@ -443,10 +443,20 @@ body {
 .main-content .inventary-data .product-list .product-item .product-name {
   color: #1a1a1a;
   justify-content: flex-start;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+  display: block;
 }
 .main-content .inventary-data .product-list .product-item .product-desc {
   color: #555;
   justify-content: flex-start;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+  display: block;
 }
 .main-content .inventary-data .product-list .product-item .product-stock {
   font-size: 16px;
