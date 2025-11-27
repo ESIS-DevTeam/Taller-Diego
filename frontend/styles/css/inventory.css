@@ -443,8 +443,7 @@ body {
   justify-content: center;
   font-weight: 200;
 }
-.main-content .inventary-data .product-list .product-item .product-name,
-.main-content .inventary-data .product-list .product-item .product-desc {
+.main-content .inventary-data .product-list .product-item .product-name, .main-content .inventary-data .product-list .product-item .product-desc {
   color: #1a1a1a;
   justify-content: flex-start;
   white-space: nowrap;
@@ -636,6 +635,7 @@ input[type=number] {
   }
   .main-content .form-inventary .btn-back-menu {
     display: block;
+    background-color: #005bb6;
     color: white;
     padding: 10px 15px;
     font-weight: 700;
@@ -1201,5 +1201,3 @@ input[type=number] {
     display: block !important;
   }
 }
-
-/*# sourceMappingURL=inventory.css.map */

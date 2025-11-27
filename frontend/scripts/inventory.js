@@ -14,10 +14,7 @@ document.getElementById("side-bar-container").innerHTML = loadSideBar();
 document.getElementById("header").innerHTML = loadHeader();
 
 // Cargar menú móvil
-const mobileMenuContainer = document.getElementById("mobile-menu-container");
-if (mobileMenuContainer) {
-  mobileMenuContainer.innerHTML = loadInventoryMobileMenu();
-}
+// Removed duplicate mobile menu loading; it will be loaded on DOMContentLoaded
 
 // Inicializar inventario
 async function initializeInventory() {
@@ -69,7 +66,7 @@ function setupMobileInventoryMenu() {
   const btnBack = document.getElementById("inventory-mobile-back-btn");
   const btnBackMenu = document.querySelector(".btn-back-menu"); // ← NUEVO: botón volver al menú
   const mainContent = document.querySelector(".main-content");
-
+  const container = document.querySelector(".container");
   const safeAdd = (el, handler) => {
     if (!el) return;
     el.addEventListener("click", handler, { passive: false });
@@ -77,9 +74,10 @@ function setupMobileInventoryMenu() {
 
   // Ver inventario
   safeAdd(btnList, () => {
-    if (!mobileMenu || !mainContent) return;
+    if (!mobileMenu || !mainContent || !container) return;
     mobileMenu.classList.add("active"); // oculta menú
     mainContent.classList.add("active"); // muestra inventario
+    container.classList.add("active"); // mantiene side‑bar visible en móvil
     document.body.classList.remove("menu-open");
     document.body.classList.add("inventory-open");
   });
@@ -88,16 +86,7 @@ function setupMobileInventoryMenu() {
   safeAdd(btnAdd, (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Ocultar menú móvil pero NO mostrar inventario
-    if (mobileMenu && mainContent) {
-      mobileMenu.classList.add("active"); // oculta menú
-      mainContent.classList.add("active"); // muestra inventario
-      document.body.classList.remove("menu-open");
-      document.body.classList.add("inventory-open");
-    }
-
-    // Abrir modal
+    // Solo abrir el modal para agregar producto, sin mostrar inventario ni ocultar el menú
     setTimeout(() => {
       openModalForm("add");
     }, 100);
@@ -105,25 +94,27 @@ function setupMobileInventoryMenu() {
 
   // Volver al menú desde el botón de la parte superior
   safeAdd(btnBack, () => {
-    if (!mobileMenu || !mainContent) return;
+    if (!mobileMenu || !mainContent || !container) return;
     mobileMenu.classList.remove("active");
     mainContent.classList.remove("active");
+    container.classList.remove("active");
     document.body.classList.add("menu-open");
     document.body.classList.remove("inventory-open");
     if (mobileMenu) {
-      mobileMenu.style.display = 'flex';
+      mobileMenu.style.display = '';
     }
   });
 
   // Volver al menú desde el botón dentro del formulario (NUEVO)
   safeAdd(btnBackMenu, () => {
-    if (!mobileMenu || !mainContent) return;
+    if (!mobileMenu || !mainContent || !container) return;
     mobileMenu.classList.remove("active");
     mainContent.classList.remove("active");
+    container.classList.remove("active");
     document.body.classList.add("menu-open");
     document.body.classList.remove("inventory-open");
     if (mobileMenu) {
-      mobileMenu.style.display = 'flex';
+      mobileMenu.style.display = '';
     }
   });
 }
