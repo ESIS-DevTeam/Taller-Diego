@@ -9,8 +9,9 @@ import { loadSideBar } from "./componets/side_bar.js";
 import { loadHeader } from "./componets/header.js";
 import { showSuccess, showError, showWarning } from "./utils/notification.js";
 
-const API_BASE_URL = 'http://127.0.0.1:8080/api/v1';
-
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000/api/v1'  // Desarrollo local
+  : '/api/v1';
 
 // ========== MENÚ MÓVIL PARA SERVICIOS ==========
 function loadServiceMobileMenu() {
@@ -50,7 +51,7 @@ let filteredServices = [];
 // ========== API: OBTENER SERVICIOS ==========
 async function getServices() {
   try {
-    const response = await fetch(`${API_BASE_URL}/servicios`);
+    const response = await fetch(`${API_BASE_URL}/servicios/`);
     if (!response.ok) throw new Error('Error al obtener servicios');
     services = await response.json();
     filteredServices = [...services];
@@ -65,7 +66,7 @@ async function getServices() {
 // ========== API: CREAR SERVICIO ==========
 async function createService(serviceData) {
   try {
-    const response = await fetch(`${API_BASE_URL}/servicios`, {
+    const response = await fetch(`${API_BASE_URL}/servicios/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(serviceData)
