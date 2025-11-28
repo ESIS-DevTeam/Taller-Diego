@@ -12,10 +12,13 @@ import { fetchFromApi } from "./data-manager.js";
 // Cargar menú móvil
 // (Cargado con SSI)
 
+// Iniciar fetch inmediatamente (no esperar al DOM)
+const productsPromise = fetchFromApi('productos');
+
 // Inicializar inventario
 async function initializeInventory() {
   try {
-    // 1. Cargar UI de filtros primero (sin esperar datos)
+    // 1. Cargar UI de filtros primero
     loadFilterUI();
 
     // 2. Configurar eventos de filtros
@@ -36,13 +39,13 @@ async function initializeInventory() {
       `.repeat(5);
     }
 
-    // 4. Cargar productos del API (en paralelo con UI)
-    const products = await fetchFromApi('productos');
+    // 4. Esperar a que lleguen los datos (iniciados arriba)
+    const products = await productsPromise;
 
     // 5. Inicializar búsqueda con Fuse.js
     initializeSearch(products);
 
-    // 6. Renderizar productos (pasa los productos ya cargados)
+    // 6. Renderizar productos
     await renderProducts(products);
 
     // 7. Configurar acciones de productos  
@@ -54,11 +57,12 @@ async function initializeInventory() {
 }
 
 function setupMobileInventoryMenu() {
+  // ... (código existente del menú móvil) ...
   const mobileMenu = document.querySelector("#mobile-menu-container");
   const btnList = document.getElementById("inventory-mobile-btn-list");
   const btnAdd = document.getElementById("inventory-mobile-btn-add");
   const btnBack = document.getElementById("inventory-mobile-back-btn");
-  const btnBackMenu = document.querySelector(".btn-back-menu"); // ← NUEVO: botón volver al menú
+  const btnBackMenu = document.querySelector(".btn-back-menu");
   const mainContent = document.querySelector(".main-content");
   const container = document.querySelector(".container");
   const safeAdd = (el, handler) => {
@@ -69,25 +73,24 @@ function setupMobileInventoryMenu() {
   // Ver inventario
   safeAdd(btnList, () => {
     if (!mobileMenu || !mainContent || !container) return;
-    mobileMenu.classList.add("active"); // oculta menú
-    mainContent.classList.add("active"); // muestra inventario
-    container.classList.add("active"); // mantiene side‑bar visible en móvil
+    mobileMenu.classList.add("active");
+    mainContent.classList.add("active");
+    container.classList.add("active");
     document.body.classList.remove("menu-open");
     document.body.classList.add("inventory-open");
   });
 
-  // Agregar producto - SOLO abre modal, NO muestra inventario
+  // Agregar producto
   safeAdd(btnAdd, (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Solo abrir el modal para agregar producto, sin mostrar inventario ni ocultar el menú
     setTimeout(() => {
       openModalForm("add");
     }, 100);
   });
 
-  // Volver al menú desde el botón de la parte superior
-  safeAdd(btnBack, () => {
+  // Volver al menú
+  const closeMenu = () => {
     if (!mobileMenu || !mainContent || !container) return;
     mobileMenu.classList.remove("active");
     mainContent.classList.remove("active");
@@ -97,20 +100,10 @@ function setupMobileInventoryMenu() {
     if (mobileMenu) {
       mobileMenu.style.display = '';
     }
-  });
+  };
 
-  // Volver al menú desde el botón dentro del formulario (NUEVO)
-  safeAdd(btnBackMenu, () => {
-    if (!mobileMenu || !mainContent || !container) return;
-    mobileMenu.classList.remove("active");
-    mainContent.classList.remove("active");
-    container.classList.remove("active");
-    document.body.classList.add("menu-open");
-    document.body.classList.remove("inventory-open");
-    if (mobileMenu) {
-      mobileMenu.style.display = '';
-    }
-  });
+  safeAdd(btnBack, closeMenu);
+  safeAdd(btnBackMenu, closeMenu);
 }
 
 // Botón agregar producto (desktop)
