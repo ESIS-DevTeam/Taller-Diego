@@ -18,41 +18,39 @@ document.getElementById("header").innerHTML = loadHeader();
 
 // Inicializar inventario
 async function initializeInventory() {
-  const perfStart = performance.now();
-
   try {
-    // 1. Cargar productos del API (una sola vez)
-    const fetchStart = performance.now();
-    const products = await fetchFromApi('productos');
-    const fetchEnd = performance.now();
-
-    // 2. Cargar UI de filtros (categorías)
-    const filterUIStart = performance.now();
+    // 1. Cargar UI de filtros primero (sin esperar datos)
     loadFilterUI();
-    const filterUIEnd = performance.now();
 
-    // 3. Configurar eventos de filtros
-    const eventsStart = performance.now();
+    // 2. Configurar eventos de filtros
     setupFilterEvents();
-    const eventsEnd = performance.now();
 
-    // 4. Inicializar búsqueda con Fuse.js
-    const searchStart = performance.now();
+    // 3. Mostrar skeleton loader inmediatamente
+    const productList = document.getElementById("product-list");
+    if (productList) {
+      productList.innerHTML = `
+        <div class="product-item skeleton">
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-actions"></div>
+        </div>
+      `.repeat(5);
+    }
+
+    // 4. Cargar productos del API (en paralelo con UI)
+    const products = await fetchFromApi('productos');
+
+    // 5. Inicializar búsqueda con Fuse.js
     initializeSearch(products);
-    const searchEnd = performance.now();
 
-    // 5. Renderizar productos (pasa los productos ya cargados)
-    const renderStart = performance.now();
+    // 6. Renderizar productos (pasa los productos ya cargados)
     await renderProducts(products);
-    const renderEnd = performance.now();
 
-    // 6. Configurar acciones de productos  
-    const actionsStart = performance.now();
+    // 7. Configurar acciones de productos  
     setupProductActions();
-    const actionsEnd = performance.now();
-
-    const perfEnd = performance.now();
-    const totalTime = perfEnd - perfStart;
 
   } catch (error) {
     console.error('❌ Error al inicializar inventario:', error);

@@ -1,94 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taller de Mecánica Diego</title>
-    <link rel="stylesheet" href="../styles/css/inventory.css"> 
-    <link rel="stylesheet" href="../styles/css/side_bar.css">
-    <link rel="stylesheet" href="../styles/css/header.css">
-    <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles/css/modal-add-product.css">
-    <link rel="stylesheet" href="../styles/css/modal-confirm.css">
-    <link rel="stylesheet" href="../styles/css/product-details.css">
-    <link rel="stylesheet" href="../styles/css/notification.css">
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taller de Mecánica Diego</title>
+
+  <!-- Preconnect para recursos externos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- Preload de recursos críticos -->
+  <link rel="preload" href="../styles/css/inventory.css" as="style">
+  <link rel="preload" href="../styles/css/side_bar.css" as="style">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" as="style">
+
+  <link rel="stylesheet" href="../styles/css/inventory.css">
+  <link rel="stylesheet" href="../styles/css/side_bar.css">
+  <link rel="stylesheet" href="../styles/css/header.css">
+  <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/css/modal-add-product.css">
+  <link rel="stylesheet" href="../styles/css/modal-confirm.css">
+  <link rel="stylesheet" href="../styles/css/product-details.css">
+  <link rel="stylesheet" href="../styles/css/notification.css">
+
+  <!-- Defer de scripts no críticos -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
+
+  <!-- Registrar Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('✅ Service Worker registrado'))
+          .catch(err => console.log('❌ Error registrando Service Worker:', err));
+      });
+    }
+  </script>
 </head>
+
 <body>
-    <div id="header"></div>
-    
-    <div id="mobile-menu-container"></div>
+  <div id="header"></div>
 
-    <div id="side-bar-container" class="side-bar-container"></div>
-    
-    <div class="container">
-        <main class="main-content">
+  <div id="mobile-menu-container"></div>
 
-            <h1>Gestion de inventario</h1>
-            <div class="card" id="open-modal-btn">
-                <a href="#">
-                    <p>Nuevo producto</p>
-                </a>
+  <div id="side-bar-container" class="side-bar-container sidebar-placeholder"></div>
+
+  <div class="container">
+    <main class="main-content">
+
+      <h1>Gestion de inventario</h1>
+      <div class="card" id="open-modal-btn">
+        <a href="#">
+          <p>Nuevo producto</p>
+        </a>
+      </div>
+      <section class="form-inventary">
+        <button class="btn-back-menu">← Volver al menú</button>
+        <h2>Inventario</h2>
+        <form id="inventory-form" class="inventory-form">
+          <!-- Búsqueda -->
+          <div class="search-box">
+            <img src="../assets/icons/search.png" alt="Buscar">
+            <input id="search" type="text" data-search-input placeholder="Buscar producto...">
+          </div>
+
+          <!-- Categorías -->
+          <div class="section-filter category">
+            <h4>Categorías</h4>
+            <ul class="category-option">
+            </ul>
+          </div>
+
+          <!-- Stock bajo -->
+          <div class="section-filter low-stock">
+            <h4>Stock</h4>
+            <ul>
+              <li>
+                <label class="low-stock">
+                  <input type="checkbox" name="stock" data-low-stock>
+                  Stock bajo
+                </label>
+              </li>
+            </ul>
+          </div>
+
+          <div class="section-filter price-range">
+            <h4>Rango de precios</h4>
+            <div class="price-range">
+              <input type="number" placeholder="Mínimo" data-min-price>
+              <span>-</span>
+              <input type="number" placeholder="Máximo" data-max-price>
             </div>
-            <section class="form-inventary">
-                <button class="btn-back-menu">← Volver al menú</button>
-                <h2>Inventario</h2>
-                <form id="inventory-form" class="inventory-form">
-                    <!-- Búsqueda -->
-                    <div class="search-box">
-                        <img src="../assets/icons/search.png" alt="Buscar">
-                        <input id="search" type="text" data-search-input placeholder="Buscar producto...">
-                    </div>
+          </div>
 
-                    <!-- Categorías -->
-                    <div class="section-filter category">
-                        <h4>Categorías</h4>
-                        <ul class="category-option">
-                        </ul>
-                    </div>
+        </form>
+      </section>
 
-                    <!-- Stock bajo -->
-                    <div class="section-filter low-stock">
-                        <h4>Stock</h4>
-                        <ul>
-                            <li>
-                                <label class="low-stock">
-                                    <input type="checkbox" name="stock" data-low-stock>
-                                    Stock bajo
-                                </label>
-                            </li>
-                        </ul>
-                    </div>
+      <section class="inventary-data">
+        <div class="inventory-header grid-layout" role="row">
+          <div class="header-item" role="columnheader">Nombre</div>
+          <div class="header-item" role="columnheader">Descripción</div>
+          <div class="header-item" role="columnheader">Stock</div>
+          <div class="header-item" role="columnheader">Precio de Compra</div>
+          <div class="header-item" role="columnheader">Precio de Venta</div>
+          <div class="header-item" role="columnheader">Acciones</div>
+        </div>
 
-                    <div class="section-filter price-range">
-                        <h4>Rango de precios</h4>
-                        <div class="price-range">
-                            <input type="number" placeholder="Mínimo" data-min-price>
-                            <span>-</span>
-                            <input type="number" placeholder="Máximo" data-max-price>
-                        </div>
-                    </div>
+        <div class="product-list" id="product-list">
+        </div>
+      </section>
+    </main>
 
-                </form>
-            </section>
+  </div>
+</body>
+<div id="modal-container"></div>
+<script type="module" src="../scripts/inventory.js"></script>
 
-            <section class="inventary-data">
-                <div class="inventory-header grid-layout" role="row">
-                    <div class="header-item" role="columnheader">Nombre</div>
-                    <div class="header-item" role="columnheader">Descripción</div>
-                    <div class="header-item" role="columnheader">Stock</div>
-                    <div class="header-item" role="columnheader">Precio de Compra</div>
-                    <div class="header-item" role="columnheader">Precio de Venta</div>
-                    <div class="header-item" role="columnheader">Acciones</div>
-                </div>
-                
-                <div class="product-list" id="product-list">
-                </div>
-            </section>
-        </main>
-        
-    </div>
-  </body>
-  <div id="modal-container"></div>
-  <script type="module" src="../scripts/inventory.js"></script>
 </html>

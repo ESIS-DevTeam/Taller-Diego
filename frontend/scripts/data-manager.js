@@ -5,29 +5,105 @@ import { handleApiError } from "./utils/error-handlers.js";
  * @constant {string}
  */
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8000/api/v1'  // Desarrollo local
-    : '/api/v1';   
+  ? 'http://localhost:8000/api/v1'  // Desarrollo local
+  : '/api/v1';
+
+// ========================================
+// CACHÉ EN LOCALSTORAGE CON TTL
+// ========================================
+
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutos en milisegundos
+
+/**
+ * Obtiene datos del caché si no han expirado
+ */
+function getCachedData(key) {
+  try {
+    const cached = localStorage.getItem(key);
+    if (!cached) return null;
+
+    const { data, timestamp } = JSON.parse(cached);
+    const now = Date.now();
+
+    // Verificar si el caché ha expirado
+    if (now - timestamp > CACHE_TTL) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error leyendo caché:', error);
+    return null;
+  }
+}
+
+/**
+ * Guarda datos en el caché con timestamp
+ */
+function setCachedData(key, data) {
+  try {
+    const cacheEntry = {
+      data,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(key, JSON.stringify(cacheEntry));
+  } catch (error) {
+    console.error('Error guardando en caché:', error);
+  }
+}
+
+/**
+ * Invalida el caché de un endpoint específico
+ */
+export function invalidateCache(endpoint) {
+  const cacheKey = `api_cache_${endpoint}`;
+  localStorage.removeItem(cacheKey);
+}
+
 // ========================================
 // FUNCIONES GENÉRICAS
 // ========================================
 
 /**
- * Realiza peticiones GET a la API.
+ * Realiza peticiones GET a la API con caché.
  * @param {string} endpoint - Ruta del endpoint (ej: 'productos', 'autopartes').
  * @param {number|null} id - ID opcional para obtener un recurso específico.
+ * @param {boolean} skipCache - Si es true, omite el caché y hace petición directa.
  * @returns {Promise<Object|Array>} Datos de la respuesta en formato JSON.
  * @throws {Error} Si la petición falla.
  */
-export async function fetchFromApi(endpoint, id = null) {
+export async function fetchFromApi(endpoint, id = null, skipCache = false) {
   try {
     let apiUrl = `${API_BASE_URL}/${endpoint}/`;
     if (id !== null) {
       apiUrl = `${API_BASE_URL}/${endpoint}/${id}`;
     }
+
+    // Intentar obtener del caché primero (solo para listas, no para IDs específicos)
+    if (!skipCache && id === null) {
+      const cacheKey = `api_cache_${endpoint}`;
+      const cachedData = getCachedData(cacheKey);
+
+      if (cachedData) {
+        console.log(`✅ Datos obtenidos del caché: ${endpoint}`);
+        return cachedData;
+      }
+    }
+
+    // Si no hay caché, hacer petición al API
     const response = await fetch(apiUrl);
     checkResponseStatus(response);
 
-    return await response.json();
+    const data = await response.json();
+
+    // Guardar en caché (solo para listas)
+    if (id === null) {
+      const cacheKey = `api_cache_${endpoint}`;
+      setCachedData(cacheKey, data);
+    }
+
+    return data;
   } catch (error) {
     handleApiError(error, {
       endpoint,
@@ -56,7 +132,12 @@ export async function createResource(endpoint, data) {
 
     checkResponseStatus(response);
 
-    return await response.json();
+    const result = await response.json();
+
+    // Invalidar caché después de crear
+    invalidateCache(endpoint);
+
+    return result;
   } catch (error) {
     handleApiError(error, {
       endpoint,
@@ -86,7 +167,12 @@ export async function updateResource(endpoint, id, data) {
 
     checkResponseStatus(response);
 
-    return await response.json();
+    const result = await response.json();
+
+    // Invalidar caché después de actualizar
+    invalidateCache(endpoint);
+
+    return result;
   } catch (error) {
     handleApiError(error, {
       endpoint,
@@ -112,7 +198,12 @@ export async function deleteResource(endpoint, id) {
 
     checkResponseStatus(response);
 
-    return await response.json();
+    const result = await response.json();
+
+    // Invalidar caché después de eliminar
+    invalidateCache(endpoint);
+
+    return result;
   } catch (error) {
     handleApiError(error, {
       endpoint,

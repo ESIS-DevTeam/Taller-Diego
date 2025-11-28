@@ -6,6 +6,22 @@ import { generateProductCard } from "./product-card.js";
 const ENDPOINT = "productos";
 
 /**
+ * Genera HTML para skeleton loader
+ */
+function generateSkeletonLoader() {
+  return `
+    <div class="product-item skeleton">
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-actions"></div>
+    </div>
+  `.repeat(5); // Mostrar 5 skeleton items
+}
+
+/**
  * Renderiza la lista de productos
  * @param {Array|null} products - Productos a renderizar. Si es null, los obtiene del API.
  */
@@ -17,9 +33,9 @@ export async function renderProducts(products = null) {
   }
 
   try {
-    // Mostrar loading solo si no tenemos productos
+    // Mostrar skeleton loader solo si no tenemos productos
     if (!products) {
-      productList.innerHTML = '<p class="loading">Cargando productos...</p>';
+      productList.innerHTML = generateSkeletonLoader();
       products = await fetchFromApi(ENDPOINT);
     }
 
@@ -29,9 +45,23 @@ export async function renderProducts(products = null) {
       return;
     }
 
-    productList.innerHTML = products.map(producto =>
+    // Usar DocumentFragment para renderizado eficiente
+    const fragment = document.createDocumentFragment();
+    const tempDiv = document.createElement('div');
+
+    // Generar todo el HTML de una vez
+    tempDiv.innerHTML = products.map(producto =>
       generateProductCard(producto)
     ).join('');
+
+    // Mover todos los nodos al fragment
+    while (tempDiv.firstChild) {
+      fragment.appendChild(tempDiv.firstChild);
+    }
+
+    // Una sola operación DOM
+    productList.innerHTML = '';
+    productList.appendChild(fragment);
 
     setupProductActions();
     setupViewProduct();
