@@ -1,6 +1,3 @@
-import { loadSideBar } from "./componets/side_bar.js";
-import { loadHeader } from "./componets/header.js";
-import { loadInventoryMobileMenu } from "./mobile-menu.js";
 import { openModalForm } from "./componets/modal-product/modal-product.js";
 import { renderProducts } from "./componets/product-list/product-list.js";
 import { setupProductActions } from "./componets/product-list/product-actions.js";
@@ -10,11 +7,10 @@ import { initializeSearch } from "./componets/filter-product/filter-handler.js";
 import { fetchFromApi } from "./data-manager.js";
 
 // Cargar componentes UI
-document.getElementById("side-bar-container").innerHTML = loadSideBar();
-document.getElementById("header").innerHTML = loadHeader();
+// (El sidebar y header ahora se cargan con Nginx SSI para evitar parpadeo)
 
 // Cargar menú móvil
-// Removed duplicate mobile menu loading; it will be loaded on DOMContentLoaded
+// (Cargado con SSI)
 
 // Inicializar inventario
 async function initializeInventory() {
@@ -125,10 +121,6 @@ document.getElementById("open-modal-btn")?.addEventListener("click", (e) => {
 
 // Inicializar cuando cargue el DOM
 document.addEventListener('DOMContentLoaded', async () => {
-  const mobileMenuContainer = document.getElementById("mobile-menu-container");
-  if (mobileMenuContainer) {
-    mobileMenuContainer.innerHTML = loadInventoryMobileMenu();
-  }
   await initializeInventory();
   setupMobileInventoryMenu();
 });

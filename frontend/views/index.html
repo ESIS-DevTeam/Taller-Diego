@@ -13,12 +13,14 @@
 </head>
 
 <body>
-    <!-- Menú lateral de navegación (se carga dinámicamente con JavaScript) -->
+    <!-- Menú lateral de navegación (Cargado con SSI) -->
     <aside id="side-bar" class="side-bar-container sidebar-placeholder">
+        <!--#include virtual="/includes/sidebar.html" -->
     </aside>
 
-    <!-- Encabezado superior con logo y título (se carga dinámicamente con JavaScript) -->
+    <!-- Encabezado superior (Cargado con SSI) -->
     <header id="header">
+        <!--#include virtual="/includes/header.html" -->
     </header>
 
     <!-- Contenedor principal del dashboard -->
@@ -107,18 +109,6 @@
             </section>
         </div>
     </div>
-
-    <!-- Script para cargar dinámicamente el menú lateral -->
-    <script type="module">
-        import { loadSideBar } from '../scripts/componets/side_bar.js';
-        document.getElementById('side-bar').innerHTML = loadSideBar();
-    </script>
-
-    <!-- Script para cargar dinámicamente el encabezado -->
-    <script type="module">
-        import { loadHeader } from '../scripts/componets/header.js';
-        document.getElementById('header').innerHTML = loadHeader();
-    </script>
 
     <!-- Script principal: maneja DOM y carga datos dinámicos desde data-manager.js -->
     <script type="module" src="../scripts/main.js"></script>
