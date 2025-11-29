@@ -143,9 +143,10 @@ async function initVentaProducto() {
 
   productoSearch.addEventListener('input', filterProductos);
   productoSearch.addEventListener('focus', () => {
-    if (productoSearch.value) {
-      productoDropdown.style.display = 'block';
+    if (!productoSearch.value) {
+      displayProductos(productosDisponibles);
     }
+    productoDropdown.style.display = 'block';
   });
 
   addBtn.addEventListener('click', addProductoToVenta);
@@ -187,6 +188,7 @@ function displayProductos(productos) {
     item.addEventListener('click', (e) => {
       const productoSearch = document.getElementById('producto-search');
       const stock = parseInt(e.target.dataset.stock);
+      const nombre = e.target.dataset.nombre;
       
       // Validar stock antes de seleccionar
       if (stock === 0) {
@@ -196,7 +198,7 @@ function displayProductos(productos) {
         return;
       }
       
-      productoSearch.value = e.target.textContent.trim();
+      productoSearch.value = nombre;
       productoSearch.dataset.selectedId = e.target.dataset.id;
       productoSearch.dataset.precio = e.target.dataset.precio;
       productoSearch.dataset.stock = e.target.dataset.stock;
