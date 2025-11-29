@@ -47,7 +47,19 @@ source venv/bin/activate        # Linux/Mac
 ```bash
 pip install -r requirements.txt
 ```
-6. Corre el servidor:
+5. Cambia el path de python a backend
+```bash
+$env:PYTHONPATH = "backend"
+```
+6. Crea el archivo `.env` en la carpeta `backend` con la conexión a Supabase
+```env
+DATABASE_URL="<link>"
+```
+7. Ejecuta el script para crear las tablas
+```bash
+python .\backend\database.py
+```
+8. Corre el servidor:
 ```bash
 uvicorn main:app --reload
 ```

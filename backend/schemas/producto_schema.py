@@ -22,12 +22,12 @@ class ProductoBase(BaseModel):
 
     nombre: str
     descripcion: str
-    precio_compra: float
-    precio_venta: float
+    precioCompra: float
+    precioVenta: float
     marca: str
     categoria: str
     stock: int
-    stock_min: int
+    stockMin: int
 
 
 class ProductoCreate(ProductoBase):
@@ -53,7 +53,7 @@ class ProductoResponse(ProductoBase):
     """
 
     id: int
-    cod_barras: str | None = None
+    codBarras: str | None = None
     img: str | None = None
     tipo: str | None = None
 

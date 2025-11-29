@@ -4,7 +4,7 @@ import { handleApiError } from "./utils/error-handlers.js";
  * URL base para la API
  * @constant {string}
  */
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+const API_BASE_URL = 'http://127.0.0.1:8080/api/v1';
 
 // ========================================
 // FUNCIONES GENÉRICAS
@@ -19,9 +19,9 @@ const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
  */
 export async function fetchFromApi(endpoint, id = null) {
   try {
-    let apiUrl = `${API_BASE_URL}/${endpoint}`;
+    let apiUrl = `${API_BASE_URL}/${endpoint}/`;
     if (id !== null) {
-      apiUrl += `/${id}`;
+      apiUrl = `${API_BASE_URL}/${endpoint}/${id}`;
     }
     const response = await fetch(apiUrl);
     checkResponseStatus(response);
@@ -52,13 +52,13 @@ export async function createResource(endpoint, data) {
       },
       body: JSON.stringify(data),
     });
-    
+
     checkResponseStatus(response);
-    
+
     return await response.json();
   } catch (error) {
     handleApiError(error, {
-      endpoint, 
+      endpoint,
       method: 'POST',
       data,
     });
@@ -108,9 +108,9 @@ export async function deleteResource(endpoint, id) {
     const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
       method: 'DELETE',
     });
-    
+
     checkResponseStatus(response);
-    
+
     return await response.json();
   } catch (error) {
     handleApiError(error, {

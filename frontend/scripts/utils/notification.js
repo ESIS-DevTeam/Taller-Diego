@@ -27,3 +27,17 @@ export function showNotification(message, type = "info", duration = 3000) {
     }, 300); 
 }, duration);
 }
+
+export function showError(message) {
+  showNotification(message, "error");
+}
+
+
+export function showWarning(message) {
+  showNotification(message, "warning");
+}
+
+
+export function showSuccess(message) {
+  showNotification(message, "success");
+}

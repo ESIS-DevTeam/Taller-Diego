@@ -1,19 +1,94 @@
+// ===================================
+// HEADER - ENCABEZADO SUPERIOR
+// ===================================
+// Este archivo contiene los estilos del encabezado superior de la aplicación
+// El header incluye el logo y el título "TALLER DE DIEGO"
+// Se mantiene fijo en la parte superior en todas las pantallas
+
+// ===================================
+// ESTILOS BASE DEL HEADER (Desktop)
+// ===================================
 #header {
-  width: 100%;
-  height: 100px;
-  background-color: white;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
+  width: 100%; // El header ocupa todo el ancho de la pantalla
+  height: 75px; // Altura del header en desktop (aumentado de 60px para mejor visibilidad)
+  background-color: white; // Fondo blanco para contraste
+  position: fixed; // Posición fija para que siempre esté visible al hacer scroll
+  top: 0; // Se fija en la parte superior de la pantalla
+  left: 0; // Se fija desde el borde izquierdo
+  z-index: 1000; // Z-index alto para que esté por encima de otros elementos
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Sombra sutil para dar profundidad
+
+  // Contenedor interno del header
   .header-container {
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    height: 100%;
+    display: flex; // Activa flexbox para alinear logo y título
+    align-items: center; // Centra los elementos verticalmente
+    padding: 0 30px; // Espaciado interno horizontal (30px a cada lado)
+    height: 100%; // Ocupa toda la altura del header
+    gap: 15px; // Espacio entre el logo y el título
+
+    // Logo de la aplicación (imagen de herramientas/taller)
     .logo {
-      width: 100px;
-      height: 100px;
+      width: 50px; // Ancho del logo (aumentado de 40px)
+      height: 50px; // Alto del logo (aumentado de 40px)
+    }
+
+    // Título principal "TALLER DE DIEGO"
+    h1 {
+      font-size: 1.5rem; // Tamaño de fuente del título (aumentado de 1.3rem)
+      font-weight: 800; // Peso de fuente extra bold (aumentado de 700)
+      color: #1f2937; // Color gris oscuro para mejor legibilidad
+      margin: 0; // Elimina márgenes por defecto del h1
+      text-transform: uppercase; // Convierte el texto a mayúsculas
+      letter-spacing: 1px; // Espaciado entre letras para mejor estética
+    }
+  }
+}
+
+// ===================================
+// DISEÑO RESPONSIVE - MÓVIL Y TABLET
+// ===================================
+
+// TABLETS Y MÓVILES (hasta 768px de ancho)
+@media (max-width: 768px) {
+  #header {
+    height: 60px; // Reduce la altura del header en móviles para ahorrar espacio
+
+    .header-container {
+      padding: 0 12px; // Reduce el padding lateral para pantallas pequeñas
+      gap: 8px; // Reduce el espacio entre logo y título
+
+      .logo {
+        width: 35px; // Logo más pequeño en móviles
+        height: 35px; // Logo más pequeño en móviles
+      }
+
+      h1 {
+        font-size: 1rem; // Título más pequeño en móviles
+        font-weight: 700; // Reduce el peso de la fuente
+        letter-spacing: 0.5px; // Reduce el espaciado entre letras
+      }
+    }
+  }
+}
+
+// MÓVILES PEQUEÑOS (hasta 480px de ancho)
+@media (max-width: 480px) {
+  #header {
+    height: 55px; // Altura aún más pequeña para pantallas muy pequeñas
+
+    .header-container {
+      padding: 0 10px; // Padding mínimo para pantallas muy pequeñas
+      gap: 6px; // Espacio mínimo entre logo y título
+
+      .logo {
+        width: 30px; // Logo más pequeño para pantallas muy pequeñas
+        height: 30px; // Logo más pequeño para pantallas muy pequeñas
+      }
+
+      h1 {
+        font-size: 0.9rem; // Título aún más pequeño
+        letter-spacing: 0.3px; // Espaciado mínimo entre letras
+      }
     }
   }
 }

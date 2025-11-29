@@ -37,6 +37,13 @@ export function confirmDelete(productId) {
       if (event.target === overlay) close(false);
     });
 
+    const escapeHandler = (event) => {
+      if(event.key === "Escape") {
+        close(false);
+        document.removeEventListener("keydown", escapeHandler);
+      }
+    }
+    document.addEventListener("keydown",escapeHandler);
     btnCancel.addEventListener("click", () => close(false));
     btnDelete.addEventListener("click", () => close(true));
   });

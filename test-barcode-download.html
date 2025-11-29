@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Descarga de Código de Barras</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .test-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .preview {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #barcode {
+            max-width: 100%;
+        }
+
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .success {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧪 Prueba de Código de Barras Mejorado</h1>
+        <p class="subtitle">Sistema Base-26 con descarga optimizada</p>
+
+        <div class="info">
+            <strong>📋 Mejoras implementadas:</strong>
+            <ul style="margin: 10px 0;">
+                <li>✅ Código de barras perfectamente centrado</li>
+                <li>✅ Espacio reducido entre código y nombre (30px vs 40px)</li>
+                <li>✅ Nombre de archivo solo con nombre del producto</li>
+                <li>✅ Canvas dinámico que se ajusta al ancho del código</li>
+                <li>✅ Mejor tipografía (16px bold, color #2c3e50)</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Prueba 1: Código Corto</h3>
+            <button onclick="testDownload('T-A024-FIL', 'filtrok6')">
+                Descargar: T-A024-FIL - filtrok6
+            </button>
+            <div class="info success" id="result1" style="display:none; margin-top:10px;">
+                ✅ Descargado como: <code id="filename1"></code>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Prueba 2: Código con Letras Dobles</h3>
+            <button onclick="testDownload('T-AA123-ACE', 'Aceite Castrol GTX 20W-50')">
+                Descargar: T-AA123-ACE - Aceite Castrol GTX 20W-50
+            </button>
+            <div class="info success" id="result2" style="display:none; margin-top:10px;">
+                ✅ Descargado como: <code id="filename2"></code>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Prueba 3: Nombre con Caracteres Especiales</h3>
+            <button onclick="testDownload('T-B456-LLA', 'Llanta Michelin 195/65 R15 Primacy™')">
+                Descargar: T-B456-LLA - Llanta Michelin 195/65 R15 Primacy™
+            </button>
+            <div class="info success" id="result3" style="display:none; margin-top:10px;">
+                ✅ Descargado como: <code id="filename3"></code>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Prueba 4: Nombre Muy Largo</h3>
+            <button
+                onclick="testDownload('T-Z999-BAT', 'Batería Bosch Premium 12V 75Ah 750A con Tecnología EFB para vehículos con Start-Stop')">
+                Descargar: T-Z999-BAT - Nombre muy largo
+            </button>
+            <div class="info success" id="result4" style="display:none; margin-top:10px;">
+                ✅ Descargado como: <code id="filename4"></code>
+            </div>
+        </div>
+
+        <div class="preview">
+            <h3>👁️ Vista Previa del Último Código</h3>
+            <svg id="barcode"></svg>
+            <p id="preview-name" style="margin-top: 10px; font-weight: bold; color: #2c3e50;"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { downloadBarcodeImage, generateBarcodeImage } from './frontend/scripts/utils/codbarra.js';
+
+        window.testDownload = async function (barcodeValue, productName) {
+            // Obtener el número de prueba del botón clickeado
+            const testNum = event.target.closest('.test-section').querySelector('[id^="result"]').id.replace('result', '');
+
+            // Mostrar vista previa
+            generateBarcodeImage('barcode', barcodeValue, productName);
+            document.getElementById('preview-name').textContent = productName;
+
+            // Descargar
+            const downloaded = await downloadBarcodeImage(barcodeValue, productName);
+
+            if (downloaded) {
+                // Calcular el nombre esperado del archivo
+                const sanitizedName = productName
+                    .trim()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-zA-Z0-9\s]+/g, '')
+                    .replace(/\s+/g, '_')
+                    .replace(/^_+|_+$/g, '')
+                    .toLowerCase()
+                    .substring(0, 40);
+
+                const fileName = `${sanitizedName || 'producto'}.png`;
+
+                // Mostrar resultado
+                const resultDiv = document.getElementById(`result${testNum}`);
+                const filenameSpan = document.getElementById(`filename${testNum}`);
+                filenameSpan.textContent = fileName;
+                resultDiv.style.display = 'block';
+
+                console.log(`✅ Archivo descargado: ${fileName}`);
+            }
+        };
+    </script>
+</body>
+
+</html>
