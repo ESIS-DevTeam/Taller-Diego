@@ -58,8 +58,8 @@ let CATEGORY_OPTIONS = [
 const SORT_OPTIONS = [
     { id: 'sort-name-asc', label: 'Nombre (A-Z)', value: 'name-asc' },
     { id: 'sort-name-desc', label: 'Nombre (Z-A)', value: 'name-desc' },
-    { id: 'sort-date-desc', label: 'Más recientes primero', value: 'date-desc' },
-    { id: 'sort-date-asc', label: 'Más antiguos primero', value: 'date-asc' },
+    //{ id: 'sort-date-desc', label: 'Más recientes primero', value: 'date-desc' },
+    //{ id: 'sort-date-asc', label: 'Más antiguos primero', value: 'date-asc' },
     { id: 'sort-code', label: 'Por código de barras', value: 'code' }
 ];
 
@@ -129,7 +129,7 @@ function generateModalHTML() {
                     </p>
 
                     <!-- Sección: Rango de tiempo -->
-                    <div class="pdf-options-container">
+                    <!-- <div class="pdf-options-container">
                         <h4>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -141,7 +141,7 @@ function generateModalHTML() {
                             ${dateOptionsHTML}
                         </div>
                     </div>
-
+                    -->
                     <!-- Sección: Filtros adicionales -->
                     <div class="pdf-options-container pdf-filters-section">
                         <h4>
@@ -711,7 +711,7 @@ function updateProductCountWithFilters(products) {
         const dateOption = DATE_OPTIONS.find(opt => opt.id === options.dateRange);
         const dateLabel = dateOption?.days === null ? '' : ` (${dateOption?.label.toLowerCase()})`;
         const categoryLabel = options.category !== 'all' ? ` - ${options.category}` : '';
-        countText.textContent = `${count} producto${count > 1 ? 's' : ''} con código de barras${dateLabel}${categoryLabel}`;
+        countText.textContent = `${count} producto${count > 1 ? 's' : ''} con código de barras seleccionado${count > 1 ? 's' : ''} `;
         previewInfo?.classList.add('success');
         previewInfo?.classList.remove('warning');
     }
