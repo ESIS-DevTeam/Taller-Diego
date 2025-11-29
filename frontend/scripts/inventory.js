@@ -8,7 +8,7 @@ import { loadFilterUI } from "./componets/filter-product/filter-loader.js";
 import { setupFilterEvents } from "./componets/filter-product/filter-events.js";
 import { initializeSearch } from "./componets/filter-product/filter-handler.js";
 import { fetchFromApi } from "./data-manager.js";
-
+import { bindAddProductButton } from "./componets/modal-product/modal-product.js";
 // Cargar componentes UI
 document.getElementById("side-bar-container").innerHTML = loadSideBar();
 document.getElementById("header").innerHTML = loadHeader();
@@ -18,6 +18,8 @@ const mobileMenuContainer = document.getElementById("mobile-menu-container");
 if (mobileMenuContainer) {
   mobileMenuContainer.innerHTML = loadInventoryMobileMenu();
 }
+
+
 
 // Inicializar inventario
 async function initializeInventory() {
@@ -97,12 +99,30 @@ document.getElementById("open-modal-btn")?.addEventListener("click", (e) => {
   openModalForm('add');
 });
 
+async function init() {
+  try {
+    bindAddProductButton();
+    setupFilterEvents();
+    await renderProducts();
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('open') === 'new-product') {
+      openModalForm('add');
+      history.replaceState(null, '', window.location.pathname);
+    }
+  } catch (error) {
+    console.error('Error inicializando inventario:', error);
+  }
+}
+
 // Inicializar cuando cargue el DOM
 document.addEventListener('DOMContentLoaded', async () => {
   const mobileMenuContainer = document.getElementById("mobile-menu-container");
   if (mobileMenuContainer) {
     mobileMenuContainer.innerHTML = loadInventoryMobileMenu();
   }
+  init();
   await initializeInventory();
   setupMobileInventoryMenu();
 });
+
