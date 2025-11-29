@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="../styles/css/modal-confirm.css">
     <link rel="stylesheet" href="../styles/css/product-details.css">
     <link rel="stylesheet" href="../styles/css/notification.css">
+    <!-- Estilos para modal de descarga de códigos de barras PDF -->
+    <link rel="stylesheet" href="../styles/css/modal-pdfcod.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 </head>
@@ -28,6 +30,13 @@
         <main class="main-content">
 
             <h1>Gestion de inventario</h1>
+            <!-- Botón para generar/ver códigos de barras (Nuevo) -->
+            <div class="card" id="barcode-btn">
+                <a href="#">
+                    <p>Codigo de barras</p>
+                </a>
+            </div>
+            <!-- Botón para abrir modal de nuevo producto -->
             <div class="card" id="open-modal-btn">
                 <a href="#">
                     <p>Nuevo producto</p>

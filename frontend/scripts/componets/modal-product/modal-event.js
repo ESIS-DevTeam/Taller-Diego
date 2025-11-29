@@ -407,7 +407,7 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
           await updateResource(endpoint, newProduct.id, formData);
 
         }
-        showNotification(`Producto agregado exitosamente. Código: ${newProduct.codBarras}`, "success");
+        showNotification(`Producto agregado exitosamente.`, "success");
       }
 
       closeModalForm();
