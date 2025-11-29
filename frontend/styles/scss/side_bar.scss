@@ -1,84 +1,70 @@
-// ===================================
-// SIDE BAR - BARRA LATERAL DE NAVEGACIÓN
-// ===================================
-// Este archivo contiene los estilos de la barra lateral de navegación
-// En desktop: barra vertical fija en el lado izquierdo
-// En móvil: barra horizontal fija en la parte inferior (bottom navbar)
-// Incluye iconos y texto para las secciones: Inicio, Inventario, Servicios, Orden, Personal
+// ========================================
+// SIDEBAR - BARRA LATERAL DE NAVEGACIÓN
+// ========================================
 
-// Importación de variables de configuración
-@use 'variables' as v; // Importa variables globales (colores, fuentes, tamaños)
-@use 'sass:color'; // Importa módulo de Sass para manipular colores
+@use 'variables' as v;
+@use 'sass:color';
 
-// ===================================
-// ESTILOS GLOBALES DEL BODY
-// ===================================
 body {
-  font-family: v.$font-base; // Aplica la fuente base definida en variables (Montserrat)
+  font-family: v.$font-base;
 }
 
-// ===================================
-// ESTILOS BASE DEL SIDEBAR (Desktop)
-// ===================================
+// ========================================
+// SIDEBAR DESKTOP
+// ========================================
+
 .side-bar-container {
-  background-color: v.color("primary"); // Color de fondo oscuro (#1A242F) desde variables
-  width: 130px; // Ancho de la barra lateral (aumentado de 110px para más espacio)
-  height: 100vh; // Altura completa de la ventana del navegador
-  position: fixed; // Posición fija para que siempre esté visible
-  left: 0; // Se fija en el borde izquierdo de la pantalla
-  top: 0; // Comienza desde arriba
-  padding: 0; // Sin padding en el contenedor principal
-  margin-top: 75px; // Margen superior igual a la altura del header (para no superponerse)
+  background-color: v.color("primary");
+  width: 130px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 0;
+  margin-top: 75px;
 
-  // Contenedor de navegación interno
   .sidebar-nav {
-    padding: 0; // Sin padding interno
-    width: 100%; // Ocupa todo el ancho del sidebar
-    height: 100%; // Ocupa toda la altura disponible
+    padding: 0;
+    width: 100%;
+    height: 100%;
 
-    // Lista de elementos de navegación
     ul {
-      list-style: none; // Elimina las viñetas de la lista
-      padding: 0; // Sin padding en la lista
-      margin: 0; // Sin margen en la lista
+      list-style: none;
+      padding: 0;
+      margin: 0;
 
-      // Cada elemento de navegación (Inicio, Inventario, etc.)
       li {
-        width: 100%; // Cada item ocupa todo el ancho del sidebar
+        width: 100%;
 
-        // Enlaces de navegación
         a {
-          display: flex; // Activa flexbox para organizar icono y texto
-          flex-direction: column; // Organiza icono y texto en columna (uno encima del otro)
-          align-items: center; // Centra horizontalmente el icono y texto
-          justify-content: center; // Centra verticalmente el contenido
-          gap: 6px; // Espacio entre el icono y el texto
-          padding: 18px 0; // Padding vertical (arriba y abajo) sin padding horizontal
-          width: 100%; // El enlace ocupa todo el ancho disponible
-          text-decoration: none; // Elimina el subrayado del enlace
-          background-color: v.color("primary"); // Color de fondo igual al sidebar
-          transition: all 0.2s ease; // Animación suave para efectos hover
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 18px 0;
+          width: 100%;
+          text-decoration: none;
+          background-color: v.color("primary");
+          transition: all 0.2s ease;
 
-          // Efecto hover (cuando el usuario pasa el mouse)
           &:hover {
-            background-color: color.adjust(v.color("primary"), $lightness: 6%); // Aclara el fondo un 6% al hacer hover
+            background-color: color.adjust(v.color("primary"), $lightness: 6%);
           }
 
-          // Iconos de navegación (imágenes SVG/PNG)
           img {
-            height: 36px; // Altura del icono
-            width: 36px; // Ancho del icono
-            filter: brightness(0) invert(1); // Convierte el icono a color blanco
-            object-fit: contain; // Mantiene las proporciones del icono
+            height: 36px;
+            width: 36px;
+            filter: brightness(0) invert(1);
+            object-fit: contain;
           }
 
-          // Texto de los enlaces (Inicio, Inventario, etc.)
           span {
-            color: white; // Color blanco para contraste con el fondo oscuro
-            font-size: 14px; // Tamaño de fuente (aumentado de 13px)
-            text-align: center; // Centra el texto horizontalmente
-            font-weight: 600; // Texto semi-bold (aumentado de 400 para mejor legibilidad)
-            line-height: 1.2; // Altura de línea para texto de dos líneas
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
           }
         }
       }
@@ -86,92 +72,74 @@ body {
   }
 }
 
-// ===================================
-// AJUSTE DEL CONTENIDO PRINCIPAL
-// ===================================
-// Desplaza el contenido principal hacia la derecha para que no quede debajo del sidebar
 .main-content {
-  margin-left: 130px; // Margen izquierdo igual al ancho del sidebar (actualizado de 110px a 130px)
-  padding: 20px; // Padding interno del contenido principal
+  margin-left: 130px;
+  padding: 20px;
 }
 
-// ===================================
-// DISEÑO RESPONSIVE - MÓVIL Y TABLET
-// ===================================
+// ========================================
+// RESPONSIVE - TABLET Y MÓVIL
+// ========================================
 
-// TABLETS Y MÓVILES (hasta 768px de ancho)
 @media (max-width: 768px) {
   .side-bar-container {
-    // TRANSFORMACIÓN: De barra lateral vertical a barra inferior horizontal
-    width: 100%; // Ocupa todo el ancho de la pantalla
-    height: auto; // Altura automática según el contenido
-    bottom: 0; // Se fija en la parte inferior de la pantalla
-    top: auto; // Ya no se fija arriba
-    left: 0; // Se extiende desde el borde izquierdo
-    margin-top: 0; // Elimina el margen superior
-    padding: 15px 0px 10px 0px; // Padding vertical ajustado para navbar inferior
-    z-index: 1000; // Z-index alto para estar por encima de otros elementos
-    position: fixed; // Posición fija en la parte inferior
+    width: 100%;
+    height: auto;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    margin-top: 0;
+    padding: 15px 0 10px 0;
+    z-index: 1000;
+    position: fixed;
 
-    .sidebar-nav {
-      ul {
-        display: flex; // Activa flexbox
-        flex-direction: row; // Organiza los items horizontalmente (en fila)
-        justify-content: space-around; // Distribuye los items uniformemente
+    .sidebar-nav ul {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
 
-        li {
-          width: auto; // Ancho automático para cada item
-          flex: 1; // Cada item ocupa el mismo espacio disponible
+      li {
+        width: auto;
+        flex: 1;
 
-          a {
-            padding: 0px; // Sin padding adicional
-            gap: 5px; // Espacio reducido entre icono y texto
+        a {
+          padding: 0;
+          gap: 5px;
 
-            img {
-              height: 45px; // Iconos más grandes en navbar inferior
-              width: 45px; // Iconos más grandes en navbar inferior
-            }
+          img {
+            height: 45px;
+            width: 45px;
+          }
 
-            span {
-              font-size: v.$font-size-xl * 0.6; // Texto más pequeño (60% del tamaño xl)
-            }
+          span {
+            font-size: v.$font-size-xl * 0.6;
           }
         }
       }
     }
   }
 
-  // Ajusta el contenido principal cuando el sidebar está en la parte inferior
   .main-content {
-    margin-left: 0; // Elimina el margen izquierdo (ya no hay sidebar lateral)
-    margin-bottom: 80px; // Agrega margen inferior para que el contenido no quede debajo de la navbar
-    padding: 15px; // Reduce el padding en pantallas pequeñas
+    margin-left: 0;
+    margin-bottom: 80px;
+    padding: 15px;
   }
 }
 
-// MÓVILES PEQUEÑOS (hasta 450px de ancho)
 @media (max-width: 450px) {
-  .side-bar-container {
-    .sidebar-nav {
-      ul {
-        li {
-          a {
-            img {
-              height: 34px; // Iconos más pequeños en pantallas muy pequeñas
-              width: 34px; // Iconos más pequeños en pantallas muy pequeñas
-            }
+  .side-bar-container .sidebar-nav ul li a {
+    img {
+      height: 34px;
+      width: 34px;
+    }
 
-            span {
-              font-size: v.$font-size-xl * 0.6; // Mantiene el tamaño del texto
-            }
-          }
-        }
-      }
+    span {
+      font-size: v.$font-size-xl * 0.6;
     }
   }
 
   .main-content {
-    padding: 10px; // Padding mínimo en pantallas muy pequeñas
-    margin-bottom: 70px; // Margen inferior reducido
+    padding: 10px;
+    margin-bottom: 70px;
   }
 }
