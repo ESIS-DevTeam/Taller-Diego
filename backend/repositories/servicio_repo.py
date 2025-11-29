@@ -63,6 +63,22 @@ class ServicioRepository:
 
         return self.db.query(Servicio).filter(Servicio.nombre == nombre).first()
 
+    def get_paginated(self, pagina: int = 1, cantidad_por_pagina: int = 10, nombre: str = None):
+        query = self.db.query(Servicio)
+        if nombre:
+            query = query.filter(Servicio.nombre.ilike(f"%{nombre}%"))
+        total = query.count()
+        skip = (pagina - 1) * cantidad_por_pagina
+        servicios = query.offset(skip).limit(cantidad_por_pagina).all()
+        cantidad_paginas = (total + cantidad_por_pagina - 1) // cantidad_por_pagina
+        return {
+            "data": servicios,
+            "total": total,
+            "pagina": pagina,
+            "cantidad_paginas": cantidad_paginas,
+            "cantidad_por_pagina": cantidad_por_pagina
+        }
+
     def update(self, id: int, servicio_data: ServicioCreate):
         """Actualiza un servicio existente.
 

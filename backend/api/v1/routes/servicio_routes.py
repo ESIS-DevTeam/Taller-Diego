@@ -1,12 +1,7 @@
-"""Rutas API para Servicio.
-
-Define los endpoints para operaciones CRUD de Servicio.
-"""
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from db.base import SessionLocal
-from schemas.servicio_schema import ServicioCreate, ServicioResponse
+from schemas.servicio_schema import ServicioCreate, ServicioResponse, ServicioPaginado
 from services.servicio_service import ServicioService
 
 router = APIRouter(tags=["Servicios"])
@@ -51,17 +46,14 @@ def create_servicio(
 
     return service.create_servicio(data)
 
-@router.get("/", response_model=list[ServicioResponse])
+@router.get("/", response_model=ServicioPaginado)
 def list_servicios(
+    pagina: int = Query(1, ge=1, description="Número de página"),
+    cantidad: int = Query(10, ge=1, le=100, description="Cantidad de servicios por página"),
+    nombre: str = Query(None, description="Buscar por nombre (opcional)"),
     service: ServicioService = Depends(get_servicio_service)
 ):
-    """Obtiene todos los servicios.
-
-    :param service: Servicio de Servicio inyectado.
-    :returns: Lista de ServicioResponse.
-    """
-
-    return service.list_servicios()
+    return service.list_servicios_paginados(pagina, cantidad, nombre)
 
 @router.get("/{id}", response_model=ServicioResponse)
 def get_servicio(id: int, service: ServicioService = Depends(get_servicio_service)):
