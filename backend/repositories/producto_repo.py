@@ -64,6 +64,9 @@ class ProductoRepository:
         """
 
         return self.db.query(Producto).filter(Producto.nombre == nombre).first()
+    
+    def get_by_barcode(self, codBarras: str):
+        return self.db.query(Producto).filter(Producto.codBarras == codBarras).first()
 
     def update(self, id: int, producto_data: ProductoCreate):
         """Actualiza un producto existente.

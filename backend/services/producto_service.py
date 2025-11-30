@@ -66,7 +66,10 @@ class ProductoService:
         """
 
         return self.repo.get_by_name(nombre)
-
+    
+    def get_by_barcode(self, codBarras: str):
+        return self.repo.get_by_barcode(codBarras)
+    
     def update_producto(self, id: int, data: ProductoCreate):
         """Actualiza un producto existente.
 
