@@ -273,3 +273,22 @@ function checkResponseStatus(response) {
     throw error;
   }
 }
+
+export async function fetchForBarCode(barCode) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/productos/barcode/${barCode}`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null; // Producto no encontrado
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const product = await response.json();
+    return product;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+}

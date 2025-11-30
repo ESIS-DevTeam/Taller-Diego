@@ -44,7 +44,7 @@ body {
   font-size: 14px;
   color: #333 !important;
   text-align: left;
-  z-index: 2000 ; 
+  z-index: 2000;
 
 
   .dropdown-arrow {
@@ -155,13 +155,25 @@ body {
     font-weight: 700;
   }
 
-  .card {
+  .inventory-actions {
     grid-column: span 3;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .card {
+    grid-column: initial;
     min-height: 50px;
     background: #005bb6;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    flex: 0 0 auto;
+
+    &.card-secondary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
 
     &:hover {
       transform: translateY(-3px);
@@ -178,20 +190,21 @@ body {
       color: white;
       font-weight: 600;
       font-size: 16px;
-      padding: 10px;
+      padding: 10px 20px;
+      white-space: nowrap;
 
       p {
         margin: 0;
         display: flex;
         align-items: center;
         gap: 8px;
-
-        &::before {
-          content: "+";
-          font-size: 20px;
-          font-weight: bold;
-        }
       }
+    }
+
+    &#open-modal-btn a p::before {
+      content: "";
+      font-size: 20px;
+      font-weight: bold;
     }
   }
 
@@ -205,7 +218,7 @@ body {
     gap: 15px;
     height: fit-content;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 180px);
     overflow-y: auto;
 
     
@@ -366,7 +379,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    max-height: calc(100vh - 200px); 
+    max-height: calc(100vh - 180px);
 
     .inventory-header {
       display: grid;
@@ -375,7 +388,7 @@ body {
       padding: 18px 10px;
       font-weight: 700;
       color: white;
-      
+
       .header-item {
         padding: 0 10px;
         font-size: clamp(20px, 2vw, 20px);
@@ -393,7 +406,7 @@ body {
     .product-list {
       display: flex;
       flex-direction: column;
-      max-height: calc(100vh - 260px);
+      max-height: calc(100vh - 240px);
       overflow-y: auto;
 
       .product-item {
@@ -413,7 +426,7 @@ body {
           cursor: pointer;
         }
 
-        > div {
+        >div {
           padding: 0 10px;
           display: flex;
           align-items: center;
@@ -439,7 +452,7 @@ body {
           justify-self: center;
           width: auto;
           display: inline-flex;
-          
+
           &.low-stock {
             background-color: #ffebee;
             color: #d32f2f;
@@ -461,6 +474,7 @@ body {
           display: flex;
           gap: 8px;
           justify-content: center;
+
           button {
             width: 32px;
             height: 32px;
@@ -480,9 +494,7 @@ body {
               }
 
               .img-edit {
-                filter: brightness(0) saturate(100%) invert(27%) sepia(98%)
-                  saturate(2466%) hue-rotate(201deg) brightness(95%)
-                  contrast(101%);
+                filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(2466%) hue-rotate(201deg) brightness(95%) contrast(101%);
               }
             }
 
@@ -492,15 +504,13 @@ body {
               }
 
               .img-delete {
-                filter: brightness(0) saturate(100%) invert(23%) sepia(89%)
-                  saturate(3470%) hue-rotate(348deg) brightness(89%)
-                  contrast(89%);
+                filter: brightness(0) saturate(100%) invert(23%) sepia(89%) saturate(3470%) hue-rotate(348deg) brightness(89%) contrast(89%);
               }
             }
 
             img {
               width: 18px;
-              pointer-events: none; 
+              pointer-events: none;
               height: 18px;
             }
           }
@@ -625,6 +635,7 @@ input[type="number"] {
     height: auto;
     min-height: 100dvh; 
   }
+
   body.inventory-open {
     background-color: #ffffff !important;
     min-height: 100vh;
@@ -637,11 +648,13 @@ input[type="number"] {
     padding: 0;
     grid-template-rows: auto !important;
   }
+
   .main-content h1 {
     margin: 70px 0 0 0 !important;
-    padding: 0 ;
-    font-size: 20px ;
+    padding: 0;
+    font-size: 20px;
   }
+
   .main-content {
     background-color: white;
     gap: 0; // base sin separación
@@ -675,7 +688,7 @@ input[type="number"] {
     }
 
     .card {
-      display: none ; // no ocupa lugar en el grid
+      display: none; // no ocupa lugar en el grid
     }
   }
 
@@ -788,12 +801,15 @@ input[type="number"] {
   body.menu-open .container {
     display: none;
   }
+
   // Contenido principal oculto por defecto
   .main-content {
-    display: none;;
+    display: none;
+    ;
     gap: 0;
     margin: 0;
     padding: 0;
+
     &.active {
       display: grid;
       gap: 15px;
@@ -844,7 +860,7 @@ input[type="number"] {
       padding: 15px 15px 0 15px;
       box-shadow: none;
       gap: 12px;
-      overflow: visible; 
+      overflow: visible;
       position: relative;
       z-index: 100;
       margin-top: 0;
@@ -855,21 +871,24 @@ input[type="number"] {
 
       .inventory-form {
         display: grid;
-        grid-template-columns: repeat(5,1fr);
+        grid-template-columns: repeat(5, 1fr);
         overflow: visible;
-        .search-box{
+
+        .search-box {
           grid-column: span 5;
+
           input {
             padding: 10px 12px 10px 35px;
             font-size: 14px;
           }
-        } 
+        }
 
         .section-filter {
-          
+
           border-radius: 12px;
           padding: 0px;
           gap: 12px;
+
           h4 {
             display: none;
             font-size: 16px;
@@ -915,7 +934,7 @@ input[type="number"] {
       margin-bottom: 20px;
       top: 80px;
       .inventory-header {
-        grid-template-columns: 2fr 1fr 1fr ;
+        grid-template-columns: 2fr 1fr 1fr;
         padding: 12px 8px;
         gap: 8px;
         flex-shrink: 0;
@@ -924,8 +943,8 @@ input[type="number"] {
           padding: 0 4px;
 
           &:nth-child(2),
-          &:nth-child(4),  
-          &:nth-child(5){
+          &:nth-child(4),
+          &:nth-child(5) {
             display: none;
           }
 
@@ -951,7 +970,7 @@ input[type="number"] {
             display: none;
           }
 
-          > div {
+          >div {
             padding: 0 4px;
             font-size: 13px;
           }
@@ -962,7 +981,7 @@ input[type="number"] {
             font-size: 13px;
             overflow: hidden;
             text-overflow: ellipsis;
-            word-break: break-word; 
+            word-break: break-word;
           }
 
           .product-stock {
@@ -1012,7 +1031,7 @@ input[type="number"] {
   .main-content {
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-    
+
     h1 {
       grid-column: span 3;
       font-size: 18px;
@@ -1033,7 +1052,7 @@ input[type="number"] {
       max-height: calc(100vh - 140px);
       overflow-y: auto;
       padding: 15px;
-      
+
       h2 {
         font-size: 16px;
       }
@@ -1099,7 +1118,7 @@ input[type="number"] {
             display: none;
           }
 
-          > div {
+          >div {
             font-size: 12px;
           }
 
@@ -1128,13 +1147,14 @@ input[type="number"] {
         }
       }
     }
-    
+
   }
 
   // Menú móvil en landscape
   #mobile-menu-container {
     margin-top: 60px;
     padding: 15px;
+
     .mobile-actions-menu ul {
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
@@ -1312,7 +1332,7 @@ input[type="number"] {
             display: none;
           }
 
-          > div {
+          >div {
             padding: 0 6px;
             font-size: 15px;
           }

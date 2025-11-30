@@ -48,7 +48,10 @@ export async function generateModalHTML(type = 'add', id = null) {
   const categoryOptions = generateCategoryOptions(data.categoria, isReadOnly);
   const isAutoparte = data.tipo === 'autoparte' || data.modelo || data.anio;
 
-  return `
+    const categoryOptions = generateCategoryOptions(data.categoria, isReadOnly);
+    const isAutoparte = data.tipo === 'autoparte' || data.modelo || data.anio;
+
+    return `
   <div class="modal-overlay">
       <div class="modal-inventory-form ${isView ? 'view-mode' : ''}">
           <div class="modal-header">
@@ -100,6 +103,7 @@ export async function generateModalHTML(type = 'add', id = null) {
                          step="0.01" placeholder="${isEdit || isView ? data.precioVenta : 'Ej: 200.00'}"
                          value="${data.precioVenta}" ${required} min="0" ${readonly}>
               </div>
+
               <div class="form-group">
                   <label for="product-description" class="form-label">Descripción</label>
                   <textarea maxlength="500" id="product-description" name="product-description" 
@@ -152,6 +156,21 @@ export async function generateModalHTML(type = 'add', id = null) {
                 ` : ''}
               </div>
               
+              <! -- Código de barras -->
+              ${(isEdit || isView) && data.codBarras ? `
+              <div class="form-group barcode-group">
+                  <label class="form-label">Código de barras</label>
+                  <div class="barcode-container" id="barcode-container" 
+                       title="Haz clic para descargar la imagen"
+                       style="cursor: pointer; padding: 4px; border: 1px solid #ddd; border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                      <svg id="product-barcode"></svg>
+                      <p style="margin: 0; font-size: 12px; color: #3498db; font-weight: 500; white-space: nowrap;">
+                        Haz clic para<br>descargar
+                      </p>
+                  </div>
+              </div>
+              ` : ''}
+
               <div class="form-actions">
                   ${!isView ? `
                   <button type="submit" class="btn-save">${isEdit ? 'Actualizar' : 'Guardar'}</button>

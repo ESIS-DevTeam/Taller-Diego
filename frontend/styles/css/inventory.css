@@ -232,10 +232,16 @@ body {
 }
 
 .main-content h1 {
-  grid-column: span 9;
+  /* Modificado: Reducido a 6 columnas para dar espacio al botón de código de barras */
+  grid-column: span 6;
   font-size: 28px;
   color: #2c3e50;
   font-weight: 700;
+}
+
+/* Nuevo: Estilo específico para el botón de código de barras (sin icono +) */
+#barcode-btn a p::before {
+  content: none;
 }
 
 .main-content .card {
@@ -296,10 +302,6 @@ body {
   font-size: clamp(18px, 2.5vw, 20px);
   color: #2c3e50;
   font-weight: 700;
-}
-
-.main-content .form-inventary .btn-back-menu {
-  display: none;
 }
 
 .main-content .form-inventary .inventory-form {
@@ -507,7 +509,11 @@ body {
   font-weight: 200;
 }
 
-.main-content .inventary-data .product-list .product-item .product-name,
+.main-content .inventary-data .product-list .product-item .product-name {
+  color: #1a1a1a;
+  justify-content: flex-start;
+}
+
 .main-content .inventary-data .product-list .product-item .product-desc {
   color: #1a1a1a;
   justify-content: flex-start;
@@ -1123,7 +1129,9 @@ input[type=number] {
     height: 18px;
   }
 
-  #open-modal-btn {
+  /* Modificado: Ocultar ambos botones en móvil/tablet vertical */
+  #open-modal-btn,
+  #barcode-btn {
     display: none;
   }
 }
@@ -1146,7 +1154,9 @@ input[type=number] {
     margin-bottom: 0;
   }
 
-  .main-content #open-modal-btn {
+  /* Modificado: Ocultar ambos botones en landscape móvil */
+  .main-content #open-modal-btn,
+  .main-content #barcode-btn {
     display: none;
   }
 
@@ -1305,181 +1315,470 @@ input[type=number] {
     margin-bottom: 0;
   }
 
-  .main-content #open-modal-btn {
+  /* Modificado: Mostrar ambos botones en ancho completo para tablets grandes */
+  .main-content #open-modal-btn,
+  .main-content #barcode-btn {
     grid-column: span 12;
     display: block;
     max-width: none;
     margin: 0;
   }
 
-  .main-content #open-modal-btn a {
+  .main-content #open-modal-btn a,
+  .main-content #barcode-btn a {
     min-height: 56px;
-    font-size: 16px;
+
+    -modal-btn a {
+      min-height: 56px;
+      font-size: 16px;
+    }
+
+    .main-content .form-inventary {
+      grid-column: span 12;
+      max-height: none;
+      padding: 20px;
+    }
+
+    .main-content .form-inventary h2 {
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    .main-content .form-inventary .inventory-form {
+      gap: 18px;
+      overflow: hidden;
+    }
+
+    .main-content .form-inventary .inventory-form .search-box input {
+      font-size: 16px;
+      padding: 14px 16px 14px 42px;
+      height: 50px;
+    }
+
+    .main-content .form-inventary .inventory-form .search-box img {
+      width: 20px;
+      height: 20px;
+      left: 14px;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter h4 {
+      font-size: 17px;
+      margin-bottom: 10px;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter .category-dropdown {
+      display: block !important;
+      margin-bottom: 0;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter .category-option li {
+      display: none !important;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter ul {
+      gap: 10px;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter ul label {
+      padding: 10px 12px;
+      font-size: 16px;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter ul label input[type=checkbox] {
+      width: 20px;
+      height: 20px;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter .price-range {
+      gap: 10px;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter .price-range input {
+      padding: 12px;
+      font-size: 16px;
+      height: 50px;
+    }
+
+    .main-content .form-inventary .inventory-form .section-filter .price-range span {
+      font-size: 16px;
+    }
+
+    .main-content .form-inventary .inventory-form button {
+      padding: 14px 24px;
+      font-size: 16px;
+      height: 50px;
+    }
+
+    .main-content .inventary-data {
+      grid-column: span 12;
+      max-height: none;
+    }
+
+    .main-content .inventary-data .inventory-header {
+      grid-template-columns: 2fr 1fr 1.2fr 1.2fr;
+      padding: 18px 15px;
+      gap: 10px;
+    }
+
+    .main-content .inventary-data .inventory-header .header-item {
+      font-size: 15px;
+      padding: 0 6px;
+    }
+
+    .main-content .inventary-data .inventory-header .header-item:nth-child(2),
+    .main-content .inventary-data .inventory-header .header-item:nth-child(4) {
+      display: none;
+    }
+
+    .main-content .inventary-data .inventory-header .header-item:first-child {
+      justify-content: flex-start;
+    }
+
+    .main-content .inventary-data .product-list {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .main-content .inventary-data .product-list .product-item {
+      grid-template-columns: 2fr 1fr 1.2fr 1.2fr;
+      padding: 16px 15px;
+      gap: 10px;
+    }
+
+    .main-content .inventary-data .product-list .product-item .product-desc,
+    .main-content .inventary-data .product-list .product-item .product-purchase-price {
+      display: none;
+    }
+
+    .main-content .inventary-data .product-list .product-item>div {
+      padding: 0 6px;
+      font-size: 15px;
+    }
+
+    .main-content .inventary-data .product-list .product-item .product-name {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.4;
+      justify-content: flex-start;
+    }
+
+    .main-content .inventary-data .product-list .product-item .product-stock {
+      font-size: 14px;
+      padding: 8px;
+    }
+
+    .main-content .inventary-data .product-list .product-item .product-selling-price {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .main-content .inventary-data .product-list .product-item .product-actions {
+      gap: 8px;
+      padding-right: 5px;
+    }
+
+    .main-content .inventary-data .product-list .product-item .product-actions button {
+      width: 34px;
+      height: 34px;
+    }
+
+    .main-content .inventary-data .product-list .product-item .product-actions button img {
+      width: 22px;
+      height: 22px;
+    }
   }
 
-  .main-content .form-inventary {
-    grid-column: span 12;
-    max-height: none;
-    padding: 20px;
+  @media (min-width: 769px) {
+    .category-dropdown {
+      display: none !important;
+    }
+
+    .category-option li {
+      display: block !important;
+    }
   }
 
-  .main-content .form-inventary h2 {
-    font-size: 20px;
-    margin-bottom: 14px;
+  @media (max-width: 480px) {
+    .container {
+      padding: 10px;
+    }
+
+    #mobile-menu-container {
+      padding: 15px;
+    }
+
+    #mobile-menu-container .mobile-actions-menu ul {
+      gap: 12px;
+      max-width: 400px;
+    }
   }
 
-  .main-content .form-inventary .inventory-form {
-    gap: 18px;
-    overflow: hidden;
+  @media (max-width: 375px) {
+    #mobile-menu-container .mobile-actions-menu ul {
+      max-width: 320px;
+      gap: 10px;
+    }
+
+    #mobile-menu-container .mobile-actions-menu ul li button {
+      gap: 8px;
+      padding: 12px;
+    }
   }
 
-  .main-content .form-inventary .inventory-form .search-box input {
-    font-size: 16px;
-    padding: 14px 16px 14px 42px;
-    height: 50px;
+  /*# sourceMappingURL=inventory.css.map */
+
+  /* ========================================
+   BOTÓN DE DESCARGA MASIVA DE CÓDIGOS
+   ======================================== */
+
+  .inventory-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
   }
 
-  .main-content .form-inventary .inventory-form .search-box img {
-    width: 20px;
-    height: 20px;
-    left: 14px;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter h4 {
-    font-size: 17px;
-    margin-bottom: 10px;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter .category-dropdown {
-    display: block !important;
-    margin-bottom: 0;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter .category-option li {
-    display: none !important;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter ul {
-    gap: 10px;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter ul label {
-    padding: 10px 12px;
-    font-size: 16px;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter ul label input[type=checkbox] {
-    width: 20px;
-    height: 20px;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter .price-range {
-    gap: 10px;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter .price-range input {
-    padding: 12px;
-    font-size: 16px;
-    height: 50px;
-  }
-
-  .main-content .form-inventary .inventory-form .section-filter .price-range span {
-    font-size: 16px;
-  }
-
-  .main-content .form-inventary .inventory-form button {
-    padding: 14px 24px;
-    font-size: 16px;
-    height: 50px;
-  }
-
-  .main-content .inventary-data {
-    grid-column: span 12;
-    max-height: none;
-  }
-
-  .main-content .inventary-data .inventory-header {
-    grid-template-columns: 2fr 1fr 1.2fr 1.2fr;
-    padding: 18px 15px;
-    gap: 10px;
-  }
-
-  .main-content .inventary-data .inventory-header .header-item {
-    font-size: 15px;
-    padding: 0 6px;
-  }
-
-  .main-content .inventary-data .inventory-header .header-item:nth-child(2),
-  .main-content .inventary-data .inventory-header .header-item:nth-child(4) {
-    display: none;
-  }
-
-  .main-content .inventary-data .inventory-header .header-item:first-child {
-    justify-content: flex-start;
-  }
-
-  .main-content .inventary-data .product-list {
-    max-height: 600px;
-    overflow-y: auto;
-  }
-
-  .main-content .inventary-data .product-list .product-item {
-    grid-template-columns: 2fr 1fr 1.2fr 1.2fr;
-    padding: 16px 15px;
-    gap: 10px;
-  }
-
-  .main-content .inventary-data .product-list .product-item .product-desc,
-  .main-content .inventary-data .product-list .product-item .product-purchase-price {
-    display: none;
-  }
-
-  .main-content .inventary-data .product-list .product-item>div {
-    padding: 0 6px;
-    font-size: 15px;
-  }
-
-  .main-content .inventary-data .product-list .product-item .product-name {
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.4;
-    justify-content: flex-start;
-  }
-
-  .main-content .inventary-data .product-list .product-item .product-stock {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  .main-content .inventary-data .product-list .product-item .product-selling-price {
+  .btn-download-barcodes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
     font-size: 15px;
     font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
   }
 
-  .main-content .inventary-data .product-list .product-item .product-actions {
+  .btn-download-barcodes:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-download-barcodes:active {
+    transform: translateY(0);
+  }
+
+  .btn-download-barcodes svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+  }
+
+  /* Modal de descarga masiva */
+  .modal-barcode-download {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-barcode-download.active {
+    display: flex;
+  }
+
+  .modal-barcode-content {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease;
+    position: relative;
+  }
+
+  .modal-barcode-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e6ed;
+  }
+
+  .modal-barcode-header h2 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-barcode-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #7f8c8d;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+
+  .modal-barcode-close:hover {
+    background: #f8f9fa;
+    color: #2c3e50;
+    transform: rotate(90deg);
+  }
+
+  .time-options {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .time-option {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border: 2px solid #e0e6ed;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .time-option:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+    transform: translateX(5px);
+  }
+
+  .time-option input[type='radio'] {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #667eea;
+  }
+
+  .time-option label {
+    cursor: pointer;
+    font-size: 16px;
+    color: #2c3e50;
+    font-weight: 500;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .time-option.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #f8f9ff 0%, #e8ebff 100%);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  }
+
+  .option-icon {
+    font-size: 20px;
+  }
+
+  .option-description {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-left: 32px;
+    margin-top: 4px;
+  }
+
+  .modal-barcode-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 25px;
+  }
+
+  .btn-barcode-cancel,
+  .btn-barcode-download {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .btn-barcode-cancel {
+    background: #e0e6ed;
+    color: #2c3e50;
+  }
+
+  .btn-barcode-cancel:hover {
+    background: #cbd5e0;
+  }
+
+  .btn-barcode-download {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
     gap: 8px;
-    padding-right: 5px;
   }
 
-  .main-content .inventary-data .product-list .product-item .product-actions button {
-    width: 34px;
-    height: 34px;
+  .btn-barcode-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   }
 
-  .main-content .inventary-data .product-list .product-item .product-actions button img {
-    width: 22px;
-    height: 22px;
-  }
-}
-
-@media (min-width: 769px) {
-  .category-dropdown {
-    display: none !important;
+  .btn-barcode-download:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
 
-  .category-option li {
-    display: block !important;
-  }
-}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
 
-/*# sourceMappingURL=inventory.css.map */
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Loading spinner */
+  .loading-spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }

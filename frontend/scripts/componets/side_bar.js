@@ -33,7 +33,7 @@ export function loadSideBar() {
                 
                 <!-- Opción de navegación: Órdenes de servicio -->
                 <li>
-                    <a href="#">
+                    <a href="orden.html">
                         <img src="../assets/icons/checklist.png" alt="Orden de servicio" class="icon">
                         <span>Orden</span>
                     </a>
