@@ -148,6 +148,10 @@ body {
   padding-bottom: 20px;
   margin: 0 auto;
 
+  .btn-back-menu {
+    display: none;
+  }
+
   h1 {
     grid-column: span 9;
     font-size: 28px;
@@ -218,7 +222,7 @@ body {
     gap: 15px;
     height: fit-content;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    max-height: calc(100vh - 180px);
+    max-height: calc(100vh - 220px);
     overflow-y: auto;
 
     h2 {
@@ -374,7 +378,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    max-height: calc(100vh - 180px);
+    max-height: calc(100vh - 220px);
 
     .inventory-header {
       display: grid;
@@ -433,11 +437,21 @@ body {
         .product-name {
           color: #1a1a1a;
           justify-content: flex-start;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-width: 0;
+          display: block;
         }
 
         .product-desc {
           color: #555;
           justify-content: flex-start;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-width: 0;
+          display: block;
         }
 
         .product-stock {
@@ -447,6 +461,10 @@ body {
           justify-self: center;
           width: auto;
           display: inline-flex;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-width: 0;
 
           &.low-stock {
             background-color: #ffebee;
@@ -463,6 +481,11 @@ body {
         .product-selling-price {
           font-family: "Courier New", monospace;
           color: #1a1a1a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-width: 0;
+          display: block;
         }
 
         .product-actions {
@@ -633,7 +656,8 @@ input[type="number"] {
 
   body.inventory-open {
     background-color: #ffffff !important;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
   }
 
   .main-content,
@@ -645,7 +669,7 @@ input[type="number"] {
   }
 
   .main-content h1 {
-    margin: 70px 0 0 0 !important;
+    margin: 40px 10px 0 10px !important;
     padding: 0;
     font-size: 20px;
   }
@@ -670,7 +694,7 @@ input[type="number"] {
     }
 
     .inventary-data {
-      margin-top: 12px; // solo la tabla necesita respiración
+      margin: 12px 10px 20px 10px;
     }
 
     .card {
@@ -680,15 +704,16 @@ input[type="number"] {
 
 
   .container {
-    margin-top: 0;
-    padding: 0;
     margin-top: 35px;
-    padding-bottom: 250px !important;
-    height: 100vh;
+    padding: 0 0 100px 0;
+    height: calc(100vh - 35px);
+    overflow: hidden;
 
     &.active {
       display: grid;
-      padding: 0 10px; // Solo padding lateral mínimo
+      padding: 0 10px 90px 10px;
+      height: calc(100vh - 35px);
+      overflow: hidden;
     }
   }
 
@@ -705,38 +730,30 @@ input[type="number"] {
   // Mostrar menú móvil
   #mobile-menu-container {
     display: flex;
-    inset: 0;
     justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-    padding: 20px;
-    margin-top: 80px;
+    align-items: flex-start;
+    width: 100%;
+    padding: 0 160px;
+    margin-top: 100px !important;
 
     .mobile-actions-menu {
       display: flex;
       width: 100%;
-      height: max-content;
       justify-content: center;
-      align-items: center;
+      align-items: stretch;
 
       ul {
         list-style: none;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 15px;
-        justify-items: center;
-        align-items: center;
-        gap: 12px;
-        width: 200px;
-        height: 200px;
-        padding: 0 8px;
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 0;
 
         li {
           transition: all 0.3s ease;
-          width: 100%;
-          display: flex;
-          justify-content: center;
 
           &:active {
             transform: scale(0.95);
@@ -760,13 +777,13 @@ input[type="number"] {
             cursor: pointer;
 
             img {
-              width: 40px;
-              height: 40px;
+              width: clamp(35px, 10vw, 50px);
+              height: clamp(35px, 10vw, 50px);
               filter: brightness(0) invert(1);
             }
 
             span {
-              font-size: 15px;
+              font-size: clamp(13px, 3vw, 16px);
               font-weight: 500;
               text-align: center;
             }
@@ -775,8 +792,8 @@ input[type="number"] {
       }
     }
 
-    // Ocultar menú cuando se muestra el contenido
-    &.active {
+    // Ocultar menú cuando está activo
+    &.hidden {
       display: none;
     }
   }
@@ -792,42 +809,42 @@ input[type="number"] {
   // Contenido principal oculto por defecto
   .main-content {
     display: none;
-    ;
     gap: 0;
     margin: 0;
     padding: 0;
 
     &.active {
       display: grid;
+      grid-template-columns: repeat(12, 1fr);
       gap: 15px;
     }
 
-    // Mostrar botón volver
-    .mobile-back-wrapper {
+    .btn-back-menu {
+      display: none;
       grid-column: span 12;
-      display: flex;
-      justify-content: flex-start;
+      background-color: v.color("primary");
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
       margin-bottom: 10px;
-      order: -1;
-
-      .mobile-back-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 16px;
-        border-radius: 999px;
-        border: 1px solid v.color("primary");
-        background-color: white;
-        color: v.color("primary");
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:active {
-          transform: scale(0.95);
-          background-color: #f0f0f0;
-        }
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    &.active .btn-back-menu {
+      display: block;
     }
 
     h1 {
@@ -871,7 +888,6 @@ input[type="number"] {
         }
 
         .section-filter {
-
           border-radius: 12px;
           padding: 0px;
           gap: 12px;
@@ -915,8 +931,11 @@ input[type="number"] {
     .inventary-data {
       grid-column: span 12;
       order: 2;
-      height: 55vh;
-      max-height: 57vh;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 420px)!important;
+      max-height: calc(100vh - 420px)!important;
 
       .inventory-header {
         grid-template-columns: 2fr 1fr 1fr;
@@ -940,7 +959,10 @@ input[type="number"] {
       }
 
       .product-list {
-        max-width: auto;
+        max-width: none;
+        overflow-y: auto;
+        flex: 1;
+        -webkit-overflow-scrolling: touch;
 
         .product-item {
           grid-template-columns: 2fr 1fr 1fr;
@@ -959,13 +981,12 @@ input[type="number"] {
           }
 
           .product-name {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
             font-size: 13px;
-            -webkit-line-clamp: 2;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            word-break: break-word;
+            min-width: 0;
+            display: block;
           }
 
           .product-stock {
@@ -973,12 +994,19 @@ input[type="number"] {
             padding: 5px 10px;
             text-align: center;
             white-space: nowrap;
-
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
           }
 
           .product-selling-price {
             font-size: 13px;
             font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            display: block;
           }
 
           .product-actions {
@@ -1108,15 +1136,29 @@ input[type="number"] {
 
           .product-name {
             font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            display: block;
           }
 
           .product-stock {
             font-size: 12px;
             padding: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
           }
 
           .product-selling-price {
             font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            display: block;
           }
 
           .product-actions button {
@@ -1324,18 +1366,31 @@ input[type="number"] {
           .product-name {
             font-size: 15px;
             font-weight: 500;
-            line-height: 1.4;
             justify-content: flex-start;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            display: block;
           }
 
           .product-stock {
             font-size: 14px;
             padding: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
           }
 
           .product-selling-price {
             font-size: 15px;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            display: block;
           }
 
           .product-actions {
