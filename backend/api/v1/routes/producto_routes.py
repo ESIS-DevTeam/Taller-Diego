@@ -35,6 +35,14 @@ def list_productos(
     return service.list_productos()
 
 
+@router.get("/barcode/{codBarras}", response_model=ProductoResponse)
+def get_producto_by_barcode(codBarras: str, service: ProductoService = Depends(get_producto_service)):
+    producto = service.get_by_barcode(codBarras)
+    if not producto:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+    return producto
+
+
 @router.get("/{id}", response_model=ProductoResponse)
 def get_producto(id: int, service: ProductoService = Depends(get_producto_service)):
     producto = service.get_by_id(id)

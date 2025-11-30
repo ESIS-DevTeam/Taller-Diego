@@ -24,6 +24,9 @@ class ProductoRepository:
     
     def get_by_name(self, nombre: str):
         return self.db.query(Producto).filter(Producto.nombre == nombre).first()
+    
+    def get_by_barcode(self, codBarras: str):
+        return self.db.query(Producto).filter(Producto.codBarras == codBarras).first()
 
     def update(self, id: int, producto_data: ProductoCreate):
         producto = self.get_by_id(id)
