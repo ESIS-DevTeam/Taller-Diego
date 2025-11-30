@@ -68,7 +68,7 @@ body {
     top: auto;
     left: 0;
     margin-top: 0;
-    padding: 15px 0px 10px 0px;
+    padding: 15px 0 10px 0;
     z-index: 1000;
     position: fixed;
   }
@@ -82,7 +82,7 @@ body {
     flex: 1;
   }
   .side-bar-container .sidebar-nav ul li a {
-    padding: 0px;
+    padding: 0;
     gap: 5px;
   }
   .side-bar-container .sidebar-nav ul li a img {
@@ -111,5 +111,3 @@ body {
     margin-bottom: 70px;
   }
 }
-
-/*# sourceMappingURL=side_bar.css.map */

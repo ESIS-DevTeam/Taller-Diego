@@ -16,6 +16,8 @@ loadComponent("mobile-menu-container", "includes/mobile-menu.html");
 // Iniciar fetch inmediatamente (no esperar al DOM)
 const productsPromise = fetchFromApi('productos');
 
+
+
 // Inicializar inventario
 async function initializeInventory() {
   try {
@@ -85,6 +87,16 @@ function setupMobileInventoryMenu() {
   safeAdd(btnAdd, (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Ocultar menú móvil pero NO mostrar inventario
+    if (mobileMenu && mainContent) {
+      mobileMenu.classList.add("active"); // oculta menú
+      mainContent.classList.add("active"); // muestra inventario
+      document.body.classList.remove("menu-open");
+      document.body.classList.add("inventory-open");
+    }
+
+    // Abrir modal
     setTimeout(() => {
       openModalForm("add");
     }, 100);
@@ -113,8 +125,18 @@ document.getElementById("open-modal-btn")?.addEventListener("click", (e) => {
   openModalForm('add');
 });
 
+// Vincular botón de códigos de barras PDF
+bindBarcodeButton();
+
 // Inicializar cuando cargue el DOM
 document.addEventListener('DOMContentLoaded', async () => {
   await initializeInventory();
   setupMobileInventoryMenu();
+
+  // Abrir modal si viene desde URL
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('open') === 'new-product') {
+    openModalForm('add');
+    history.replaceState(null, '', window.location.pathname);
+  }
 });
