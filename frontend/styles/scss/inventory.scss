@@ -207,11 +207,16 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+
     
     h2 {
       font-size: clamp(18px, 2.5vw, 20px);
       color: #2c3e50;
       font-weight: 700;
+    }
+
+    .btn-back-menu{
+      display: none;
     }
 
     .inventory-form {
@@ -417,14 +422,14 @@ body {
           font-weight: 200;
         }
 
-        .product-name {
+        .product-name, .product-desc {
           color: #1a1a1a;
           justify-content: flex-start;
-        }
-
-        .product-desc {
-          color: #555;
-          justify-content: flex-start;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          max-width: 100%;
+          display: block;
+          overflow: hidden;
         }
 
         .product-stock {
@@ -616,14 +621,15 @@ input[type="number"] {
 
 @media (max-width: 768px) {
   body {
-    overflow-y: hidden !important;
-    height: 100vh;
-    
+    overflow-y: auto !important;
+    height: auto;
+    min-height: 100dvh; 
   }
   body.inventory-open {
     background-color: #ffffff !important;
     min-height: 100vh;
   }
+
   .main-content,
   .main-content.active {
     gap: 0px !important;
@@ -653,6 +659,15 @@ input[type="number"] {
     .form-inventary {
       margin-top: 0 ;
       padding: 0 ;
+      .btn-back-menu{
+        display: block;
+        background-color: #005bb6;
+        color: white;
+        padding: 10px 15px;
+        font-weight: 700;
+        border-radius: 10px;
+        border: none;
+      }
     }
 
     .inventary-data {
@@ -667,10 +682,11 @@ input[type="number"] {
 
   .container {
     margin-top: 0;
-    padding: 0;
-    margin-top: 35px;
+    padding: 90px 15px 40px 15px; 
+    min-height: 100dvh;
     padding-bottom: 250px !important;
-    height: 100vh;
+    height: auto;
+    display: none;
     &.active {
       display: grid;
       padding: 0 10px; // Solo padding lateral mínimo
@@ -691,37 +707,37 @@ input[type="number"] {
   #mobile-menu-container {
     display: flex;
     inset: 0;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-    padding: 20px;
-    margin-top: 80px;
+    min-height: 100vh;
+    padding: 16vh 30px 0 30px ;
 
     .mobile-actions-menu {
       display: flex;
       width: 100%;
-      height: max-content;
+      height: 100%;
       justify-content: center;
       align-items: center;
 
       ul {
         list-style: none;
-        padding: 0;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 15px;
         justify-items: center ; 
         align-items: center ;
-        gap: 12px ;
-        width: 200px;
-        height: 200px;
-        padding: 0 8px;
+        justify-content: center;
+        gap: 15px;
+        margin: 0 auto;
+        width: 100%;
+        height: 100%;
 
         li {
           transition: all 0.3s ease;
-           width: 100%;
-            display: flex;
-            justify-content: center;
+          width: 100%;
+          height: 100%;
+          max-width: 250px;
+          max-height: 250px;
+          display: flex;
+          justify-content: center;
           &:active {  
             transform: scale(0.95);
           }
@@ -893,13 +909,16 @@ input[type="number"] {
     .inventary-data {
       grid-column: span 12;
       order: 2;
-      height: 55vh;
-      max-height: 57vh;
+      height: auto;
+      min-height: 200;
+      max-height: none;
+      margin-bottom: 20px;
+      top: 80px;
       .inventory-header {
         grid-template-columns: 2fr 1fr 1fr ;
         padding: 12px 8px;
         gap: 8px;
-
+        flex-shrink: 0;
         .header-item {
           font-size: 13px;
           padding: 0 4px;
@@ -917,12 +936,14 @@ input[type="number"] {
       }
 
       .product-list {
-        max-width: auto;
-
+        flex: 1;
+        overflow-y: auto;
+        min-height: 200px;
         .product-item {
           grid-template-columns: 2fr 1fr 1fr;
           padding: 10px 8px;
           gap: 8px;
+
 
           .product-desc,
           .product-purchase-price,
@@ -936,10 +957,9 @@ input[type="number"] {
           }
 
           .product-name {
-            display: -webkit-box;
+            display: block;
             -webkit-box-orient: vertical;
             font-size: 13px;
-            -webkit-line-clamp: 2;
             overflow: hidden;
             text-overflow: ellipsis;
             word-break: break-word; 
@@ -1342,34 +1362,5 @@ input[type="number"] {
 
   .category-option li {
     display: block !important;
-  }
-}
-
-// Móviles pequeños
-@media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-
-  #mobile-menu-container {
-    padding: 15px;
-
-    .mobile-actions-menu ul {
-      gap: 12px;
-      max-width: 400px;
-    }
-  }
-}
-
-// Móviles muy pequeños
-@media (max-width: 375px) {
-  #mobile-menu-container .mobile-actions-menu ul {
-    max-width: 320px;
-    gap: 10px;
-
-    li button {
-      gap: 8px;
-      padding: 12px;
-    }
   }
 }

@@ -1,12 +1,11 @@
 // Cargar componentes dinámicamente
-import { loadHeader } from './componets/header.js';
-import { loadSideBar } from './componets/side_bar.js';
+import { loadComponent } from './utils/component-loader.js';
 import { fetchForBarCode } from './data-manager.js';
 import { showSuccess, showError, showWarning } from './utils/notification.js';
 
-// Cargar header y sidebar inmediatamente
-document.getElementById("header").innerHTML = loadHeader();
-document.getElementById("side-bar-container").innerHTML = loadSideBar();
+// Cargar header y sidebar dinámicamente (Hybrid)
+loadComponent("header", "includes/header.html");
+loadComponent("side-bar-container", "includes/sidebar.html");
 
 // Elementos del DOM
 const ordenSidebar = document.getElementById('orden-sidebar');
@@ -20,10 +19,10 @@ let sidebarVisible = true;
 document.addEventListener('DOMContentLoaded', () => {
   setupOrdenSidebar();
   setupSidebarToggle();
-  
+
   // Mostrar el sidebar secundario por defecto al cargar la página
   showOrdenSidebar();
-  
+
   // Cargar venta de producto por defecto
   loadSection('venta-producto');
   barcodeReader();
@@ -32,17 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // Configurar eventos del sidebar secundario
 function setupOrdenSidebar() {
   const menuItems = document.querySelectorAll('.orden-sidebar-menu a');
-  
+
   menuItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
-      
+
       // Remover clase active de todos
       menuItems.forEach(link => link.classList.remove('active'));
-      
+
       // Agregar clase active al clickeado
       item.classList.add('active');
-      
+
       // Obtener la sección
       const section = item.dataset.section;
       loadSection(section);
@@ -52,7 +51,7 @@ function setupOrdenSidebar() {
 
 // Cargar contenido según la sección
 function loadSection(section) {
-  switch(section) {
+  switch (section) {
     case 'venta-producto':
       loadVentaProducto();
       break;
@@ -108,7 +107,7 @@ let productosVenta = [];
 async function initVentaProducto() {
   // Cargar productos desde el backend
   await loadProductos();
-  
+
   // Event listeners
   const productoSearch = document.getElementById('producto-search');
   const productoDropdown = document.getElementById('producto-dropdown');
@@ -125,7 +124,7 @@ async function initVentaProducto() {
 
   addBtn.addEventListener('click', addProductoToVenta);
   registrarBtn.addEventListener('click', registrarVenta);
-  
+
   // Ocultar dropdown al hacer click fuera
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.form-field')) {
@@ -138,7 +137,7 @@ async function loadProductos() {
   try {
     const response = await fetch('http://localhost:8000/api/v1/productos/');
     if (!response.ok) throw new Error('Error al cargar productos');
-    
+
     productosDisponibles = await response.json();
     displayProductos(productosDisponibles);
   } catch (error) {
@@ -155,22 +154,22 @@ async function barcodeReader() {
   document.addEventListener("keydown", async (event) => {
     // Verificar si estamos en la vista de venta (si existe el input de búsqueda)
     const reader = document.getElementById('producto-search');
-    if (!reader) return; 
+    if (!reader) return;
 
     const currentTime = Date.now();
     const timeDiff = currentTime - lastTime;
     lastTime = currentTime;
-    
+
     // Si es Enter, verificamos si tenemos un código escaneado acumulado
     if (event.key === "Enter") {
       if (buffer.length > 2) {
         event.preventDefault(); // Evitar acciones por defecto del Enter
-        
+
         const barCode = buffer.replaceAll("'", "-");
         console.log('Escaneo global detectado:', barCode);
-        
+
         await processScannedProduct(barCode, reader);
-        
+
         buffer = ""; // Limpiar buffer tras procesar
       } else {
         buffer = ""; // Enter manual o buffer sucio
@@ -182,26 +181,26 @@ async function barcodeReader() {
     if (event.key.length > 1) return;
 
     // Lógica de detección de escáner basada en velocidad (< 60ms entre teclas)
-    if (timeDiff < 60) { 
+    if (timeDiff < 60) {
       // Ráfaga detectada: Es el lector de códigos
       event.preventDefault(); // Evitar que se escriba en cualquier input activo
-      
+
       // Corrección del primer carácter:
       // El primer carácter del código siempre llega "lento" (timeDiff alto).
       // Si el foco estaba en un input, ese carácter se escribió. Aquí intentamos borrarlo.
       if (buffer.length === 1 && document.activeElement.tagName === 'INPUT') {
-         const input = document.activeElement;
-         // Verificamos si el input termina con ese carácter para borrarlo con seguridad
-         if (input.value.endsWith(buffer)) {
-             input.value = input.value.slice(0, -1);
-         }
+        const input = document.activeElement;
+        // Verificamos si el input termina con ese carácter para borrarlo con seguridad
+        if (input.value.endsWith(buffer)) {
+          input.value = input.value.slice(0, -1);
+        }
       }
-      
+
       buffer += event.key;
     } else {
       // Tiempo largo: Puede ser escritura manual o el PRIMER carácter de un escaneo
       // Lo guardamos en el buffer por si acaso, pero dejamos que se escriba (no preventDefault)
-      buffer = event.key; 
+      buffer = event.key;
     }
   });
 }
@@ -209,29 +208,29 @@ async function barcodeReader() {
 async function processScannedProduct(barCode, reader) {
   try {
     const producto = await fetchForBarCode(barCode);
-    
+
     if (!producto) {
       showWarning(`Producto no encontrado: ${barCode}`);
       return;
     }
-    
+
     if (producto.stock === 0) {
       showWarning(`Sin stock: ${producto.nombre}`);
       return;
     }
-    
+
     // Llenar datos
     reader.value = producto.nombre;
     reader.dataset.selectedId = producto.id;
     reader.dataset.precio = producto.precioVenta;
     reader.dataset.stock = producto.stock;
-    
+
     // Asegurar que el dropdown esté cerrado (ya que es una selección automática)
     const dropdown = document.getElementById('producto-dropdown');
     if (dropdown) dropdown.style.display = 'none';
-    
+
     showSuccess(`Producto detectado: ${producto.nombre}`);
-    
+
     // Mover foco a cantidad
     const cantidadInput = document.getElementById('cantidad-input');
     if (cantidadInput) {
@@ -239,7 +238,7 @@ async function processScannedProduct(barCode, reader) {
       cantidadInput.focus();
       cantidadInput.select();
     }
-    
+
   } catch (error) {
     console.error(error);
     showError('Error al procesar código de barras');
@@ -253,16 +252,16 @@ function displayProductos(productos) {
       ${p.nombre} ${p.marca ? `- ${p.marca}` : ''} (Stock: ${p.stock})
     </div>
   `).join('');
-  
+
   dropdown.innerHTML = itemsHTML;
-  
+
   // Agregar event listeners a cada item
   dropdown.querySelectorAll('.dropdown-item').forEach(item => {
     item.addEventListener('click', (e) => {
       const productoSearch = document.getElementById('producto-search');
       const stock = parseInt(e.target.dataset.stock);
       const nombre = e.target.dataset.nombre;
-      
+
       // Validar stock antes de seleccionar
       if (stock === 0) {
         showWarning('Este producto no tiene stock disponible');
@@ -270,7 +269,7 @@ function displayProductos(productos) {
         productoSearch.value = '';
         return;
       }
-      
+
       productoSearch.value = nombre;
       productoSearch.dataset.selectedId = e.target.dataset.id;
       productoSearch.dataset.precio = e.target.dataset.precio;
@@ -283,18 +282,18 @@ function displayProductos(productos) {
 function filterProductos() {
   const search = document.getElementById('producto-search').value.toLowerCase();
   const dropdown = document.getElementById('producto-dropdown');
-  
+
   if (!search) {
     displayProductos(productosDisponibles);
     dropdown.style.display = 'none';
     return;
   }
-  
-  const filtered = productosDisponibles.filter(p => 
+
+  const filtered = productosDisponibles.filter(p =>
     p.nombre.toLowerCase().includes(search) ||
     p.marca.toLowerCase().includes(search)
   );
-  
+
   displayProductos(filtered);
   dropdown.style.display = 'block';
 }
@@ -302,7 +301,7 @@ function filterProductos() {
 function addProductoToVenta() {
   const productoSearch = document.getElementById('producto-search');
   const cantidadInput = document.getElementById('cantidad-input');
-  
+
   if (!productoSearch.dataset.selectedId) {
     showWarning('Selecciona un producto');
     return;
@@ -312,7 +311,7 @@ function addProductoToVenta() {
   const cantidad = parseInt(cantidadInput.value);
   const stock = parseInt(productoSearch.dataset.stock);
   const precio = parseInt(productoSearch.dataset.precio);
-  
+
   if (cantidad <= 0) {
     showWarning('La cantidad debe ser mayor a 0');
     return;
@@ -344,7 +343,7 @@ function addProductoToVenta() {
 
   updateVentaTable();
   cantidadInput.value = 1;
-  
+
   // Limpiar búsqueda
   document.getElementById('producto-search').value = '';
   delete productoSearch.dataset.selectedId;
@@ -356,7 +355,7 @@ function addProductoToVenta() {
 
 function updateVentaTable() {
   const tbody = document.getElementById('productos-table-body');
-  
+
   tbody.innerHTML = productosVenta.map((item, index) => `
     <div class="table-row" data-index="${index}">
       <div class="table-cell">${item.nombre}</div>
@@ -375,11 +374,11 @@ function updateVentaTable() {
   `).join('');
 
   // Calcular total
-  const total = productosVenta.reduce((sum, item) => 
+  const total = productosVenta.reduce((sum, item) =>
     sum + (item.cantidad * item.precio_unitario), 0
   );
   document.getElementById('total-venta').textContent = `$${total}`;
-  
+
   // Agregar event listeners a los botones
   attachTableEvents();
 }
@@ -392,7 +391,7 @@ function attachTableEvents() {
       editCantidad(index);
     });
   });
-  
+
   // Botones de eliminar
   document.querySelectorAll('.btn-delete').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -405,12 +404,12 @@ function attachTableEvents() {
 function editCantidad(index) {
   const item = productosVenta[index];
   const producto = productosDisponibles.find(p => p.id === item.producto_id);
-  
+
   const modalContainer = document.getElementById('modal-container');
   if (!modalContainer) return;
-  
+
   const precioTotal = item.cantidad * item.precio_unitario;
-  
+
   modalContainer.innerHTML = `
     <div class="modal-overlay" id="edit-modal-overlay">
       <div class="modal-content">
@@ -474,14 +473,14 @@ function editCantidad(index) {
       </div>
     </div>
   `;
-  
+
   // Event listeners del modal
   const closeBtn = document.getElementById('close-edit-modal');
   const overlay = document.getElementById('edit-modal-overlay');
   const form = document.getElementById('edit-form');
   const cantidadInput = document.getElementById('cantidad-edit');
   const precioTotalInput = document.getElementById('precio-total');
-  
+
   // Actualizar precio total cuando cambia la cantidad
   if (cantidadInput) {
     cantidadInput.addEventListener('input', () => {
@@ -490,32 +489,32 @@ function editCantidad(index) {
       precioTotalInput.value = `$${nuevoTotal}`;
     });
   }
-  
+
   if (closeBtn) {
     closeBtn.addEventListener('click', closeModal);
   }
-  
+
   if (overlay) {
     overlay.addEventListener('click', (e) => {
       if (e.target.id === 'edit-modal-overlay') closeModal();
     });
   }
-  
+
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const nuevaCantidad = parseInt(document.getElementById('cantidad-edit').value);
-      
+
       if (isNaN(nuevaCantidad) || nuevaCantidad <= 0) {
         showWarning('La cantidad debe ser un número mayor a 0');
         return;
       }
-      
+
       if (nuevaCantidad > producto.stock) {
         showWarning(`Stock insuficiente. Disponible: ${producto.stock}`);
         return;
       }
-      
+
       productosVenta[index].cantidad = nuevaCantidad;
       updateVentaTable();
       showSuccess('Cantidad actualizada');
@@ -526,15 +525,15 @@ function editCantidad(index) {
 
 function removeProductoFromVenta(index) {
   const item = productosVenta[index];
-  
+
   const modalContainer = document.getElementById('modal-container');
   if (!modalContainer) return;
-  
+
   // Truncar nombre si es muy largo
-  const truncatedName = item.nombre.length > 50 
-    ? item.nombre.substring(0, 50) + '...' 
+  const truncatedName = item.nombre.length > 50
+    ? item.nombre.substring(0, 50) + '...'
     : item.nombre;
-  
+
   modalContainer.innerHTML = `
     <div class="modal-overlay" id="confirm-modal-overlay">
       <div class="modal-confirm">
@@ -547,14 +546,14 @@ function removeProductoFromVenta(index) {
       </div>
     </div>
   `;
-  
+
   document.getElementById('confirm-delete').addEventListener('click', () => {
     productosVenta.splice(index, 1);
     updateVentaTable();
     showSuccess('Producto eliminado de la venta');
     closeModal();
   });
-  
+
   document.getElementById('cancel-delete').addEventListener('click', closeModal);
   document.getElementById('confirm-modal-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'confirm-modal-overlay') closeModal();
@@ -595,14 +594,14 @@ async function registrarVenta() {
     }
 
     showSuccess('Venta registrada exitosamente');
-    
+
     // Limpiar la venta
     productosVenta = [];
     updateVentaTable();
-    
+
     // Recargar productos para actualizar stock
     await loadProductos();
-    
+
   } catch (error) {
     console.error('Error:', error);
     showError('Error al registrar venta: ' + error.message);
@@ -617,7 +616,7 @@ function setupSidebarToggle() {
   // Escuchar clicks en el botón "Orden" del sidebar principal
   document.addEventListener('click', (e) => {
     const ordenLink = e.target.closest('a[href="orden.html"]');
-    
+
     if (ordenLink && window.location.pathname.includes('orden.html')) {
       e.preventDefault();
       toggleOrdenSidebar();
@@ -628,7 +627,7 @@ function setupSidebarToggle() {
 // Mostrar/ocultar sidebar secundario
 function toggleOrdenSidebar() {
   sidebarVisible = !sidebarVisible;
-  
+
   if (sidebarVisible) {
     showOrdenSidebar();
   } else {
