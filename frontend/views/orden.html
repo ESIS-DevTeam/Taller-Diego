@@ -38,6 +38,46 @@
         <div id="orden-content">
           <p>Selecciona una opción del menú</p>
         </div>
+
+        <!-- Template para Venta de Producto -->
+        <template id="venta-producto-template">
+          <div class="venta-producto-container">
+            <div class="venta-form-row">
+              <div class="form-field">
+                <label>Producto</label>
+                <input type="text" id="producto-search" placeholder="Buscar producto..." autocomplete="off">
+                <div id="producto-dropdown" class="producto-dropdown" hidden></div>
+              </div>
+              <div class="form-field">
+                <label>Cantidad</label>
+                <input type="number" id="cantidad-input" min="1" value="1">
+              </div>
+              <div class="form-field-btn">
+                <button id="add-producto-btn" class="btn-add">Añadir</button>
+              </div>
+            </div>
+
+            <div class="venta-table-container">
+              <div class="table-header">
+                <div class="header-item">Producto</div>
+                <div class="header-item">Cantidad</div>
+                <div class="header-item">Precio Unit.</div>
+                <div class="header-item">Total</div>
+                <div class="header-item">Acciones</div>
+              </div>
+              <div class="table-body" id="productos-table-body"></div>
+              <div class="venta-total">
+                <strong>Total:</strong>
+                <span id="total-venta">$0</span>
+              </div>
+            </div>
+
+            <div class="venta-actions">
+              <button id="registrar-venta-btn" class="btn-registrar">Registrar venta</button>
+            </div>
+          </div>
+        </template>
+        
       </section>
     </main>
   </div>

@@ -1,6 +1,7 @@
 // Cargar componentes dinámicamente
 import { loadHeader } from './componets/header.js';
 import { loadSideBar } from './componets/side_bar.js';
+import { fetchForBarCode } from './data-manager.js';
 import { showSuccess, showError, showWarning } from './utils/notification.js';
 
 // Cargar header y sidebar inmediatamente
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Cargar venta de producto por defecto
   loadSection('venta-producto');
+  barcodeReader();
 });
 
 // Configurar eventos del sidebar secundario
@@ -85,46 +87,18 @@ function loadSection(section) {
 
 // Cargar interfaz de venta de productos
 async function loadVentaProducto() {
-  ordenContent.innerHTML = `
-    <div class="venta-producto-container">
-      <div class="venta-form-row">
-        <div class="form-field">
-          <label>Nombre del producto</label>
-          <input type="text" id="producto-search" placeholder="Buscar producto..." autocomplete="off">
-          <div id="producto-dropdown" class="producto-dropdown" style="display: none;"></div>
-        </div>
-        <div class="form-field">
-          <label>Cantidad</label>
-          <input type="number" id="cantidad-input" min="1" value="1">
-        </div>
-        <div class="form-field-btn">
-          <button id="add-producto-btn" class="btn-add">Añadir</button>
-        </div>
-      </div>
+  const tpl = document.getElementById('venta-producto-template');
+  ordenContent.innerHTML = '';
+  if (!tpl) {
+    // fallback: crear HTML mínimo si no hay template
+    ordenContent.innerHTML = '<p>Error: template de venta no encontrado.</p>';
+    return;
+  }
 
-      <div class="venta-table-container">
-        <div class="table-header">
-          <div class="header-item">Producto</div>
-          <div class="header-item">Cantidad</div>
-          <div class="header-item">Precio Unitario</div>
-          <div class="header-item">Precio total</div>
-          <div class="header-item">Acciones</div>
-        </div>
-        <div class="table-body" id="productos-table-body">
-        </div>
-        <div class="venta-total">
-          <strong>PRECIO TOTAL DE LA VENTA</strong>
-          <span id="total-venta">$0</span>
-        </div>
-      </div>
+  const clone = tpl.content.cloneNode(true);
+  ordenContent.appendChild(clone);
 
-      <div class="venta-actions">
-        <button id="registrar-venta-btn" class="btn-registrar">Registrar venta</button>
-      </div>
-    </div>
-  `;
-
-  // Inicializar funcionalidad
+  // inicializar lógica (carga productos, attach events, etc.)
   await initVentaProducto();
 }
 
@@ -170,6 +144,105 @@ async function loadProductos() {
   } catch (error) {
     console.error('Error:', error);
     showError('Error al cargar productos');
+  }
+}
+
+async function barcodeReader() {
+  // Listener global al documento para capturar escaneos sin necesidad de focus
+  let buffer = "";
+  let lastTime = 0;
+
+  document.addEventListener("keydown", async (event) => {
+    // Verificar si estamos en la vista de venta (si existe el input de búsqueda)
+    const reader = document.getElementById('producto-search');
+    if (!reader) return; 
+
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastTime;
+    lastTime = currentTime;
+    
+    // Si es Enter, verificamos si tenemos un código escaneado acumulado
+    if (event.key === "Enter") {
+      if (buffer.length > 2) {
+        event.preventDefault(); // Evitar acciones por defecto del Enter
+        
+        const barCode = buffer.replaceAll("'", "-");
+        console.log('Escaneo global detectado:', barCode);
+        
+        await processScannedProduct(barCode, reader);
+        
+        buffer = ""; // Limpiar buffer tras procesar
+      } else {
+        buffer = ""; // Enter manual o buffer sucio
+      }
+      return;
+    }
+
+    // Ignorar teclas especiales (Shift, Ctrl, Alt, etc.)
+    if (event.key.length > 1) return;
+
+    // Lógica de detección de escáner basada en velocidad (< 60ms entre teclas)
+    if (timeDiff < 60) { 
+      // Ráfaga detectada: Es el lector de códigos
+      event.preventDefault(); // Evitar que se escriba en cualquier input activo
+      
+      // Corrección del primer carácter:
+      // El primer carácter del código siempre llega "lento" (timeDiff alto).
+      // Si el foco estaba en un input, ese carácter se escribió. Aquí intentamos borrarlo.
+      if (buffer.length === 1 && document.activeElement.tagName === 'INPUT') {
+         const input = document.activeElement;
+         // Verificamos si el input termina con ese carácter para borrarlo con seguridad
+         if (input.value.endsWith(buffer)) {
+             input.value = input.value.slice(0, -1);
+         }
+      }
+      
+      buffer += event.key;
+    } else {
+      // Tiempo largo: Puede ser escritura manual o el PRIMER carácter de un escaneo
+      // Lo guardamos en el buffer por si acaso, pero dejamos que se escriba (no preventDefault)
+      buffer = event.key; 
+    }
+  });
+}
+
+async function processScannedProduct(barCode, reader) {
+  try {
+    const producto = await fetchForBarCode(barCode);
+    
+    if (!producto) {
+      showWarning(`Producto no encontrado: ${barCode}`);
+      return;
+    }
+    
+    if (producto.stock === 0) {
+      showWarning(`Sin stock: ${producto.nombre}`);
+      return;
+    }
+    
+    // Llenar datos
+    reader.value = producto.nombre;
+    reader.dataset.selectedId = producto.id;
+    reader.dataset.precio = producto.precioVenta;
+    reader.dataset.stock = producto.stock;
+    
+    // Asegurar que el dropdown esté cerrado (ya que es una selección automática)
+    const dropdown = document.getElementById('producto-dropdown');
+    if (dropdown) dropdown.style.display = 'none';
+    
+    showSuccess(`Producto detectado: ${producto.nombre}`);
+    
+    // Mover foco a cantidad
+    const cantidadInput = document.getElementById('cantidad-input');
+    if (cantidadInput) {
+      cantidadInput.value = 1;
+      cantidadInput.focus();
+      cantidadInput.select();
+    }
+    
+  } catch (error) {
+    console.error(error);
+    showError('Error al procesar código de barras');
   }
 }
 
@@ -278,6 +351,7 @@ function addProductoToVenta() {
   delete productoSearch.dataset.precio;
   delete productoSearch.dataset.stock;
   document.getElementById('producto-dropdown').style.display = 'none';
+  productoSearch.focus();
 }
 
 function updateVentaTable() {
