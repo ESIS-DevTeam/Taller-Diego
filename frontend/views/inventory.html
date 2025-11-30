@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taller de Mecánica Diego</title>
-    <link rel="stylesheet" href="../styles/css/inventory.css"> 
+    <link rel="stylesheet" href="../styles/css/inventory.css">
     <link rel="stylesheet" href="../styles/css/side_bar.css">
     <link rel="stylesheet" href="../styles/css/header.css">
     <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
@@ -12,19 +13,30 @@
     <link rel="stylesheet" href="../styles/css/modal-confirm.css">
     <link rel="stylesheet" href="../styles/css/product-details.css">
     <link rel="stylesheet" href="../styles/css/notification.css">
+    <!-- Estilos para modal de descarga de códigos de barras PDF -->
+    <link rel="stylesheet" href="../styles/css/modal-pdfcod.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 </head>
+
 <body>
     <div id="header"></div>
-    
+
     <div id="mobile-menu-container"></div>
-    
+
     <div class="container">
         <div id="side-bar-container" class="side-bar-container"></div>
 
         <main class="main-content">
 
             <h1>Gestion de inventario</h1>
+            <!-- Botón para generar/ver códigos de barras (Nuevo) -->
+            <div class="card" id="barcode-btn">
+                <a href="#">
+                    <p>Codigo de barras</p>
+                </a>
+            </div>
+            <!-- Botón para abrir modal de nuevo producto -->
             <div class="card" id="open-modal-btn">
                 <a href="#">
                     <p>Nuevo producto</p>
@@ -80,14 +92,15 @@
                     <div class="header-item" role="columnheader">Precio de Venta</div>
                     <div class="header-item" role="columnheader">Acciones</div>
                 </div>
-                
+
                 <div class="product-list" id="product-list">
                 </div>
             </section>
         </main>
-        
+
     </div>
-  </body>
-  <div id="modal-container"></div>
-  <script type="module" src="../scripts/inventory.js"></script>
+</body>
+<div id="modal-container"></div>
+<script type="module" src="../scripts/inventory.js"></script>
+
 </html>
