@@ -13,15 +13,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Header dinámico: Cargado desde componets/header.js -->
-  <div id="header"></div>
+  <!-- Header dinámico: Cargado con SSI -->
+  <div id="header">
+    <!--#include virtual="/includes/header.html" -->
+  </div>
   
   <div class="container">
-    <!-- Sidebar dinámico: Cargado desde componets/side_bar.js -->
-    <div id="side-bar-container" class="side-bar-container"></div>
+    <!-- Sidebar dinámico: Cargado con SSI -->
+    <div id="side-bar-container" class="side-bar-container sidebar-placeholder">
+      <!--#include virtual="/includes/sidebar.html" -->
+    </div>
     
     <!-- Menú móvil dinámico -->
-    <div id="mobile-menu-container"></div>
+    <div id="mobile-menu-container">
+      <!--#include virtual="/includes/mobile-menu.html" -->
+    </div>
 
     <!-- Contenido principal: Gestión de servicios -->
     <main class="main-content">
