@@ -158,4 +158,12 @@ async function init() {
 }
 
 // Iniciar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', init);
+// Iniciar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', async () => {
+  // Cargar componentes dinámicamente (si no están ya cargados por SSI)
+  const { loadComponent } = await import('./utils/component-loader.js');
+  await loadComponent("header", "includes/header.html");
+  await loadComponent("side-bar", "includes/sidebar.html");
+
+  init();
+});

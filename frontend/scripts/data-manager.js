@@ -86,7 +86,6 @@ export async function fetchFromApi(endpoint, id = null, skipCache = false) {
       const cachedData = getCachedData(cacheKey);
 
       if (cachedData) {
-        console.log(`✅ Datos obtenidos del caché: ${endpoint}`);
         return cachedData;
       }
     }
@@ -277,14 +276,14 @@ function checkResponseStatus(response) {
 export async function fetchForBarCode(barCode) {
   try {
     const response = await fetch(`${API_BASE_URL}/productos/barcode/${barCode}`);
-    
+
     if (!response.ok) {
       if (response.status === 404) {
         return null; // Producto no encontrado
       }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const product = await response.json();
     return product;
   } catch (error) {

@@ -5,44 +5,17 @@
  * modales de agregar/editar y búsqueda en tiempo real.
  */
 
-import { loadSideBar } from "./componets/side_bar.js";
-import { loadHeader } from "./componets/header.js";
+import { loadComponent } from "./utils/component-loader.js";
 import { showSuccess, showError, showWarning } from "./utils/notification.js";
 
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:8000/api/v1'  // Desarrollo local
   : '/api/v1';
 
-// ========== MENÚ MÓVIL PARA SERVICIOS ==========
-function loadServiceMobileMenu() {
-  return `
-        <div class="mobile-actions-menu">
-            <ul>
-                <li>
-                    <button id="mobile-btn-list">
-                        <img src="../assets/icons/list.png" alt="Lista de servicios">
-                        <span>Servicios</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="mobile-btn-add">
-                        <img src="../assets/icons/add.png" alt="Agregar servicio">
-                        <span>Agregar servicio</span>
-                    </button>
-                </li>
-            </ul>
-        </div>
-    `;
-}
-
 // ========== CARGAR COMPONENTES UI ==========
-const sideBarContainer = document.getElementById("side-bar-container");
-const mobileMenu = document.getElementById("mobile-menu-container");
-const header = document.getElementById("header");
-
-if (sideBarContainer) sideBarContainer.innerHTML = loadSideBar();
-if (mobileMenu) mobileMenu.innerHTML = loadServiceMobileMenu();
-if (header) header.innerHTML = loadHeader();
+loadComponent("header", "includes/header.html");
+loadComponent("side-bar-container", "includes/sidebar.html");
+loadComponent("mobile-menu-container", "includes/mobile-menu.html");
 
 // ========== ESTADO GLOBAL ==========
 let services = [];

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,18 +13,19 @@
   <link rel="stylesheet" href="../styles/css/notification.css">
   <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <!-- Header dinámico: Cargado con SSI -->
   <div id="header">
     <!--#include virtual="/includes/header.html" -->
   </div>
-  
+
   <div class="container">
     <!-- Sidebar dinámico: Cargado con SSI -->
     <div id="side-bar-container" class="side-bar-container sidebar-placeholder">
       <!--#include virtual="/includes/sidebar.html" -->
     </div>
-    
+
     <!-- Menú móvil dinámico -->
     <div id="mobile-menu-container">
       <!--#include virtual="/includes/mobile-menu.html" -->
@@ -32,7 +34,7 @@
     <!-- Contenido principal: Gestión de servicios -->
     <main class="main-content">
       <h1>Gestión de servicios</h1>
-      
+
       <!-- Botón para agregar nuevo servicio -->
       <div class="card" id="open-modal-btn">
         <a href="#">
@@ -61,7 +63,7 @@
             <div class="header-item" role="columnheader">Descripción</div>
             <div class="header-item" role="columnheader">Acciones</div>
           </div>
-          
+
           <!-- Lista de servicios (renderizada dinámicamente) -->
           <div class="service-list">
             <!-- Los servicios se insertan aquí vía JavaScript -->
@@ -70,11 +72,12 @@
       </section>
     </main>
   </div>
-  
+
   <!-- Contenedor para modales dinámicos -->
   <div id="modal-container"></div>
-  
+
   <!-- Script principal (tipo módulo ES6) -->
   <script type="module" src="../scripts/service.js"></script>
 </body>
+
 </html>

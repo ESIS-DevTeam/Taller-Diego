@@ -5,17 +5,17 @@ const API_CACHE = 'api-v1';
 
 // Assets estáticos para cachear
 const STATIC_ASSETS = [
-  '/views/inventory.html',
-  '/views/service.html',
-  '/views/index.html',
-  '/styles/css/inventory.css',
-  '/styles/css/side_bar.css',
-  '/styles/css/header.css',
-  '/styles/css/main.css',
-  '/assets/icons/home.png',
-  '/assets/icons/package.png',
-  '/assets/icons/toolbox.png',
-  '/assets/icons/search.png',
+  './views/inventory.html',
+  './views/service.html',
+  './views/index.html',
+  './styles/css/inventory.css',
+  './styles/css/side_bar.css',
+  './styles/css/header.css',
+  './styles/css/main.css',
+  './assets/icons/home.png',
+  './assets/icons/package.png',
+  './assets/icons/toolbox.png',
+  './assets/icons/search.png',
   'https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap'
 ];
 

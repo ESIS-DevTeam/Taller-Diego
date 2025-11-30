@@ -5,12 +5,13 @@ import { loadFilterUI } from "./componets/filter-product/filter-loader.js";
 import { setupFilterEvents } from "./componets/filter-product/filter-events.js";
 import { initializeSearch } from "./componets/filter-product/filter-handler.js";
 import { fetchFromApi } from "./data-manager.js";
+import { bindBarcodeButton } from "./componets/modal-pdfcod.js";
+import { loadComponent } from "./utils/component-loader.js";
 
-// Cargar componentes UI
-// (El sidebar y header ahora se cargan con Nginx SSI para evitar parpadeo)
-
-// Cargar menú móvil
-// (Cargado con SSI)
+// Cargar header y sidebar dinámicamente (Hybrid)
+loadComponent("header", "includes/header.html");
+loadComponent("side-bar-container", "includes/sidebar.html");
+loadComponent("mobile-menu-container", "includes/mobile-menu.html");
 
 // Iniciar fetch inmediatamente (no esperar al DOM)
 const productsPromise = fetchFromApi('productos');
