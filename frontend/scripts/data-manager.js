@@ -9,56 +9,11 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
   : '/api/v1';
 
 // ========================================
-// CACHÉ EN LOCALSTORAGE CON TTL
+// SIN CACHÉ - DATOS SIEMPRE FRESCOS
 // ========================================
-
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutos en milisegundos
-
-/**
- * Obtiene datos del caché si no han expirado
- */
-function getCachedData(key) {
-  try {
-    const cached = localStorage.getItem(key);
-    if (!cached) return null;
-
-    const { data, timestamp } = JSON.parse(cached);
-    const now = Date.now();
-
-    // Verificar si el caché ha expirado
-    if (now - timestamp > CACHE_TTL) {
-      localStorage.removeItem(key);
-      return null;
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Error leyendo caché:', error);
-    return null;
-  }
-}
-
-/**
- * Guarda datos en el caché con timestamp
- */
-function setCachedData(key, data) {
-  try {
-    const cacheEntry = {
-      data,
-      timestamp: Date.now()
-    };
-    localStorage.setItem(key, JSON.stringify(cacheEntry));
-  } catch (error) {
-    console.error('Error guardando en caché:', error);
-  }
-}
-
-/**
- * Invalida el caché de un endpoint específico
- */
+// Mantener función vacía para compatibilidad
 export function invalidateCache(endpoint) {
-  const cacheKey = `api_cache_${endpoint}`;
-  localStorage.removeItem(cacheKey);
+  // No hace nada, ya no hay caché
 }
 
 // ========================================
@@ -66,10 +21,10 @@ export function invalidateCache(endpoint) {
 // ========================================
 
 /**
- * Realiza peticiones GET a la API con caché.
+ * Realiza peticiones GET a la API - SIEMPRE datos frescos del servidor.
  * @param {string} endpoint - Ruta del endpoint (ej: 'productos', 'autopartes').
  * @param {number|null} id - ID opcional para obtener un recurso específico.
- * @param {boolean} skipCache - Si es true, omite el caché y hace petición directa.
+ * @param {boolean} skipCache - Parámetro mantenido por compatibilidad (no se usa).
  * @returns {Promise<Object|Array>} Datos de la respuesta en formato JSON.
  * @throws {Error} Si la petición falla.
  */
@@ -79,30 +34,25 @@ export async function fetchFromApi(endpoint, id = null, skipCache = false) {
     if (id !== null) {
       apiUrl = `${API_BASE_URL}/${endpoint}/${id}`;
     }
+    
+    // Añadir timestamp para evitar caché del navegador
+    const separator = apiUrl.includes('?') ? '&' : '?';
+    apiUrl += `${separator}_t=${Date.now()}`;
 
-    // Intentar obtener del caché primero (solo para listas, no para IDs específicos)
-    if (!skipCache && id === null) {
-      const cacheKey = `api_cache_${endpoint}`;
-      const cachedData = getCachedData(cacheKey);
-
-      if (cachedData) {
-        return cachedData;
+    // Siempre hacer petición al API sin caché del navegador
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
-    }
-
-    // Si no hay caché, hacer petición al API
-    const response = await fetch(apiUrl);
+    });
     checkResponseStatus(response);
 
     const data = await response.json();
-
-    // Guardar en caché (solo para listas)
-    if (id === null) {
-      const cacheKey = `api_cache_${endpoint}`;
-      setCachedData(cacheKey, data);
-    }
-
     return data;
+    
   } catch (error) {
     handleApiError(error, {
       endpoint,
@@ -129,13 +79,21 @@ export async function createResource(endpoint, data) {
       body: JSON.stringify(data),
     });
 
-    checkResponseStatus(response);
+    if (!response.ok) {
+      let errorData = null;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        // Si no se puede parsear, ignorar
+      }
+      
+      const error = new Error(errorData?.detail || `Error HTTP: ${response.status}`);
+      error.status = response.status;
+      error.detail = errorData?.detail;
+      throw error;
+    }
 
     const result = await response.json();
-
-    // Invalidar caché después de crear
-    invalidateCache(endpoint);
-
     return result;
   } catch (error) {
     handleApiError(error, {
@@ -164,13 +122,21 @@ export async function updateResource(endpoint, id, data) {
       body: JSON.stringify(data),
     });
 
-    checkResponseStatus(response);
+    if (!response.ok) {
+      let errorData = null;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        // Si no se puede parsear, ignorar
+      }
+      
+      const error = new Error(errorData?.detail || `Error HTTP: ${response.status}`);
+      error.status = response.status;
+      error.detail = errorData?.detail;
+      throw error;
+    }
 
     const result = await response.json();
-
-    // Invalidar caché después de actualizar
-    invalidateCache(endpoint);
-
     return result;
   } catch (error) {
     handleApiError(error, {
@@ -195,12 +161,27 @@ export async function deleteResource(endpoint, id) {
       method: 'DELETE',
     });
 
-    checkResponseStatus(response);
+    // Si la respuesta no es ok, intentar leer el JSON de error
+    if (!response.ok) {
+      let errorData = null;
+      try {
+        const text = await response.text();
+        errorData = text ? JSON.parse(text) : null;
+      } catch (e) {
+        // Si no se puede parsear, ignorar
+      }
+      
+      const error = new Error(errorData?.detail || `Error HTTP: ${response.status}`);
+      error.status = response.status;
+      error.detail = errorData?.detail;
+      throw error;
+    }
 
-    const result = await response.json();
-
-    // Invalidar caché después de eliminar
-    invalidateCache(endpoint);
+    let result = null;
+    if (response.status !== 204) {
+      const text = await response.text();
+      result = text ? JSON.parse(text) : null;
+    }
 
     return result;
   } catch (error) {

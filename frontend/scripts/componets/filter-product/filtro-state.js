@@ -1,6 +1,6 @@
 export const filterState = {
   searchQuery : '',
-  selectCategories: [],
+  selectedCategories: [],
   lowStock : false,
   priceRange : {
     min: null,
@@ -14,7 +14,7 @@ export function updateFilterState (filterName, data) {
 
 export function clearFilters () {
   filterState.searchQuery = '';
-  filterState.selectCategories = [];
+  filterState.selectedCategories = [];
   filterState.lowStock = false;
   filterState.priceRange.min = null;
   filterState.priceRange.max = null;

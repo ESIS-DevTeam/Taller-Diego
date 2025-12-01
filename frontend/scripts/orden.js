@@ -2,6 +2,7 @@
 import { loadComponent } from './utils/component-loader.js';
 import { fetchForBarCode } from './data-manager.js';
 import { showSuccess, showError, showWarning } from './utils/notification.js';
+import { resetBodyDefaults } from './utils/state-manager.js';
 
 // Cargar header y sidebar dinámicamente (Hybrid)
 loadComponent("header", "includes/header.html");
@@ -17,6 +18,9 @@ let sidebarVisible = true;
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
+  // Limpiar estado previo de otros módulos
+  resetBodyDefaults();
+  
   setupOrdenSidebar();
   setupSidebarToggle();
 

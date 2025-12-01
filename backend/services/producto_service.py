@@ -66,10 +66,14 @@ class ProductoService:
         return producto
     
     def delete_producto(self, id: int):
-        result = self.repo.delete(id)
-        
-        # Invalidar caché
-        cache.delete(f'producto_{id}')
-        cache.invalidate_pattern('productos')
-        
-        return result
+        try:
+            result = self.repo.delete(id)
+            
+            # Invalidar caché
+            cache.delete(f'producto_{id}')
+            cache.invalidate_pattern('productos')
+            
+            return result
+        except ValueError as e:
+            # Re-lanzar como error para que el endpoint lo capture
+            raise e

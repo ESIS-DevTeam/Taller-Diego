@@ -7,6 +7,8 @@
 
 import { loadComponent } from "./utils/component-loader.js";
 import { showSuccess, showError, showWarning } from "./utils/notification.js";
+import { resetBodyDefaults } from "./utils/state-manager.js";
+import { deleteResource } from "./data-manager.js";
 
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:8000/api/v1'  // Desarrollo local
@@ -15,7 +17,11 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
 // ========== CARGAR COMPONENTES UI ==========
 loadComponent("header", "includes/header.html");
 loadComponent("side-bar-container", "includes/sidebar.html");
-loadComponent("mobile-menu-container", "includes/mobile-menu.html");
+loadComponent("mobile-menu-container", "includes/mobile-menu-service.html");
+
+// ========== LIMPIAR ESTADO PREVIO ==========
+// Ejecutar apenas se cargue el script
+resetBodyDefaults();
 
 // ========== ESTADO GLOBAL ==========
 let services = [];
@@ -87,15 +93,7 @@ async function updateService(id, serviceData) {
 // ========== API: ELIMINAR SERVICIO ==========
 async function deleteService(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/servicios/${id}`, {
-      method: 'DELETE'
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || 'Error al eliminar servicio');
-    }
-
+    await deleteResource('servicios', id);
     showSuccess('Servicio eliminado exitosamente');
     return true;
   } catch (error) {
@@ -409,7 +407,10 @@ async function handleEditService(e, serviceId) {
 async function handleDeleteService(serviceId) {
   try {
     await deleteService(serviceId);
-    await loadAndRenderServices();
+    // Forzar recarga de datos frescos desde el servidor
+    services = []; // Limpiar array local
+    filteredServices = []; // Limpiar array filtrado
+    await loadAndRenderServices(); // Recargar y renderizar
   } catch (error) {
     // El error ya se muestra en deleteService
   }
@@ -442,8 +443,8 @@ async function loadAndRenderServices() {
 
 // ========== CONTROLADOR MENÚ MÓVIL ==========
 function setupMobileMenuControler() {
-  const btnList = document.getElementById("mobile-btn-list");
-  const btnAdd = document.getElementById("mobile-btn-add");
+  const btnList = document.getElementById("service-mobile-btn-list");
+  const btnAdd = document.getElementById("service-mobile-btn-add");
   const btnBack = document.getElementById("mobile-back-btn");
 
   const mainContent = document.querySelector(".main-content");

@@ -5,20 +5,26 @@ import { setupProductActions } from '../product-list/product-actions.js';
 let fuse;
 let allProducts = [];
 
-export function initializeSearch(products) {
-  allProducts = products;
-  
+function createFuseInstance(products) {
   if (typeof Fuse === 'undefined') {
     console.error('Fuse.js no está cargado. Agrégalo al HTML.');
-    return;
+    return null;
   }
-  
-  fuse = new Fuse(products, {
+
+  return new Fuse(products, {
     keys: ['nombre', 'descripcion'],
     threshold: 0.3,
     ignoreLocation: true,
     ignoreLocation: false,
   });
+}
+
+export function initializeSearch(products) {
+  allProducts = products;
+  const instance = createFuseInstance(products);
+  if (instance) {
+    fuse = instance;
+  }
 }
 
 export function applyFilters(products = null) {
@@ -64,5 +70,17 @@ function renderFilteredProducts(products) {
   }
 
   productList.innerHTML = products.map(product => generateProductCard(product)).join('');
-  setupProductActions();
+  // No llamar setupProductActions aquí, ya está configurado con delegación
 }
+
+window.addEventListener('inventory:products-updated', (event) => {
+  const products = Array.isArray(event.detail) ? event.detail : [];
+  allProducts = products;
+
+  const instance = createFuseInstance(products);
+  if (instance) {
+    fuse = instance;
+  }
+  
+  // Solo actualizar el fuse, NO re-renderizar (ya se hizo en product-actions)
+});

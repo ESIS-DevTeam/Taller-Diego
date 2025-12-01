@@ -405,6 +405,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  height: calc(100vh - 220px);
   max-height: calc(100vh - 220px);
 }
 .main-content .inventary-data .inventory-header {
@@ -428,7 +429,7 @@ body {
 .main-content .inventary-data .product-list {
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 240px);
+  flex: 1;
   overflow-y: auto;
 }
 .main-content .inventary-data .product-list .product-item {
@@ -860,8 +861,8 @@ input[type=number] {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    height: calc(100vh - 420px) !important;
-    max-height: calc(100vh - 420px) !important;
+    height: calc(100vh - 280px) !important;
+    max-height: calc(100vh - 280px) !important;
   }
   .main-content .inventary-data .inventory-header {
     grid-template-columns: 2fr 1fr 1fr;

@@ -7,16 +7,21 @@ import { initializeSearch } from "./componets/filter-product/filter-handler.js";
 import { fetchFromApi } from "./data-manager.js";
 import { bindBarcodeButton } from "./componets/modal-pdfcod.js";
 import { loadComponent } from "./utils/component-loader.js";
+import { resetBodyDefaults } from "./utils/state-manager.js";
+
+console.log('🚀 Inventory.js cargado correctamente');
+
+// Limpiar caché viejo de localStorage (por si existía)
+Object.keys(localStorage).forEach(key => {
+  if (key.startsWith('api_cache_')) {
+    localStorage.removeItem(key);
+  }
+});
 
 // Cargar header y sidebar dinámicamente (Hybrid)
-loadComponent("header", "includes/header.html");
-loadComponent("side-bar-container", "includes/sidebar.html");
-loadComponent("mobile-menu-container", "includes/mobile-menu.html");
-
-// Iniciar fetch inmediatamente (no esperar al DOM)
-const productsPromise = fetchFromApi('productos');
-
-
+const headerPromise = loadComponent("header", "includes/header.html");
+const sidebarPromise = loadComponent("side-bar-container", "includes/sidebar.html");
+const mobileMenuPromise = loadComponent("mobile-menu-container", "includes/mobile-menu-inventory.html");
 
 // Inicializar inventario
 async function initializeInventory() {
@@ -40,10 +45,15 @@ async function initializeInventory() {
           <div class="skeleton-actions"></div>
         </div>
       `.repeat(5);
+    } else {
+      console.error('❌ No se encontró el elemento product-list');
+      return;
     }
 
-    // 4. Esperar a que lleguen los datos (iniciados arriba)
-    const products = await productsPromise;
+    // 4. Obtener productos del servidor
+    console.log('📡 Obteniendo productos...');
+    const products = await fetchFromApi('productos', null, false);
+    console.log('✅ Productos obtenidos:', products?.length || 0);
 
     // 5. Inicializar búsqueda con Fuse.js
     initializeSearch(products);
@@ -56,6 +66,10 @@ async function initializeInventory() {
 
   } catch (error) {
     console.error('❌ Error al inicializar inventario:', error);
+    const productList = document.getElementById("product-list");
+    if (productList) {
+      productList.innerHTML = '<p class="error-state">Error al cargar productos. Por favor, recarga la página.</p>';
+    }
   }
 }
 
@@ -76,11 +90,12 @@ function setupMobileInventoryMenu() {
   // Ver inventario
   safeAdd(btnList, () => {
     if (!mobileMenu || !mainContent || !container) return;
-    mobileMenu.classList.add("active");
+    mobileMenu.classList.add("hidden");
     mainContent.classList.add("active");
     container.classList.add("active");
-    document.body.classList.remove("menu-open");
     document.body.classList.add("inventory-open");
+    document.body.classList.remove("menu-open");
+    container.scrollTop = 0;
   });
 
   // Agregar producto
@@ -88,12 +103,15 @@ function setupMobileInventoryMenu() {
     e.preventDefault();
     e.stopPropagation();
 
-    // Ocultar menú móvil pero NO mostrar inventario
+    // Ocultar menú móvil y mostrar inventario
     if (mobileMenu && mainContent) {
-      mobileMenu.classList.add("active"); // oculta menú
+      mobileMenu.classList.add("hidden"); // oculta menú
       mainContent.classList.add("active"); // muestra inventario
-      document.body.classList.remove("menu-open");
+      if (container) {
+        container.classList.add("active");
+      }
       document.body.classList.add("inventory-open");
+      document.body.classList.remove("menu-open");
     }
 
     // Abrir modal
@@ -105,11 +123,11 @@ function setupMobileInventoryMenu() {
   // Volver al menú
   const closeMenu = () => {
     if (!mobileMenu || !mainContent || !container) return;
-    mobileMenu.classList.remove("active");
+    mobileMenu.classList.remove("hidden");
     mainContent.classList.remove("active");
     container.classList.remove("active");
-    document.body.classList.add("menu-open");
     document.body.classList.remove("inventory-open");
+    document.body.classList.add("menu-open");
     if (mobileMenu) {
       mobileMenu.style.display = '';
     }
@@ -130,8 +148,23 @@ bindBarcodeButton();
 
 // Inicializar cuando cargue el DOM
 document.addEventListener('DOMContentLoaded', async () => {
-  await initializeInventory();
+  console.log('🎯 DOMContentLoaded - Iniciando inventario...');
+  
+  // Limpiar estado previo de otros módulos
+  resetBodyDefaults();
+  
+  // Esperar a que carguen TODOS los componentes (especialmente el menú móvil)
+  await Promise.all([headerPromise, sidebarPromise, mobileMenuPromise]);
+  console.log('✅ Componentes UI cargados');
+  
+  document.body.classList.add("menu-open");
+
+  // Ahora setupear el menú móvil (ya existen los elementos del DOM)
   setupMobileInventoryMenu();
+  
+  // Luego inicializar inventario
+  await initializeInventory();
+  console.log('✅ Inventario inicializado completamente');
 
   // Abrir modal si viene desde URL
   const params = new URLSearchParams(window.location.search);

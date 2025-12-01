@@ -1,22 +1,50 @@
-export function generateProductCard (product) {
-  let classStock = 'product-stock'; 
-  if(product.stockMin > product.stock) {
-    classStock += ' low-stock';
-  }else{
-    classStock += ' normal-stock';
+function escapeHtml(value) {
+  if (value === null || value === undefined) {
+    return '';
   }
+
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatCurrency(value) {
+  const amount = Number(value);
+  if (Number.isNaN(amount)) {
+    return '$0';
+  }
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function generateProductCard(product) {
+  const stock = Number(product?.stock ?? 0);
+  const stockMin = Number(product?.stockMin ?? 0);
+  const classStock = `product-stock ${stockMin > stock ? 'low-stock' : 'normal-stock'}`;
+
+  const safeName = escapeHtml(product?.nombre);
+  const safeDescription = escapeHtml(product?.descripcion || 'Sin descripción');
+  const safePurchasePrice = formatCurrency(product?.precioCompra);
+  const safeSellingPrice = formatCurrency(product?.precioVenta);
+
   return `
-  <div class="product-item" data-product-id="${product.id}">
-    <div class="product-name">${product.nombre}</div>
-    <div class="product-desc">${product.descripcion || 'Sin descripcion'}</div>
-    <div class="${classStock}">${product.stock}</div>
-    <div class="product-purchase-price">$${product.precioVenta}</div>
-    <div class="product-selling-price">$${product.precioCompra}</div>
+  <div class="product-item" data-product-id="${escapeHtml(product?.id)}">
+    <div class="product-name">${safeName}</div>
+    <div class="product-desc">${safeDescription}</div>
+    <div class="${classStock}">${escapeHtml(stock)}</div>
+    <div class="product-purchase-price">${safePurchasePrice}</div>
+    <div class="product-selling-price">${safeSellingPrice}</div>
     <div class="product-actions">
-      <button class="btn-edit product-actions-product" data-id="${product.id}" data-action="edit">
+      <button class="btn-edit product-actions-product" data-id="${escapeHtml(product?.id)}" data-action="edit">
         <img class="img-edit" src="../assets/icons/edit.png" alt="Editar">
       </button>
-      <button class="btn-delete product-actions-product" data-id="${product.id}" data-action="delete"">
+      <button class="btn-delete product-actions-product" data-id="${escapeHtml(product?.id)}" data-action="delete">
         <img class="img-delete" src="../assets/icons/delete.png" alt="Eliminar">
       </button>
     </div>

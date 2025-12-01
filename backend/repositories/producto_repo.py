@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from db.models import Producto
 from schemas.producto_schema import ProductoCreate
 
@@ -42,6 +43,11 @@ class ProductoRepository:
     def delete(self, id: int):
         producto = self.get_by_id(id)
         if producto:
-            self.db.delete(producto)
-            self.db.commit()
+            try:
+                self.db.delete(producto)
+                self.db.commit()
+            except IntegrityError as e:
+                self.db.rollback()
+                # Si hay un error de integridad (ej: ventas asociadas), lanzar una excepción más clara
+                raise ValueError(f"No se puede eliminar el producto porque tiene ventas o referencias asociadas")
         return producto

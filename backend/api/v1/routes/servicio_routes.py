@@ -49,7 +49,10 @@ def update_servicio(
 
 @router.delete("/{id}")
 def delete_servicio(id: int, service: ServicioService = Depends(get_servicio_service)):
-    servicio = service.delete_servicio(id)
-    if not servicio:
-        raise HTTPException(status_code=404, detail="Servicio no encontrado")
-    return {"detail": "Servicio eliminado"}
+    try:
+        servicio = service.delete_servicio(id)
+        if not servicio:
+            raise HTTPException(status_code=404, detail="Servicio no encontrado")
+        return {"detail": "Servicio eliminado"}
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))

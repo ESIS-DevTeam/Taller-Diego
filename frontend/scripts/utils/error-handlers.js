@@ -61,8 +61,9 @@ export function handleApiError(error, context = {}) {
         console.info("Error leve: recurso no encontrado");
         break;
       case 409:
-        message = "Ya existe un registro con esos datos.";
-        console.info("Error leve: conflicto de datos");
+        message = error.detail || "No se puede eliminar este elemento porque tiene referencias asociadas.";
+        typeNotification = "warning";
+        console.info("Error leve: conflicto - elemento tiene referencias");
         break;
       case 422:
         message = "Validacion incorrecto, intente de nuevo.";

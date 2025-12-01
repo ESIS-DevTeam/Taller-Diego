@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from db.models import Servicio
 
 from schemas.servicio_schema import ServicioCreate
@@ -38,6 +39,10 @@ class ServicioRepository:
     def delete(self, id: int):
         servicio = self.get_by_id(id)
         if servicio:
-            self.db.delete(servicio)
-            self.db.commit()
+            try:
+                self.db.delete(servicio)
+                self.db.commit()
+            except IntegrityError as e:
+                self.db.rollback()
+                raise ValueError(f"No se puede eliminar el servicio porque tiene órdenes o referencias asociadas")
         return servicio

@@ -59,10 +59,13 @@ class ServicioService:
         return servicio
     
     def delete_servicio(self, id: int):
-        result = self.repo.delete(id)
-        
-        # Invalidar caché
-        cache.delete(f'servicio_{id}')
-        cache.invalidate_pattern('servicios')
-        
-        return result
+        try:
+            result = self.repo.delete(id)
+            
+            # Invalidar caché
+            cache.delete(f'servicio_{id}')
+            cache.invalidate_pattern('servicios')
+            
+            return result
+        except ValueError as e:
+            raise e

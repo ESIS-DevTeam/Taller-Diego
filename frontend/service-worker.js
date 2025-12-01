@@ -1,7 +1,7 @@
 // Service Worker para caché offline
-const CACHE_NAME = 'taller-diego-v1';
-const STATIC_CACHE = 'static-v1';
-const API_CACHE = 'api-v1';
+const CACHE_NAME = 'taller-diego-v4';
+const STATIC_CACHE = 'static-v4';
+const API_CACHE = 'api-v4';
 
 // Assets estáticos para cachear
 const STATIC_ASSETS = [
@@ -56,22 +56,30 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Estrategia para API: Network First, Cache Fallback
+  // *** IMPORTANTE: NO interceptar peticiones que no sean GET ***
+  // Dejar que todas las peticiones no-GET (POST, PUT, DELETE) pasen directamente
+  // El navegador manejará CORS apropiadamente
+  if (request.method !== 'GET') {
+    // Simplemente pasar al navegador sin interceptar
+    return;
+  }
+
+  // Si la petición es a otro origen (ej. backend en otro puerto), no interceptar
+  if (url.origin !== self.location.origin) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Peticiones a la API (mismo origen) -> solo red, sin cachear
   if (url.pathname.startsWith('/api/v1/')) {
     event.respondWith(
-      fetch(request)
-        .then(response => {
-          // Clonar la respuesta para cachearla
-          const responseClone = response.clone();
-          caches.open(API_CACHE).then(cache => {
-            cache.put(request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Si falla la red, intentar desde caché
-          return caches.match(request);
-        })
+      fetch(request).catch(() => new Response(
+        JSON.stringify({ error: 'offline' }),
+        {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      ))
     );
     return;
   }
@@ -88,7 +96,7 @@ self.addEventListener('fetch', (event) => {
         return fetch(request)
           .then(response => {
             // Cachear la nueva respuesta
-            if (request.method === 'GET' && response.status === 200) {
+            if (response && response.status === 200) {
               const responseClone = response.clone();
               caches.open(STATIC_CACHE).then(cache => {
                 cache.put(request, responseClone);
@@ -99,6 +107,7 @@ self.addEventListener('fetch', (event) => {
       })
       .catch(err => {
         console.error('Service Worker: Error en fetch:', err);
+        return new Response(null, { status: 504 });
       })
   );
 });

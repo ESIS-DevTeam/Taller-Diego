@@ -6,6 +6,48 @@ import { renderProducts } from "../product-list/product-list.js";
 import { generateBarcodeImage, downloadBarcodeImage, isValidBarcode } from "../../utils/codbarra.js";
 
 // ========================================
+// UTILIDADES DE SANITIZACIÓN
+// ========================================
+
+function sanitizeText(value, { allowNewLines = false } = {}) {
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  let text = String(value)
+    .replace(/<[^>]*?>/g, "") // eliminar etiquetas HTML
+    .replace(/[`$]/g, "") // remover caracteres susceptibles a plantillas/script
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, " "); // caracteres de control
+
+  if (allowNewLines) {
+    text = text.replace(/[\t\u00A0]+/g, " ");
+  } else {
+    text = text.replace(/\s+/g, " ");
+  }
+
+  return text.trim();
+}
+
+function containsForbiddenContent(value) {
+  if (value === undefined || value === null) {
+    return false;
+  }
+
+  const text = String(value).toLowerCase();
+
+  // patrones básicos de XSS/HTML
+  if (/<\s*script|<\s*\/script|javascript:/i.test(text)) {
+    return true;
+  }
+
+  if (/<[^>]+>/g.test(text)) {
+    return true;
+  }
+
+  return false;
+}
+
+// ========================================
 // GENERADOR DE CÓDIGOS DE BARRAS
 // ========================================
 
@@ -319,17 +361,39 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // DATOS DEL FORMULARIO
+    // DATOS DEL FORMULARIO (sanitizados)
+    const rawNombre = form['product-name'].value;
+    const rawMarca = form['product-brand'].value;
+    const rawCategoria = form['product-category'].value;
+    const rawDescripcion = form['product-description'].value;
+
+    const rawFields = {
+      nombre: rawNombre,
+      marca: rawMarca,
+      descripcion: rawDescripcion,
+      modelo: form['product-model']?.value,
+    };
+
+    const fieldWithForbiddenContent = Object.entries(rawFields)
+      .find(([, value]) => containsForbiddenContent(value));
+
+    if (fieldWithForbiddenContent) {
+      const [fieldName] = fieldWithForbiddenContent;
+      console.warn(`Contenido bloqueado en campo ${fieldName}:`, rawFields[fieldName]);
+      showNotification('El campo no puede contener etiquetas HTML o script.', 'error');
+      return;
+    }
+
     let formData = {
-      nombre: form['product-name'].value.trim(),
-      marca: form['product-brand'].value.trim(),
-      categoria: form['product-category'].value,
-      stock: parseInt(form['product-stock'].value) || 0,
-      stockMin: parseInt(form['product-min-stock'].value) || 0,
+      nombre: sanitizeText(rawNombre),
+      marca: sanitizeText(rawMarca),
+      categoria: sanitizeText(rawCategoria),
+      stock: parseInt(form['product-stock'].value, 10) || 0,
+      stockMin: parseInt(form['product-min-stock'].value, 10) || 0,
       precioCompra: parseFloat(form['product-purchase-price'].value) || 0,
       precioVenta: parseFloat(form['product-selling-price'].value) || 0,
-      descripcion: form['product-description'].value.trim(),
-    }
+      descripcion: sanitizeText(rawDescripcion, { allowNewLines: true }),
+    };
 
     // ========================================
     // GENERACIÓN AUTOMÁTICA DE CÓDIGO DE BARRAS ÚNICO
@@ -363,7 +427,7 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
     const isAutopart = autopartCheckbox?.checked ?? false;
 
     if (isAutopart) {
-      formData.modelo = form['product-model'].value.trim();
+      formData.modelo = sanitizeText(form['product-model'].value);
       formData.anio = parseInt(form['product-year'].value, 10) || 0;
       endpoint = "autopartes";
     }
