@@ -7,7 +7,7 @@
  * de fecha y generación del PDF con códigos de barras.
  */
 
-import { fetchFromApi } from "../data-manager.js";
+import { countFromApi, fetchFromApi } from "../data-manager.js";
 import { showNotification } from "../utils/notification.js";
 
 // ========================================
@@ -887,9 +887,9 @@ async function generatePDFPreview(products, optionLabel, options) {
 
     let currentY = margin;
     let currentCol = 0;
-
+    let cantProduct= await countFromApi('productos');
     // Solo mostrar primeros 6 productos como preview
-    const previewProducts = products.slice(0, 6);
+    const previewProducts = products.slice(0, cantProduct);
 
     if (options.includeHeader) {
         doc.setFillColor(0, 91, 182);

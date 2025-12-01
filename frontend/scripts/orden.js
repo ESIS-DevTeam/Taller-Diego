@@ -13,6 +13,11 @@ const ordenSidebar = document.getElementById('orden-sidebar');
 const mainContent = document.querySelector('.main-content');
 const ordenContent = document.getElementById('orden-content');
 
+
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000/api/v1'  // Desarrollo local
+  : '/api/v1';
+
 // Estado del sidebar secundario
 let sidebarVisible = true;
 
@@ -139,7 +144,7 @@ async function initVentaProducto() {
 
 async function loadProductos() {
   try {
-    const response = await fetch('http://localhost:8000/api/v1/productos/');
+    const response = await fetch(`${API_BASE_URL}/productos/`);
     if (!response.ok) throw new Error('Error al cargar productos');
 
     productosDisponibles = await response.json();
@@ -584,7 +589,7 @@ async function registrarVenta() {
   };
 
   try {
-    const response = await fetch('http://localhost:8000/api/v1/ventas/', {
+    const response = await fetch(`${API_BASE_URL}/ventas/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
