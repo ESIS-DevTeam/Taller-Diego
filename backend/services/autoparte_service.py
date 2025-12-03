@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from repositories.autoparte_repo import AutoparteRepository
 from schemas.autoparte_schema import AutoparteCreate
+from core.cache import cache
 
 
 
@@ -14,6 +15,10 @@ class AutoparteService:
             raise ValueError("Ya existe una autoparte con ese nombre")
         autoparte_data = data
         autoparte = self.repo.create(autoparte_data)
+        
+        # Invalidar caché de productos (autopartes heredan de productos)
+        cache.invalidate_pattern('productos')
+        
         return autoparte
     
     def list_autopartes(self):
@@ -29,13 +34,27 @@ class AutoparteService:
         autoparte = self.repo.get_by_id(id)
         if not autoparte:
             raise ValueError("La autoparte no existe")
-        return self.repo.update(id, data)
+        
+        result = self.repo.update(id, data)
+        
+        # Invalidar caché de productos
+        cache.delete(f'producto_{id}')
+        cache.invalidate_pattern('productos')
+        
+        return result
     
     def delete_autoparte(self, id: int):
         autoparte = self.repo.get_by_id(id)
         if not autoparte:
             raise ValueError("La autoparte no existe")
-        return self.repo.delete(id)
+        
+        result = self.repo.delete(id)
+        
+        # Invalidar caché de productos
+        cache.delete(f'producto_{id}')
+        cache.invalidate_pattern('productos')
+        
+        return result
     
     def get_by_modelo(self, modelo: str):
         return self.repo.get_by_modelo(modelo)
