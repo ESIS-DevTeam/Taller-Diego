@@ -102,11 +102,9 @@ function generateBarcode(categoria, lastId, existingBarcodes = []) {
 
     // Verificar si el código ya existe
     if (!existingBarcodes.includes(barcode)) {
-      console.log(`📊 Código de barras único generado: ${barcode} (intentos: ${attempts + 1})`);
       return barcode;
     }
 
-    console.warn(`⚠️ Código ${barcode} ya existe, generando nuevo...`);
     attempts++;
   }
 
@@ -114,7 +112,6 @@ function generateBarcode(categoria, lastId, existingBarcodes = []) {
   const timestamp = Date.now().toString().slice(-3);
   const randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
   const fallbackBarcode = `${prefix}-${randomLetter}${timestamp}-${categorySuffix}`;
-  console.error(`❌ No se pudo generar código único, usando timestamp: ${fallbackBarcode}`);
   return fallbackBarcode;
 }
 
@@ -401,8 +398,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
     // ========================================
     if (!isEdit) {
       try {
-        console.log('🔄 Generando código de barras único...');
-
         // Paso 1: Obtener el último ID
         const lastId = await getLastProductId();
 
@@ -414,9 +409,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
 
         // Paso 4: Asignar al producto
         formData.codBarras = barcode;
-
-        console.log(`✅ Código único asignado: ${barcode}`);
-        console.log(`🔍 Verificado contra ${existingBarcodes.length} códigos existentes`);
       } catch (error) {
         console.error('❌ Error generando código de barras:', error);
         showNotification('Error al generar código de barras único', 'error');
@@ -444,9 +436,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       })
 
       if (isEdit) {
-        // ========================================
-        // MODO EDICIÓN - No regenerar código de barras
-        // ========================================
         await updateResource(endpoint, productId, formData);
 
 
@@ -457,13 +446,7 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
         }
         showNotification("Producto actualizado exitosamente", "success");
       } else {
-        // ========================================
-        // MODO CREACIÓN - Guardar con código de barras generado
-        // ========================================
-        console.log('📤 Enviando producto con código:', formData.codBarras);
         const newProduct = await createResource(endpoint, formData);
-        console.log('✅ Producto creado:', newProduct);
-        console.log(`🔖 Código guardado en BD: ${newProduct.codBarras || 'NO GUARDADO'}`);
 
         if (imageCompress) {
           const imgName = await uploadImage(imageCompress, newProduct.id, 'productos');
@@ -475,10 +458,9 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       }
 
       closeModalForm();
-      await renderProducts();
+      await renderProducts(null, true);
 
     } catch (error) {
-      console.error("❌ Error al crear producto:", error);
       showNotification("Error al crear producto: " + error.message, "error");
     }
   });
