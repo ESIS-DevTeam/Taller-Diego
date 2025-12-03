@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from db.base import SessionLocal
 from schemas.servicio_schema import ServicioCreate, ServicioResponse
 from services.servicio_service import ServicioService
+from core.auth import require_supabase_user
 
 router = APIRouter(tags=["Servicios"])
 
@@ -16,7 +17,7 @@ def get_db():
 def get_servicio_service(db: Session = Depends(get_db)) -> ServicioService:
     return ServicioService(db)
 
-@router.post("/", response_model=ServicioResponse)
+@router.post("/", response_model=ServicioResponse, dependencies=[Depends(require_supabase_user)])
 def create_servicio(
     data: ServicioCreate,
     service: ServicioService = Depends(get_servicio_service)
@@ -36,7 +37,7 @@ def get_servicio(id: int, service: ServicioService = Depends(get_servicio_servic
         raise HTTPException(status_code=404, detail="Servicio no encontrado")
     return servicio
 
-@router.put("/{id}", response_model=ServicioResponse)
+@router.put("/{id}", response_model=ServicioResponse, dependencies=[Depends(require_supabase_user)])
 def update_servicio(
     id: int,
     data: ServicioCreate,
@@ -47,7 +48,7 @@ def update_servicio(
         raise HTTPException(status_code=404, detail="Servicio no encontrado")
     return servicio
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(require_supabase_user)])
 def delete_servicio(id: int, service: ServicioService = Depends(get_servicio_service)):
     try:
         servicio = service.delete_servicio(id)

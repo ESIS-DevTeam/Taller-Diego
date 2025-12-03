@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from db.base import SessionLocal
 from schemas.venta_schema import VentaCreate, VentaResponse
 from services.venta_service import VentaService
+from core.auth import require_supabase_user
 
 router = APIRouter(tags=["Ventas"])
 
@@ -23,7 +24,7 @@ def get_db():
 def get_venta_service(db: Session = Depends(get_db)) -> VentaService:
     return VentaService(db)
 
-@router.post("/", response_model=VentaResponse)
+@router.post("/", response_model=VentaResponse, dependencies=[Depends(require_supabase_user)])
 def create_venta(
     data: VentaCreate,
     service: VentaService = Depends(get_venta_service)
@@ -51,7 +52,7 @@ def get_ventas_by_fecha(fecha: datetime, service: VentaService = Depends(get_ven
     return service.get_by_fecha(fecha)
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(require_supabase_user)])
 def delete_venta(id: int, service: VentaService = Depends(get_venta_service)):
     result = service.delete_venta(id)
     if not result:

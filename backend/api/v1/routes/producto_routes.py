@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from db.base import SessionLocal
 from schemas.producto_schema import ProductoCreate, ProductoResponse
 from services.producto_service import ProductoService
+from core.auth import require_supabase_user
 
 router = APIRouter(tags=["Productos"])
 
@@ -20,12 +21,15 @@ def get_db():
 def get_producto_service(db: Session = Depends(get_db)) -> ProductoService:
     return ProductoService(db)
 
-@router.post("/", response_model=ProductoResponse)
+@router.post("/", response_model=ProductoResponse, dependencies=[Depends(require_supabase_user)])
 def create_producto(
     data: ProductoCreate,
     service: ProductoService = Depends(get_producto_service)
 ):
-    return service.create_producto(data)
+    try:
+        return service.create_producto(data)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("/", response_model=list[ProductoResponse])
@@ -51,7 +55,7 @@ def get_producto(id: int, service: ProductoService = Depends(get_producto_servic
     return producto
 
 
-@router.put("/{id}", response_model=ProductoResponse)
+@router.put("/{id}", response_model=ProductoResponse, dependencies=[Depends(require_supabase_user)])
 def update_producto(
     id: int,
     data: ProductoCreate,
@@ -63,7 +67,7 @@ def update_producto(
     return producto
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(require_supabase_user)])
 def delete_producto(id: int, service: ProductoService = Depends(get_producto_service)):
     try:
         producto = service.delete_producto(id)
