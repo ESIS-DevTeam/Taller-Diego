@@ -15,11 +15,66 @@ def get_db():
         db.close()
 
 
-@router.get("/")
+@router.get("/", summary="Verificar estado del sistema")
 def health_check(db: Session = Depends(get_db)):
     """
-    Hola Mundo Arquitectónico - Valida el flujo completo:
-    Frontend → Backend → Base de Datos → Backend → Frontend
+    Verificación de salud del sistema completo
+    
+    Valida que todas las capas de la arquitectura estén funcionando correctamente:
+    **Frontend → Backend → Base de Datos → Backend → Frontend**
+    
+    **Response EXITOSA:
+    ```json
+    {
+        "status": "success",
+        "message": "Línea Base Arquitectónica validada ",
+        "layers": {
+            "presentation": "Frontend conectado",
+            "service": "Backend operativo",
+            "persistence": {
+                "database_connected": true,
+                "database_name": "postgres",
+                "database_version": "PostgreSQL 17.6 on aarch64-unknown-linux-gnu"
+            }
+        },
+        "timestamp": "2025-12-04T11:32:39.910088",
+        "architecture_flow": "✓ Frontend → ✓ Backend → ✓ Database → ✓ Response"
+    }
+    ```
+    
+    **Response FALLIDA (error de base de datos):
+    ```json
+    {
+        "status": "error",
+        "message": "Error de conexión a la base de datos",
+        "layers": {
+            "presentation": "Frontend conectado",
+            "service": "Backend operativo",
+            "persistence": {
+                "database_connected": false,
+                "error": "Connection refused"
+            }
+        },
+        "timestamp": "2025-12-04T11:32:39.910088",
+        "architecture_flow": "✓ Frontend → ✓ Backend → ✗ Database"
+    }
+    ```
+    **Status:** `500 Internal Server Error`
+    
+    **Capas validadas:
+    - **Presentation**: Frontend puede alcanzar el backend
+    - **Service**: Backend está procesando requests
+    - **Persistence**: Base de datos está accesible y respondiendo
+    
+    **Uso:
+    Este endpoint es útil para:
+    - Monitoring y health checks automáticos
+    - Validar deployment después de cambios
+    - Debugging de problemas de conectividad
+    - Verificar versión de PostgreSQL
+    
+    **Autenticación:
+    No requiere autenticación (público)
     """
     try:
         # Capa de Persistencia: Ejecutar consulta trivial a la BD
@@ -30,7 +85,7 @@ def health_check(db: Session = Depends(get_db)):
         
         return {
             "status": "success",
-            "message": "Línea Base Arquitectónica validada ✅",
+            "message": "Línea Base Arquitectónica validada ",
             "layers": {
                 "presentation": "Frontend conectado",
                 "service": "Backend operativo",

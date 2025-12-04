@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import Response
-from fastapi.openapi.utils import get_openapi
+from fastapi.responses import Response, HTMLResponse
+from fastapi.openapi.docs import get_swagger_ui_html
 from api.v1.routes import producto_routes, venta_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes, auth_routes
 import time
 
@@ -10,7 +10,7 @@ app = FastAPI(
     title="Taller Diego API",
     description="Sistema de gestión para taller mecánico",
     version="1.0.0",
-    docs_url="/docs",
+    docs_url=None,
     redoc_url="/redoc",
     openapi_url="/openapi.json"
 )
@@ -60,6 +60,21 @@ app.include_router(servicio_routes.router,
                    prefix="/api/v1/servicios", tags=["Servicios"])
 app.include_router(empleado_routes.router,
                    prefix="/api/v1/empleados", tags=["Empleados"])
+
+# Documentación personalizada con colores oscuros
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Documentación",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+        swagger_ui_parameters={
+            "syntaxHighlight.theme": "monokai",
+            "defaultModelsExpandDepth": -1,
+            "displayRequestDuration": True,
+        },
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+    )
 
 @app.get("/")
 def read_root():
