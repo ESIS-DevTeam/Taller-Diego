@@ -1,5 +1,6 @@
 from .producto_schema import ProductoBase
-
+from pydantic import field_validator
+import re
 
 
 class AutoparteBase(ProductoBase):

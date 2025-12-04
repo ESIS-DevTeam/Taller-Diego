@@ -24,7 +24,7 @@ class ProductoRepository:
         return self.db.query(Producto).filter(Producto.id == id).first()
     
     def get_by_name(self, nombre: str):
-        return self.db.query(Producto).filter(Producto.nombre == nombre).first()
+        return self.db.query(Producto).filter(Producto.nombre.ilike(nombre)).first()
     
     def get_by_barcode(self, codBarras: str):
         return self.db.query(Producto).filter(Producto.codBarras == codBarras).first()

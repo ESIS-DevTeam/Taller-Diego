@@ -50,6 +50,11 @@ class ServicioService:
         return self.repo.get_by_name(nombre)
     
     def update_servicio(self, id: int, data: ServicioCreate):
+        # Verificar si existe otro servicio con el mismo nombre
+        existing = self.repo.get_by_name(data.nombre)
+        if existing and existing.id != id:
+            raise ValueError("Ya existe un servicio con ese nombre")
+        
         servicio = self.repo.update(id, data)
         
         # Invalidar caché

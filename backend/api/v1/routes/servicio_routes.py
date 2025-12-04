@@ -22,7 +22,10 @@ def create_servicio(
     data: ServicioCreate,
     service: ServicioService = Depends(get_servicio_service)
 ):
-    return service.create_servicio(data)
+    try:
+        return service.create_servicio(data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=list[ServicioResponse])
 def list_servicios(
@@ -43,10 +46,13 @@ def update_servicio(
     data: ServicioCreate,
     service: ServicioService = Depends(get_servicio_service)
 ):
-    servicio = service.update_servicio(id, data)
-    if not servicio:
-        raise HTTPException(status_code=404, detail="Servicio no encontrado")
-    return servicio
+    try:
+        servicio = service.update_servicio(id, data)
+        if not servicio:
+            raise HTTPException(status_code=404, detail="Servicio no encontrado")
+        return servicio
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{id}", dependencies=[Depends(require_supabase_user)])
 def delete_servicio(id: int, service: ServicioService = Depends(get_servicio_service)):
