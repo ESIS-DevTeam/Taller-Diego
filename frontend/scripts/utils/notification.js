@@ -1,3 +1,5 @@
+import { escapeHtml } from './sanitize.js';
+
 /**
  * Muestra una notificación flotante en pantalla.
  * @param {string} message - Texto del mensaje.
@@ -16,7 +18,10 @@ export function showNotification(message, type = "info", duration = 3000) {
 
   const noti = document.createElement("div");
   noti.className = `notification ${type}`;
-  noti.innerHTML = `<p>${message}</p>`;
+  // Usar textContent en lugar de innerHTML para prevenir XSS
+  const p = document.createElement('p');
+  p.textContent = message;
+  noti.appendChild(p);
   container.appendChild(noti);
 
   setTimeout(() => {
