@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
-from ..repositories.auditoria_repo import AuditoriaRepository
-from ..schemas.auditoria_schema import AuditoriaCreate, AuditoriaResponse, AuditoriaFilter
-from ..db.models.auditoria import Auditoria
+from repositories.auditoria_repo import AuditoriaRepository
+from schemas.auditoria_schema import AuditoriaCreate, AuditoriaResponse, AuditoriaFilter
+from db.models.auditoria import Auditoria
 
 class AuditoriaService:
     

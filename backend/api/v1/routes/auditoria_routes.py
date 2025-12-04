@@ -2,11 +2,18 @@ from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
-from ...database import get_db
-from ...schemas.auditoria_schema import AuditoriaResponse, AuditoriaFilter
-from ...services.auditoria_service import AuditoriaService
+from db.base import SessionLocal
+from schemas.auditoria_schema import AuditoriaResponse, AuditoriaFilter
+from services.auditoria_service import AuditoriaService
 
 router = APIRouter(prefix="/auditoria", tags=["Auditoría"])
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @router.get("/", response_model=dict)
 def obtener_auditoria(

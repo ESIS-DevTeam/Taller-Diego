@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from typing import List, Optional
 from datetime import datetime
-from ..db.models.auditoria import Auditoria
-from ..schemas.auditoria_schema import AuditoriaCreate, AuditoriaFilter
+from db.models.auditoria import Auditoria
+from schemas.auditoria_schema import AuditoriaCreate, AuditoriaFilter
 
 class AuditoriaRepository:
     
