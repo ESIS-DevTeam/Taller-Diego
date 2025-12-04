@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import Response
-from api.v1.routes import producto_routes, venta_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes
+from api.v1.routes import producto_routes, venta_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes, auditoria_routes
 import time
 
 app = FastAPI()
@@ -50,6 +50,8 @@ app.include_router(servicio_routes.router,
                    prefix="/api/v1/servicios", tags=["Servicios"])
 app.include_router(empleado_routes.router,
                    prefix="/api/v1/empleados", tags=["Empleados"])
+app.include_router(auditoria_routes.router,
+                   prefix="/api/v1/auditoria", tags=["Auditoría"])
 
 @app.get("/")
 def read_root():
