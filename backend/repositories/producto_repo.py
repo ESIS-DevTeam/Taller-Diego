@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from db.models import Producto
 from schemas.producto_schema import ProductoCreate
+
+
 
 class ProductoRepository:
 
@@ -21,7 +24,10 @@ class ProductoRepository:
         return self.db.query(Producto).filter(Producto.id == id).first()
     
     def get_by_name(self, nombre: str):
-        return self.db.query(Producto).filter(Producto.nombre == nombre).first()
+        return self.db.query(Producto).filter(Producto.nombre.ilike(nombre)).first()
+    
+    def get_by_barcode(self, codBarras: str):
+        return self.db.query(Producto).filter(Producto.codBarras == codBarras).first()
 
     def update(self, id: int, producto_data: ProductoCreate):
         producto = self.get_by_id(id)
@@ -37,6 +43,11 @@ class ProductoRepository:
     def delete(self, id: int):
         producto = self.get_by_id(id)
         if producto:
-            self.db.delete(producto)
-            self.db.commit()
+            try:
+                self.db.delete(producto)
+                self.db.commit()
+            except IntegrityError as e:
+                self.db.rollback()
+                # Si hay un error de integridad (ej: ventas asociadas), lanzar una excepción más clara
+                raise ValueError(f"No se puede eliminar el producto porque tiene ventas o referencias asociadas")
         return producto
