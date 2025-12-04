@@ -8,8 +8,8 @@ import { SUPABASE } from "./data-store.js";
  */
 export async function obtainToken(email, password) {
   const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:8000/api/v1'  // Desarrollo local
-  : '/api/v1';
+    ? 'http://localhost:8000/api/v1'  // Desarrollo local
+    : '/api/v1';
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -42,5 +42,5 @@ export async function obtainToken(email, password) {
 
 export async function closeSesion() {
   localStorage.removeItem('supabase_token');
-  window.location.replace('../views/login.html');
+  window.location.replace('login.html');
 }

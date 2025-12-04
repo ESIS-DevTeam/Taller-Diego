@@ -7,19 +7,19 @@ function loginActions() {
   const passwordInput = document.getElementById("user-key");
   const errorMsg = document.getElementById('errorMsg');
 
-  
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = await obtainToken(userInput.value, passwordInput.value);
-    
-    if(!data) {
+
+    if (!data) {
       errorMsg.classList.remove("hidden");
-    }else{
+    } else {
       errorMsg.classList.add("hidden");
       const token = data.session.access_token;
       const user = data.user;
       localStorage.setItem('supabase_token', token);
-      window.location.href = "../views/index.html";
+      window.location.href = "index.html";
     }
 
   });
