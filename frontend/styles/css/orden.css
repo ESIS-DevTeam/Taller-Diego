@@ -469,17 +469,27 @@
 }
 @media (max-width: 768px) {
   .orden-sidebar {
-    left: 0;
-    width: 100%;
-  }
-  .orden-sidebar.hidden {
-    transform: translateX(-100%);
+    display: none;
   }
   .main-content {
     margin-left: 0;
+    background: #eaf5ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .main-content.with-orden-sidebar {
     margin-left: 0;
+  }
+  .orden-section {
+    display: none;
+  }
+  .main-content::after {
+    content: "En proceso";
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    font-family: "Istok Web", sans-serif;
   }
 }
 
