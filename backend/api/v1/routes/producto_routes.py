@@ -41,7 +41,8 @@ def create_producto(
         usuario=obtener_usuario_actual(request),
         datos_nuevos={
             "nombre": producto.nombre,
-            "precio": float(producto.precio),
+            "precioCompra": float(producto.precioCompra),
+            "precioVenta": float(producto.precioVenta),
             "stock": producto.stock
         },
         descripcion=f"Producto '{producto.nombre}' creado",
@@ -89,7 +90,8 @@ def update_producto(
     
     datos_anteriores = {
         "nombre": producto_anterior.nombre,
-        "precio": float(producto_anterior.precio),
+        "precioCompra": float(producto_anterior.precioCompra),
+        "precioVenta": float(producto_anterior.precioVenta),
         "stock": producto_anterior.stock
     }
     
@@ -98,7 +100,8 @@ def update_producto(
     
     datos_nuevos = {
         "nombre": producto.nombre,
-        "precio": float(producto.precio),
+        "precioCompra": float(producto.precioCompra),
+        "precioVenta": float(producto.precioVenta),
         "stock": producto.stock
     }
     
@@ -134,7 +137,8 @@ def delete_producto(
         
         datos_anteriores = {
             "nombre": producto_anterior.nombre,
-            "precio": float(producto_anterior.precio),
+            "precioCompra": float(producto_anterior.precioCompra),
+            "precioVenta": float(producto_anterior.precioVenta),
             "stock": producto_anterior.stock
         }
         
@@ -165,5 +169,21 @@ def get_historial_producto(
     db: Session = Depends(get_db)
 ):
     """Obtener el historial completo de cambios de un producto"""
-    historial = AuditoriaService.obtener_historial(db, "productos", id)
+    historial_orm = AuditoriaService.obtener_historial(db, "productos", id)
+    
+    # Convertir a dict
+    historial = [{
+        "id": h.id,
+        "modulo": h.modulo,
+        "accion": h.accion,
+        "tabla": h.tabla,
+        "registro_id": h.registro_id,
+        "usuario": h.usuario,
+        "fecha": h.fecha.isoformat(),
+        "datos_anteriores": h.datos_anteriores,
+        "datos_nuevos": h.datos_nuevos,
+        "descripcion": h.descripcion,
+        "ip_address": h.ip_address
+    } for h in historial_orm]
+    
     return {"producto_id": id, "historial": historial}

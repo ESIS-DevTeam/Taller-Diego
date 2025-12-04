@@ -64,8 +64,23 @@ class AuditoriaService:
         limit: int = 100
     ) -> Dict[str, Any]:
         """Obtener registros de auditoría con filtros y paginación"""
-        registros = AuditoriaRepository.get_by_filter(db, filtro, skip, limit)
+        registros_orm = AuditoriaRepository.get_by_filter(db, filtro, skip, limit)
         total = AuditoriaRepository.count_by_filter(db, filtro)
+        
+        # Convertir a dict
+        registros = [{
+            "id": r.id,
+            "modulo": r.modulo,
+            "accion": r.accion,
+            "tabla": r.tabla,
+            "registro_id": r.registro_id,
+            "usuario": r.usuario,
+            "fecha": r.fecha.isoformat(),
+            "datos_anteriores": r.datos_anteriores,
+            "datos_nuevos": r.datos_nuevos,
+            "descripcion": r.descripcion,
+            "ip_address": r.ip_address
+        } for r in registros_orm]
         
         return {
             "total": total,

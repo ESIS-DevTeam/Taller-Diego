@@ -6,7 +6,7 @@ from db.base import SessionLocal
 from schemas.auditoria_schema import AuditoriaResponse, AuditoriaFilter
 from services.auditoria_service import AuditoriaService
 
-router = APIRouter(prefix="/auditoria", tags=["Auditoría"])
+router = APIRouter(tags=["Auditoría"])
 
 def get_db():
     db = SessionLocal()
