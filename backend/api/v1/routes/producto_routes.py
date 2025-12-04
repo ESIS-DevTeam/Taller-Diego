@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from db.base import SessionLocal
 from schemas.producto_schema import ProductoCreate, ProductoResponse
 from services.producto_service import ProductoService
+from services.auditoria_service import AuditoriaService
+from core.auditoria_utils import obtener_ip_cliente, obtener_usuario_actual
 
 router = APIRouter(tags=["Productos"])
 
@@ -23,9 +25,30 @@ def get_producto_service(db: Session = Depends(get_db)) -> ProductoService:
 @router.post("/", response_model=ProductoResponse)
 def create_producto(
     data: ProductoCreate,
-    service: ProductoService = Depends(get_producto_service)
+    request: Request,
+    service: ProductoService = Depends(get_producto_service),
+    db: Session = Depends(get_db)
 ):
-    return service.create_producto(data)
+    producto = service.create_producto(data)
+    
+    # Registrar en auditoría
+    AuditoriaService.registrar_accion(
+        db=db,
+        modulo="inventario",
+        accion="CREATE",
+        tabla="productos",
+        registro_id=producto.id,
+        usuario=obtener_usuario_actual(request),
+        datos_nuevos={
+            "nombre": producto.nombre,
+            "precio": float(producto.precio),
+            "stock": producto.stock
+        },
+        descripcion=f"Producto '{producto.nombre}' creado",
+        ip_address=obtener_ip_cliente(request)
+    )
+    
+    return producto
 
 
 @router.get("/", response_model=list[ProductoResponse])
@@ -55,20 +78,92 @@ def get_producto(id: int, service: ProductoService = Depends(get_producto_servic
 def update_producto(
     id: int,
     data: ProductoCreate,
-    service: ProductoService = Depends(get_producto_service)
+    request: Request,
+    service: ProductoService = Depends(get_producto_service),
+    db: Session = Depends(get_db)
 ):
-    producto = service.update_producto(id, data)
-    if not producto:
+    # Obtener datos anteriores
+    producto_anterior = service.get_by_id(id)
+    if not producto_anterior:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
+    
+    datos_anteriores = {
+        "nombre": producto_anterior.nombre,
+        "precio": float(producto_anterior.precio),
+        "stock": producto_anterior.stock
+    }
+    
+    # Actualizar producto
+    producto = service.update_producto(id, data)
+    
+    datos_nuevos = {
+        "nombre": producto.nombre,
+        "precio": float(producto.precio),
+        "stock": producto.stock
+    }
+    
+    # Registrar en auditoría
+    AuditoriaService.registrar_accion(
+        db=db,
+        modulo="inventario",
+        accion="UPDATE",
+        tabla="productos",
+        registro_id=producto.id,
+        usuario=obtener_usuario_actual(request),
+        datos_anteriores=datos_anteriores,
+        datos_nuevos=datos_nuevos,
+        descripcion=f"Producto '{producto.nombre}' actualizado",
+        ip_address=obtener_ip_cliente(request)
+    )
+    
     return producto
 
 
 @router.delete("/{id}")
-def delete_producto(id: int, service: ProductoService = Depends(get_producto_service)):
+def delete_producto(
+    id: int,
+    request: Request,
+    service: ProductoService = Depends(get_producto_service),
+    db: Session = Depends(get_db)
+):
     try:
-        producto = service.delete_producto(id)
-        if not producto:
+        # Obtener datos antes de eliminar
+        producto_anterior = service.get_by_id(id)
+        if not producto_anterior:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
+        
+        datos_anteriores = {
+            "nombre": producto_anterior.nombre,
+            "precio": float(producto_anterior.precio),
+            "stock": producto_anterior.stock
+        }
+        
+        # Eliminar producto
+        producto = service.delete_producto(id)
+        
+        # Registrar en auditoría
+        AuditoriaService.registrar_accion(
+            db=db,
+            modulo="inventario",
+            accion="DELETE",
+            tabla="productos",
+            registro_id=id,
+            usuario=obtener_usuario_actual(request),
+            datos_anteriores=datos_anteriores,
+            descripcion=f"Producto '{datos_anteriores['nombre']}' eliminado",
+            ip_address=obtener_ip_cliente(request)
+        )
+        
         return {"detail": "Producto eliminado"}
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
+
+
+@router.get("/{id}/historial")
+def get_historial_producto(
+    id: int,
+    db: Session = Depends(get_db)
+):
+    """Obtener el historial completo de cambios de un producto"""
+    historial = AuditoriaService.obtener_historial(db, "productos", id)
+    return {"producto_id": id, "historial": historial}
