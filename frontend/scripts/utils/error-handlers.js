@@ -17,18 +17,27 @@ export function handleApiError(error, context = {}) {
   let message = "";
   const isGraveError = error.status >= 500 || error.message?.includes("Failed to fetch");
   
-    error: error.message,
-    status: error.status,
-    endpoint: context.endpoint,
-    method: context.method,
-    timestamp: new Date().toISOString(),
-  });
+  // Log básico del error (solo en desarrollo si es necesario)
+  if (process.env.NODE_ENV === 'development') {
+    console.error("Error capturado:", {
+      error: error.message,
+      status: error.status,
+      endpoint: context.endpoint,
+      method: context.method,
+      timestamp: new Date().toISOString(),
+    });
+  }
 
   if(isGraveError) {
-      error,
-      context,
-      userAgent: navigator.userAgent,
-    });
+    // Log detallado para errores graves (solo en desarrollo)
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Stack trace:", error.stack);
+      console.error("Detalles completos:", {
+        error,
+        context,
+        userAgent: navigator.userAgent,
+      });
+    }
   }
   if(error.detail) {
     showNotification(error.detail, typeNotification);

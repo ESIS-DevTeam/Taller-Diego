@@ -64,7 +64,6 @@ export function validateFormData(form, formData, isAutopart) {
   if (!formData.categoria) {
     validateField(form['product-category'], "Selecciona una categoría");
     isValid = false;
-  } else {
   }
 
   // Validar números (stock, precios)
