@@ -4,6 +4,7 @@ from db.base import SessionLocal
 from schemas.orden_schema import OrdenCreate, OrdenResponse
 from services.orden_service import OrdenService
 from datetime import date
+from core.auth import require_supabase_user
 
 router = APIRouter(tags=["Ordenes"])
 
@@ -17,7 +18,7 @@ def get_db():
 def get_orden_service(db: Session = Depends(get_db)) -> OrdenService:
     return OrdenService(db)
 
-@router.post("/", response_model=OrdenResponse)
+@router.post("/", response_model=OrdenResponse, dependencies=[Depends(require_supabase_user)])
 def create_orden(
     data: OrdenCreate,
     service: OrdenService = Depends(get_orden_service)
@@ -41,7 +42,7 @@ def get_orden_by_id(id: int, service: OrdenService = Depends(get_orden_service))
 def get_ordens_by_fecha(fecha: date, service: OrdenService = Depends(get_orden_service)):
     return service.get_by_fecha(fecha)
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(require_supabase_user)])
 def delete_orden(id: int, service: OrdenService = Depends(get_orden_service)):
     result = service.delete_orden(id)
     if not result:

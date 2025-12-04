@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from db.base import SessionLocal
 from schemas.autoparte_schema import AutoparteCreate, AutoparteResponse
 from services.autoparte_service import AutoparteService
+from core.auth import require_supabase_user
 
 router = APIRouter(tags=["Autopartes"])
 
@@ -20,7 +21,7 @@ def get_db():
 def get_autoparte_service(db: Session = Depends(get_db)) -> AutoparteService:
     return AutoparteService(db)
 
-@router.post("/", response_model=AutoparteResponse)
+@router.post("/", response_model=AutoparteResponse, dependencies=[Depends(require_supabase_user)])
 def create_autoparte(
     data: AutoparteCreate,
     service: AutoparteService = Depends(get_autoparte_service)
@@ -43,7 +44,7 @@ def get_autoparte(id: int, service: AutoparteService = Depends(get_autoparte_ser
     return autoparte
 
 
-@router.put("/{id}", response_model=AutoparteResponse)
+@router.put("/{id}", response_model=AutoparteResponse, dependencies=[Depends(require_supabase_user)])
 def update_autoparte(
     id: int,
     data: AutoparteCreate,
@@ -55,7 +56,7 @@ def update_autoparte(
     return autoparte
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(require_supabase_user)])
 def delete_autoparte(id: int, service: AutoparteService = Depends(get_autoparte_service)):
     autoparte = service.delete_autoparte(id)
     if not autoparte:

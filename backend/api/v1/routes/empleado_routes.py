@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from db.base import SessionLocal
 from schemas.empleado_schema import EmpleadoCreate, EmpleadoResponse
 from services.empleado_service import EmpleadoService
+from core.auth import require_supabase_user
 
 router = APIRouter(tags=["Empleados"])
 
@@ -16,7 +17,7 @@ def get_db():
 def get_empleado_service(db: Session = Depends(get_db)) -> EmpleadoService:
     return EmpleadoService(db)
 
-@router.post("/", response_model=EmpleadoResponse)
+@router.post("/", response_model=EmpleadoResponse, dependencies=[Depends(require_supabase_user)])
 def create_empleado(
     data: EmpleadoCreate,
     service: EmpleadoService = Depends(get_empleado_service)
@@ -36,7 +37,7 @@ def get_empleado(id: int, service: EmpleadoService = Depends(get_empleado_servic
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
     return empleado
 
-@router.put("/{id}", response_model=EmpleadoResponse)
+@router.put("/{id}", response_model=EmpleadoResponse, dependencies=[Depends(require_supabase_user)])
 def update_empleado(
     id: int,
     data: EmpleadoCreate,
@@ -47,7 +48,7 @@ def update_empleado(
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
     return empleado
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(require_supabase_user)])
 def delete_empleado(id: int, service: EmpleadoService = Depends(get_empleado_service)):
     empleado = service.delete_empleado(id)
     if not empleado:
