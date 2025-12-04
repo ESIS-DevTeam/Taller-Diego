@@ -8,6 +8,8 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
   ? 'http://localhost:8000/api/v1'  // Desarrollo local
   : '/api/v1';
 
+const token = localStorage.getItem('supabase_token');
+
 // ========================================
 // SIN CACHÉ - DATOS SIEMPRE FRESCOS
 // ========================================
@@ -43,6 +45,7 @@ export async function fetchFromApi(endpoint, id = null, skipCache = false) {
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'
@@ -75,6 +78,7 @@ export async function createResource(endpoint, data) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
       },
       body: JSON.stringify(data),
     });
@@ -118,6 +122,7 @@ export async function updateResource(endpoint, id, data) {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
       },
       body: JSON.stringify(data),
     });
@@ -159,6 +164,9 @@ export async function deleteResource(endpoint, id) {
   try {
     const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+      },
     });
 
     // Si la respuesta no es ok, intentar leer el JSON de error
@@ -256,7 +264,11 @@ function checkResponseStatus(response) {
 
 export async function fetchForBarCode(barCode) {
   try {
-    const response = await fetch(`${API_BASE_URL}/productos/barcode/${barCode}`);
+    const response = await fetch(`${API_BASE_URL}/productos/barcode/${barCode}`, {
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+      }
+    });
 
     if (!response.ok) {
       if (response.status === 404) {

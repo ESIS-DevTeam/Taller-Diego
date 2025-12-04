@@ -1,0 +1,96 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.main-container {
+  background-color: #1C3161;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.main-container .container {
+  display: grid;
+  width: 1200px;
+  height: 600px;
+  grid-template-columns: repeat(2, 1fr);
+  border-radius: 30px;
+  overflow: hidden;
+}
+.main-container .container .section-login {
+  background-color: white;
+  display: grid;
+  grid-template-rows: 2 repeat(3, 1fr);
+  padding: 10px 100px;
+  gap: 10px;
+}
+.main-container .container .section-login .context {
+  grid-row: span 1;
+  text-align: center;
+  padding-top: 50px;
+}
+.main-container .container .section-login .context h1 {
+  font-size: 25px;
+}
+.main-container .container .section-login .context p {
+  font-size: 30px;
+}
+.main-container .container .section-login .form-login {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.main-container .container .section-login .form-login div {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 34px);
+  gap: 10px;
+}
+.main-container .container .section-login .form-login div input {
+  height: 45px;
+  width: 100%;
+  border-radius: 8px;
+  border-color: #F2F7FF;
+  padding: 0px 15px;
+}
+.main-container .container .section-login .form-login div input:focus {
+  outline: none;
+  box-shadow: none;
+}
+.main-container .container .section-login .form-login button {
+  width: 100%;
+  background-color: #4A8CFF;
+  color: white;
+  border-radius: 12px;
+  border-color: transparent;
+  height: 45px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+.main-container .container .section-context {
+  background-color: aliceblue;
+  display: grid;
+  grid-template-rows: 2 repeat(2, 1fr);
+  padding: 80px 45px;
+  justify-content: center;
+}
+.main-container .container .section-context .img-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.main-container .container .section-context .img-container img {
+  border-radius: 10px;
+  width: 400px;
+  height: 300px;
+}
+.main-container .container .section-context .container-context {
+  padding: 0 70px;
+  text-align: center;
+}
+
+/*# sourceMappingURL=login.css.map */
