@@ -136,12 +136,6 @@ function validateBrand(input, value) {
 function validateNumbers(form, formData) {
   let isValid = true;
 
-    stock: formData.stock,
-    stockMin: formData.stockMin,
-    precioCompra: formData.precioCompra,
-    precioVenta: formData.precioVenta
-  });
-
   // Validar stock
   if (isNaN(formData.stock) || formData.stock < 0) {
     validateField(form['product-stock'], "El stock debe ser un número positivo");
