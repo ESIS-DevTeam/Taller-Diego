@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from db.base import SessionLocal
 from datetime import datetime
+from core.cache import cache
 
 router = APIRouter()
 
@@ -105,3 +106,24 @@ def health_check(db: Session = Depends(get_db)):
             "timestamp": datetime.now().isoformat(),
             "architecture_flow": "✗ Fallo en comunicación"
         }
+
+
+@router.get("/cache/stats")
+def cache_stats():
+    """
+    Obtiene estadísticas del sistema de caché.
+    Útil para monitorear el rendimiento del caché.
+    """
+    stats = cache.get_stats()
+    
+    return {
+        "status": "success",
+        "cache": stats,
+        "timestamp": datetime.now().isoformat(),
+        "description": {
+            "size": "Número de entradas en caché",
+            "hits": "Número de accesos exitosos (dato encontrado en caché)",
+            "misses": "Número de accesos fallidos (dato no encontrado, consulta a BD)",
+            "hit_rate": "Porcentaje de efectividad del caché (hits / total)"
+        }
+    }

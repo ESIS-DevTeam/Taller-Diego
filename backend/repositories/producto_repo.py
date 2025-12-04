@@ -18,7 +18,8 @@ class ProductoRepository:
         return producto
 
     def get_all(self):
-        return self.db.query(Producto).all()
+        # Optimizado: Usar order_by con índice y limit por defecto
+        return self.db.query(Producto).order_by(Producto.id.desc()).limit(1000).all()
     
     def get_by_id(self, id: int):
         return self.db.query(Producto).filter(Producto.id == id).first()
