@@ -35,7 +35,8 @@ async function getServices() {
       headers: {
         'cache-control': 'no-cache , no-store , must-revalidate',
         'pragama': 'no-cache',
-        'expires': '0'
+        'expires': '0',
+        'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
       }
     });
     if (!response.ok) throw new Error('Error al obtener servicios');
@@ -54,7 +55,10 @@ async function createService(serviceData) {
   try {
     const response = await fetch(`${API_BASE_URL}/servicios/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
+      },
       body: JSON.stringify(serviceData)
     });
 
@@ -78,7 +82,10 @@ async function updateService(id, serviceData) {
   try {
     const response = await fetch(`${API_BASE_URL}/servicios/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
+      },
       body: JSON.stringify(serviceData)
     });
 
