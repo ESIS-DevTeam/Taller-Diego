@@ -74,7 +74,8 @@ def get_autopartes_by_modelo(
 
 @router.get("/anio/{anio}", response_model=list[AutoparteResponse])
 def get_autopartes_by_anio(
-    anio: int,
+    anio: int,  # El usuario busca con un año numérico (ej: 2020)
     service: AutoparteService = Depends(get_autoparte_service)
 ):
+    """Busca autopartes compatibles con un año específico"""
     return service.get_by_anio(anio)

@@ -48,4 +48,12 @@ class AutoparteRepository:
         return self.db.query(Autoparte).filter(Autoparte.modelo == modelo).all()
     
     def get_by_anio(self, anio: int):
-        return self.db.query(Autoparte).filter(Autoparte.anio == anio).all()
+        """
+        Busca autopartes compatibles con un año específico.
+        Funciona con formatos: "2020", "2018-2023", "2018, 2020, 2022"
+        """
+        anio_str = str(anio)
+        # Buscar donde el año aparezca en el string (exacto, en rango o en lista)
+        return self.db.query(Autoparte).filter(
+            Autoparte.anio.contains(anio_str)
+        ).all()
