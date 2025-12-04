@@ -2,10 +2,18 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import Response
+from fastapi.openapi.utils import get_openapi
 from api.v1.routes import producto_routes, venta_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes, auth_routes
 import time
 
-app = FastAPI()
+app = FastAPI(
+    title="Taller Diego API",
+    description="Sistema de gestión para taller mecánico",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
 
 # Middleware de compresión gzip (reduce tamaño de respuestas)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
