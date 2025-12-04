@@ -210,7 +210,6 @@ export async function countFromApi(endpoint) {
   try {
     const object = await fetchFromApi(endpoint, null, true);
     if (!Array.isArray(object)) {
-      console.error('La respuesta no es un array');
       return 0;
     }
     return object.length;

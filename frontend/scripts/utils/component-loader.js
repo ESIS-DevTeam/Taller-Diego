@@ -20,12 +20,10 @@ export async function loadComponent(elementId, path) {
 
     if (content.length > 0) {
       // Ya tiene contenido (probablemente cargado por SSI), no hacer nada
-      // console.log(`Componente ${elementId} ya cargado (SSI).`);
       return;
     }
 
     // Si está vacío, cargar dinámicamente
-    // console.log(`Cargando componente ${elementId} dinámicamente...`);
     const response = await fetch(path);
     if (!response.ok) {
       throw new Error(`Error cargando ${path}: ${response.statusText}`);
@@ -35,7 +33,6 @@ export async function loadComponent(elementId, path) {
     element.innerHTML = html;
 
   } catch (error) {
-    console.error(`Error al cargar el componente ${path}:`, error);
     const element = document.getElementById(elementId);
     if (element) {
       element.innerHTML = `<p style="color:red">Error cargando componente</p>`;

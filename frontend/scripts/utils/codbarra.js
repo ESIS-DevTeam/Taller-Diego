@@ -20,18 +20,15 @@
 export function generateBarcodeImage(elementId, barcodeValue, productName = '') {
     try {
         if (typeof JsBarcode === 'undefined') {
-            console.error('❌ JsBarcode no está cargado');
             return false;
         }
 
         if (!barcodeValue || barcodeValue.trim() === '') {
-            console.error('❌ Código de barras vacío');
             return false;
         }
 
         const element = document.getElementById(elementId);
         if (!element) {
-            console.error(`❌ Elemento con ID "${elementId}" no encontrado`);
             return false;
         }
 
@@ -50,7 +47,6 @@ export function generateBarcodeImage(elementId, barcodeValue, productName = '') 
             lineColor: '#000000',
             valid: (valid) => {
                 if (!valid) {
-                    console.error(`❌ Código "${barcodeValue}" no es válido para CODE128`);
                 }
             }
         };
@@ -58,11 +54,9 @@ export function generateBarcodeImage(elementId, barcodeValue, productName = '') 
         // Generar el código de barras
         JsBarcode(element, barcodeValue, options);
 
-        console.log(`✅ Código de barras generado: ${barcodeValue}`);
         return true;
 
     } catch (error) {
-        console.error('❌ Error al generar código de barras:', error);
         return false;
     }
 }
@@ -80,7 +74,6 @@ export function generateBarcodeImage(elementId, barcodeValue, productName = '') 
  */
 export async function downloadBarcodeImage(barcodeValue, productName = 'producto') {
     try {
-        console.log(`📥 Iniciando descarga de código: ${barcodeValue}`);
 
         // Validaciones
         if (!barcodeValue || barcodeValue.trim() === '') {
@@ -181,11 +174,9 @@ export async function downloadBarcodeImage(barcodeValue, productName = 'producto
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        console.log(`✅ Imagen descargada: ${fileName}`);
         return true;
 
     } catch (error) {
-        console.error('❌ Error al descargar código de barras:', error);
         let errorMessage = 'Error al descargar código de barras';
 
         if (error.message.includes('JsBarcode')) {
@@ -228,7 +219,6 @@ export function isValidBarcode(barcodeValue) {
     const validChars = /^[\x00-\x7F]+$/;
 
     if (!validChars.test(barcodeValue)) {
-        console.warn(`⚠️ Código "${barcodeValue}" contiene caracteres no válidos para CODE128`);
         return false;
     }
 

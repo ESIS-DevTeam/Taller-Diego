@@ -35,7 +35,6 @@ export async function obtainToken(email, password) {
       }
     };
   } catch (error) {
-    console.error('Error en la autenticación:', error);
     return null;
   }
 }

@@ -7,7 +7,6 @@ let allProducts = [];
 
 function createFuseInstance(products) {
   if (typeof Fuse === 'undefined') {
-    console.error('Fuse.js no está cargado. Agrégalo al HTML.');
     return null;
   }
 

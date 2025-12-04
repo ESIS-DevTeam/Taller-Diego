@@ -17,7 +17,6 @@ export function handleApiError(error, context = {}) {
   let message = "";
   const isGraveError = error.status >= 500 || error.message?.includes("Failed to fetch");
   
-  console.error("Error capturado:", {
     error: error.message,
     status: error.status,
     endpoint: context.endpoint,
@@ -26,8 +25,6 @@ export function handleApiError(error, context = {}) {
   });
 
   if(isGraveError) {
-    console.error("Stack trace:", error.stack);
-    console.error("Detalles completos:", {
       error,
       context,
       userAgent: navigator.userAgent,
@@ -45,46 +42,36 @@ export function handleApiError(error, context = {}) {
         break;
       case 400:
         message = "Solicitud invalida, intente de nuevo.";
-        console.info("Error leve: solicitud inválida");
         break;
       case 401:
         message = "No autenticado, intente de nuevo.";
-        console.info("Error leve: no autenticado");
         break;
       case 403:
         message = "No tiene permiso para relizar esta operacion.";
-        console.info("Error leve: sin permisos");
         break;
       case 404:
         message = "No se encontro el recurso solicitado.";
         typeNotification = "warning";
-        console.info("Error leve: recurso no encontrado");
         break;
       case 409:
         message = error.detail || "No se puede eliminar este elemento porque tiene referencias asociadas.";
         typeNotification = "warning";
-        console.info("Error leve: conflicto - elemento tiene referencias");
         break;
       case 422:
         message = "Validacion incorrecto, intente de nuevo.";
-        console.info("Error leve: validación fallida");
         break;
       case 500:
         message = "Error interno del servidor, intente más tarde";
-        console.error("Error grave: fallo interno del servidor");
         break;
       default:
         message = "Ocurrio un error inesperado, intente de nuevo";  
-        console.error("Error inesperado con status:", error.status);
         break;
       }
   } else if(error.message?.includes("Failed to fetch") || error.message.includes("NetworkError")) {
       message = "No se pudo completar la accion, compruebe su conexion a internet";
       typeNotification = "warning";
-      console.error("Error grave: fallo de red");
   } else {
       message = "Ocurrio un error desconocido, intente mas tarde.";
-      console.error("Error desconocido:", error);
   }
   showNotification(message, typeNotification);
   throw error; 

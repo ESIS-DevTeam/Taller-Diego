@@ -31,7 +31,6 @@ const selectors = {
 function renderAlert(count) {
   const alertContent = $('.welcome-alert .alert-content');
   if (!alertContent) {
-    console.error('No se encontró el contenedor .alert-content');
     return;
   }
 
@@ -66,7 +65,6 @@ function renderAlert(count) {
  */
 function renderCard(card, title, value) {
   if (!card) {
-    console.warn('Card element is null');
     return;
   }
 
@@ -95,7 +93,6 @@ async function renderCards() {
     const productCount = await countFromApi('productos');
     renderCard(cards[0], 'Productos en inventario', productCount);
   } catch (error) {
-    console.error('Error cargando productos:', error);
     renderCard(cards[0], 'Productos en inventario', 0);
   }
 
@@ -104,7 +101,6 @@ async function renderCards() {
     const titleEl = $('h3', cards[1]);
     if (titleEl) titleEl.textContent = 'Ventas recientes';
   } catch (error) {
-    console.error('Error en tarjeta de ventas:', error);
   }
 
   // Tarjeta 2: Servicios activos
@@ -112,7 +108,6 @@ async function renderCards() {
     const serviciosCount = await countFromApi('servicios');
     renderCard(cards[2], 'Servicios activos', serviciosCount);
   } catch (error) {
-    console.error('Error cargando servicios:', error);
     renderCard(cards[2], 'Servicios activos', 0);
   }
 }
@@ -153,7 +148,6 @@ async function init() {
 
 
   } catch (error) {
-    console.error('Error inicializando dashboard:', error);
   }
 }
 

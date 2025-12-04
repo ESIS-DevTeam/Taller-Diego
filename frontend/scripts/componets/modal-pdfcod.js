@@ -495,7 +495,6 @@ async function generatePDF(products, optionLabel, options = {}) {
                 textY += barcodeHeight + 2;
             }
         } catch (error) {
-            console.error(`Error generando código para ${product.nombre}:`, error);
             doc.setFontSize(7);
             doc.setTextColor(200, 0, 0);
             doc.text('Error', x + colWidth / 2, textY + 10, { align: 'center' });
@@ -649,7 +648,6 @@ function formatDateForFile(date) {
 export async function openBarcodeModal() {
     const modalContainer = document.getElementById('modal-container');
     if (!modalContainer) {
-        console.error('Contenedor del modal no encontrado');
         return;
     }
 
@@ -674,7 +672,6 @@ export async function openBarcodeModal() {
             }))
         ];
     } catch (error) {
-        console.error('Error al cargar productos:', error);
         showNotification('Error al cargar productos', 'error');
     }
 
@@ -803,7 +800,6 @@ function setupModalEvents(products) {
             await generatePDFPreview(filtered, dateOption?.label || 'Todos', options);
             showNotification('Vista previa generada', 'success');
         } catch (error) {
-            console.error('Error al generar vista previa:', error);
             showNotification('Error al generar vista previa', 'error');
         } finally {
             previewBtn.disabled = false;
@@ -839,7 +835,6 @@ function setupModalEvents(products) {
             showNotification(`PDF descargado: ${fileName}`, 'success');
             closeBarcodeModal();
         } catch (error) {
-            console.error('Error al generar PDF:', error);
             showNotification('Error al generar el PDF', 'error');
 
             // Restaurar botón
@@ -970,13 +965,11 @@ export function bindBarcodeButton() {
     const barcodeBtn = document.getElementById('barcode-btn');
 
     if (!barcodeBtn) {
-        console.warn('Botón "Código de barras" no encontrado');
         return;
     }
 
     barcodeBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('Abriendo modal de códigos de barras...');
         openBarcodeModal();
     });
 }

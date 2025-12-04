@@ -47,43 +47,34 @@ function hasInvalidPatterns(text) {
 export function validateFormData(form, formData, isAutopart) {
   let isValid = true;
 
-  console.log('🔍 Iniciando validación del formulario...');
-  console.log('📋 Datos a validar:', formData);
-  console.log('🔧 Es autoparte:', isAutopart);
 
   // Validar nombre del producto
   const nameValid = validateProductName(form['product-name'], formData.nombre);
-  console.log('✏️ Validación nombre:', nameValid, '->', formData.nombre);
   if (!nameValid) {
     isValid = false;
   }
 
   // Validar marca
   const brandValid = validateBrand(form['product-brand'], formData.marca);
-  console.log('🏷️ Validación marca:', brandValid, '->', formData.marca);
   if (!brandValid) {
     isValid = false;
   }
 
   // Validar categoría
   if (!formData.categoria) {
-    console.log('❌ Categoría vacía');
     validateField(form['product-category'], "Selecciona una categoría");
     isValid = false;
   } else {
-    console.log('✅ Categoría válida:', formData.categoria);
   }
 
   // Validar números (stock, precios)
   const numbersValid = validateNumbers(form, formData);
-  console.log('🔢 Validación números:', numbersValid);
   if (!numbersValid) {
     isValid = false;
   }
 
   // Validar descripción
   const descValid = validateDescription(form['product-description'], formData.descripcion);
-  console.log('📝 Validación descripción:', descValid, '->', formData.descripcion);
   if (!descValid) {
     isValid = false;
   }
@@ -91,13 +82,11 @@ export function validateFormData(form, formData, isAutopart) {
   // Validar campos de autopartes si aplica
   if (isAutopart) {
     const autopartValid = validateAutopartFields(form, formData);
-    console.log('🚗 Validación autoparte:', autopartValid);
     if (!autopartValid) {
       isValid = false;
     }
   }
 
-  console.log('🎯 Resultado final de validación:', isValid);
   return isValid;
 }
 
@@ -148,7 +137,6 @@ function validateBrand(input, value) {
 function validateNumbers(form, formData) {
   let isValid = true;
 
-  console.log('🔢 Validando números:', {
     stock: formData.stock,
     stockMin: formData.stockMin,
     precioCompra: formData.precioCompra,
@@ -157,34 +145,29 @@ function validateNumbers(form, formData) {
 
   // Validar stock
   if (isNaN(formData.stock) || formData.stock < 0) {
-    console.log('❌ Stock inválido:', formData.stock);
     validateField(form['product-stock'], "El stock debe ser un número positivo");
     isValid = false;
   }
 
   // Validar stock mínimo
   if (isNaN(formData.stockMin) || formData.stockMin < 0) {
-    console.log('❌ Stock mínimo inválido:', formData.stockMin);
     validateField(form['product-min-stock'], "El stock mínimo debe ser un número positivo");
     isValid = false;
   }
 
   // Validar precios
   if (isNaN(formData.precioCompra) || formData.precioCompra <= 0) {
-    console.log('❌ Precio de compra inválido:', formData.precioCompra);
     validateField(form['product-purchase-price'], "El precio de compra debe ser mayor a 0");
     isValid = false;
   }
 
   if (isNaN(formData.precioVenta) || formData.precioVenta <= 0) {
-    console.log('❌ Precio de venta inválido:', formData.precioVenta);
     validateField(form['product-selling-price'], "El precio de venta debe ser mayor a 0");
     isValid = false;
   }
 
   // Validar lógica de precios
   if (formData.precioVenta <= formData.precioCompra) {
-    console.log('❌ Precio de venta menor o igual al de compra:', formData.precioVenta, '<=', formData.precioCompra);
     validateField(form['product-selling-price'], "El precio de venta debe ser mayor al de compra");
     isValid = false;
   }

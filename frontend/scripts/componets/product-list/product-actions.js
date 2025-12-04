@@ -91,7 +91,6 @@ async function handleDeleteProduct(productId) {
     showNotification('Producto eliminado exitosamente', 'success');
     
   } catch (error) {
-    console.error('Error al eliminar producto:', error);
     
     // Si es un 404, significa que ya fue eliminado
     if (error.status === 404) {

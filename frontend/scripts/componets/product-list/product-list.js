@@ -29,7 +29,6 @@ function generateSkeletonLoader() {
 export async function renderProducts(products = null, skipCache = false) {
   const productList = document.getElementById("product-list");
   if (!productList) {
-    console.error("No existe el contenedor de los productos");
     return [];
   }
 
@@ -60,7 +59,6 @@ export async function renderProducts(products = null, skipCache = false) {
     while (tempDiv.firstChild) {
       fragment.appendChild(tempDiv.firstChild);
     }
-    console.log('🎯 Nodos en fragment:', fragment.childNodes.length);
 
     // Una sola operación DOM
     productList.innerHTML = '';
@@ -71,7 +69,6 @@ export async function renderProducts(products = null, skipCache = false) {
 
     return products;
   } catch (error) {
-    console.error("Error al cargar productos:", error);
     productList.innerHTML = '<p class="error-state">Error al cargar productos</p>';
     handleApiError(error);
     return [];

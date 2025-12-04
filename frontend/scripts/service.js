@@ -45,7 +45,6 @@ async function getServices() {
     filteredServices = [...services];
     return services;
   } catch (error) {
-    console.error('Error:', error);
     showError('Error al cargar los servicios');
     return [];
   }
@@ -72,7 +71,6 @@ async function createService(serviceData) {
     showSuccess('Servicio creado exitosamente');
     return newService;
   } catch (error) {
-    console.error('Error:', error);
     showError(error.message);
     throw error;
   }
@@ -99,7 +97,6 @@ async function updateService(id, serviceData) {
     showSuccess('Servicio actualizado exitosamente');
     return updatedService;
   } catch (error) {
-    console.error('Error:', error);
     showError(error.message);
     throw error;
   }
@@ -112,7 +109,6 @@ async function deleteService(id) {
     showSuccess('Servicio eliminado exitosamente');
     return true;
   } catch (error) {
-    console.error('Error:', error);
     showError(error.message);
     throw error;
   }

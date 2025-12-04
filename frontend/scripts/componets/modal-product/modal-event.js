@@ -226,17 +226,14 @@ async function getLastProductId() {
     const productos = await fetchFromApi('productos');
 
     if (!productos || productos.length === 0) {
-      console.log('📦 No hay productos en la BD. Iniciando desde 0');
       return 0;
     }
 
     // Encontrar el ID más alto
     const maxId = Math.max(...productos.map(p => p.id));
-    console.log(`📦 Último ID en BD: ${maxId}`);
 
     return maxId;
   } catch (error) {
-    console.error('❌ Error al obtener último ID:', error);
     return 0;
   }
 }
@@ -257,7 +254,6 @@ async function getExistingBarcodes() {
     const productos = await fetchFromApi('productos');
 
     if (!productos || productos.length === 0) {
-      console.log('📦 No hay códigos de barras existentes');
       return [];
     }
 
@@ -266,16 +262,13 @@ async function getExistingBarcodes() {
       .map(p => p.codBarras)
       .filter(code => code != null && code !== '');
 
-    console.log(`🔖 Códigos de barras existentes: ${barcodes.length}`);
 
     // Mostrar algunos ejemplos en consola para debug
     if (barcodes.length > 0) {
-      console.log(`📋 Ejemplos: ${barcodes.slice(0, 3).join(', ')}${barcodes.length > 3 ? '...' : ''}`);
     }
 
     return barcodes;
   } catch (error) {
-    console.error('❌ Error al obtener códigos existentes:', error);
     return [];
   }
 }
@@ -378,7 +371,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
 
     if (fieldWithForbiddenContent) {
       const [fieldName] = fieldWithForbiddenContent;
-      console.warn(`Contenido bloqueado en campo ${fieldName}:`, rawFields[fieldName]);
       showNotification('El campo no puede contener etiquetas HTML o script.', 'error');
       return;
     }
@@ -412,7 +404,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
         // Paso 4: Asignar al producto
         formData.codBarras = barcode;
       } catch (error) {
-        console.error('❌ Error generando código de barras:', error);
         showNotification('Error al generar código de barras único', 'error');
         return; // Detener el envío si falla la generación
       }
@@ -634,17 +625,14 @@ function setupInputNumberWithCustomLimits() {
 async function setupBarcodeDisplay(productId) {
   try {
     if (typeof JsBarcode === 'undefined') {
-      console.warn('⚠️ JsBarcode no está disponible');
       return;
     }
 
     const producto = await fetchFromApi('productos', productId);
     if (!producto || !producto.codBarras) return;
 
-    console.log(`🔖 Configurando código de barras: ${producto.codBarras}`);
 
     if (!isValidBarcode(producto.codBarras)) {
-      console.error('❌ Código no válido');
       return;
     }
 
@@ -660,7 +648,6 @@ async function setupBarcodeDisplay(productId) {
       });
     }
   } catch (error) {
-    console.error('❌ Error:', error);
   }
 }
 

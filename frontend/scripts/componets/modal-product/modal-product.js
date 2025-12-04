@@ -44,13 +44,11 @@ export function bindAddProductButton() {
   const addButton = document.getElementById('open-modal-btn');
   
   if (!addButton) {
-    console.warn('Botón "Nuevo producto" no encontrado');
     return;
   }
 
   addButton.addEventListener('click', (e) => {
     e.preventDefault();
-    console.log('Abriendo modal para agregar producto...');
     openModalForm('add');
   });
 }

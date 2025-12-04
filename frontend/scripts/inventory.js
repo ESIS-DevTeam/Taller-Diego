@@ -9,7 +9,6 @@ import { bindBarcodeButton } from "./componets/modal-pdfcod.js";
 import { loadComponent } from "./utils/component-loader.js";
 import { resetBodyDefaults } from "./utils/state-manager.js";
 
-console.log('🚀 Inventory.js cargado correctamente');
 
 // Limpiar caché viejo de localStorage (por si existía)
 Object.keys(localStorage).forEach(key => {
@@ -46,14 +45,11 @@ async function initializeInventory() {
         </div>
       `.repeat(5);
     } else {
-      console.error('❌ No se encontró el elemento product-list');
       return;
     }
 
     // 4. Obtener productos del servidor
-    console.log('📡 Obteniendo productos...');
     const products = await fetchFromApi('productos', null, false);
-    console.log('✅ Productos obtenidos:', products?.length || 0);
 
     // 5. Inicializar búsqueda con Fuse.js
     initializeSearch(products);
@@ -65,7 +61,6 @@ async function initializeInventory() {
     setupProductActions();
 
   } catch (error) {
-    console.error('❌ Error al inicializar inventario:', error);
     const productList = document.getElementById("product-list");
     if (productList) {
       productList.innerHTML = '<p class="error-state">Error al cargar productos. Por favor, recarga la página.</p>';
@@ -148,14 +143,12 @@ bindBarcodeButton();
 
 // Inicializar cuando cargue el DOM
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🎯 DOMContentLoaded - Iniciando inventario...');
   
   // Limpiar estado previo de otros módulos
   resetBodyDefaults();
   
   // Esperar a que carguen TODOS los componentes (especialmente el menú móvil)
   await Promise.all([headerPromise, sidebarPromise, mobileMenuPromise]);
-  console.log('✅ Componentes UI cargados');
   
   document.body.classList.add("menu-open");
 
@@ -164,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Luego inicializar inventario
   await initializeInventory();
-  console.log('✅ Inventario inicializado completamente');
 
   // Abrir modal si viene desde URL
   const params = new URLSearchParams(window.location.search);

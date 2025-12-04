@@ -155,7 +155,6 @@ async function loadProductos() {
     productosDisponibles = await response.json();
     displayProductos(productosDisponibles);
   } catch (error) {
-    console.error('Error:', error);
     showError('Error al cargar productos');
   }
 }
@@ -180,7 +179,6 @@ async function barcodeReader() {
         event.preventDefault(); // Evitar acciones por defecto del Enter
 
         const barCode = buffer.replaceAll("'", "-");
-        console.log('Escaneo global detectado:', barCode);
 
         await processScannedProduct(barCode, reader);
 
@@ -254,7 +252,6 @@ async function processScannedProduct(barCode, reader) {
     }
 
   } catch (error) {
-    console.error(error);
     showError('Error al procesar código de barras');
   }
 }
@@ -618,7 +615,6 @@ async function registrarVenta() {
     await loadProductos();
 
   } catch (error) {
-    console.error('Error:', error);
     showError('Error al registrar venta: ' + error.message);
   }
 }
