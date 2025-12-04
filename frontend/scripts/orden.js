@@ -26,7 +26,7 @@ let sidebarVisible = true;
 document.addEventListener('DOMContentLoaded', () => {
   // Limpiar estado previo de otros módulos
   resetBodyDefaults();
-  
+
   setupOrdenSidebar();
   setupSidebarToggle();
 
@@ -145,7 +145,11 @@ async function initVentaProducto() {
 
 async function loadProductos() {
   try {
-    const response = await fetch(`${API_BASE_URL}/productos/`);
+    const response = await fetch(`${API_BASE_URL}/productos/`, {
+      headers: {
+        'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
+      }
+    });
     if (!response.ok) throw new Error('Error al cargar productos');
 
     productosDisponibles = await response.json();
@@ -593,7 +597,8 @@ async function registrarVenta() {
     const response = await fetch(`${API_BASE_URL}/ventas/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
       },
       body: JSON.stringify(ventaData)
     });

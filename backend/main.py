@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import Response
-from api.v1.routes import producto_routes, venta_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes
+from api.v1.routes import producto_routes, venta_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes, auth_routes
 import time
 
 app = FastAPI()
@@ -38,6 +38,8 @@ async def add_cache_headers(request: Request, call_next):
 
 app.include_router(status_routes.router,
                    prefix="/api/v1/status", tags=["Status"])
+app.include_router(auth_routes.router,
+                   prefix="/api/v1/auth", tags=["Autenticación"])
 app.include_router(producto_routes.router,
                    prefix="/api/v1/productos", tags=["Productos"])
 app.include_router(autoparte_routes.router,

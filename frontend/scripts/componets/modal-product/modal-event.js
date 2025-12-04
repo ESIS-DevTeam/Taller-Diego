@@ -4,6 +4,7 @@ import { uploadImage, updateImage, compressImage } from "../../utils/store/manag
 import { closeModalForm } from "./modal-product.js";
 import { renderProducts } from "../product-list/product-list.js";
 import { generateBarcodeImage, downloadBarcodeImage, isValidBarcode } from "../../utils/codbarra.js";
+import { validateFormData } from "./modal-validation.js";
 
 // ========================================
 // UTILIDADES DE SANITIZACIÓN
@@ -102,11 +103,9 @@ function generateBarcode(categoria, lastId, existingBarcodes = []) {
 
     // Verificar si el código ya existe
     if (!existingBarcodes.includes(barcode)) {
-      console.log(`📊 Código de barras único generado: ${barcode} (intentos: ${attempts + 1})`);
       return barcode;
     }
 
-    console.warn(`⚠️ Código ${barcode} ya existe, generando nuevo...`);
     attempts++;
   }
 
@@ -114,7 +113,6 @@ function generateBarcode(categoria, lastId, existingBarcodes = []) {
   const timestamp = Date.now().toString().slice(-3);
   const randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
   const fallbackBarcode = `${prefix}-${randomLetter}${timestamp}-${categorySuffix}`;
-  console.error(`❌ No se pudo generar código único, usando timestamp: ${fallbackBarcode}`);
   return fallbackBarcode;
 }
 
@@ -295,6 +293,7 @@ export function setupModalEvents(type = 'add', productId = null) {
 
   setupInputNumber();
   setupInputNumberWithCustomLimits();
+  setupTextInputValidation(); // Nueva función para validar texto en tiempo real
   setupCloseHandlers(modalOverlay, btnCancel, btnClose);
   setupAutopartToggle(autopartCheckbox);
   setupPreviewImage('product-img', 'product-preview');
@@ -401,8 +400,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
     // ========================================
     if (!isEdit) {
       try {
-        console.log('🔄 Generando código de barras único...');
-
         // Paso 1: Obtener el último ID
         const lastId = await getLastProductId();
 
@@ -414,9 +411,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
 
         // Paso 4: Asignar al producto
         formData.codBarras = barcode;
-
-        console.log(`✅ Código único asignado: ${barcode}`);
-        console.log(`🔍 Verificado contra ${existingBarcodes.length} códigos existentes`);
       } catch (error) {
         console.error('❌ Error generando código de barras:', error);
         showNotification('Error al generar código de barras único', 'error');
@@ -428,9 +422,20 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
 
     if (isAutopart) {
       formData.modelo = sanitizeText(form['product-model'].value);
-      formData.anio = parseInt(form['product-year'].value, 10) || 0;
+      formData.anio = form['product-year'].value; // Mantener como string para validación
       endpoint = "autopartes";
     }
+
+    // ========================================
+    // VALIDACIÓN COMPLETA DEL FORMULARIO
+    // ========================================
+    if (!validateFormData(form, formData, isAutopart)) {
+      showNotification('Por favor corrige los errores en el formulario', 'error');
+      return; // Detener el envío si hay errores de validación
+    }
+
+    // El año ya está validado como string (soporta rangos: "2018-2023" o listas: "2018, 2020")
+    // No convertir a número, mantener como string
 
     // ENVIO DE DATOS
     try {
@@ -444,9 +449,6 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       })
 
       if (isEdit) {
-        // ========================================
-        // MODO EDICIÓN - No regenerar código de barras
-        // ========================================
         await updateResource(endpoint, productId, formData);
 
 
@@ -457,13 +459,7 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
         }
         showNotification("Producto actualizado exitosamente", "success");
       } else {
-        // ========================================
-        // MODO CREACIÓN - Guardar con código de barras generado
-        // ========================================
-        console.log('📤 Enviando producto con código:', formData.codBarras);
         const newProduct = await createResource(endpoint, formData);
-        console.log('✅ Producto creado:', newProduct);
-        console.log(`🔖 Código guardado en BD: ${newProduct.codBarras || 'NO GUARDADO'}`);
 
         if (imageCompress) {
           const imgName = await uploadImage(imageCompress, newProduct.id, 'productos');
@@ -475,10 +471,9 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       }
 
       closeModalForm();
-      await renderProducts();
+      await renderProducts(null, true);
 
     } catch (error) {
-      console.error("❌ Error al crear producto:", error);
       showNotification("Error al crear producto: " + error.message, "error");
     }
   });
@@ -667,5 +662,158 @@ async function setupBarcodeDisplay(productId) {
   } catch (error) {
     console.error('❌ Error:', error);
   }
+}
+
+// ========================================
+// VALIDACIÓN DE CAMPOS DE TEXTO EN TIEMPO REAL
+// ========================================
+
+/**
+ * Configura validación en tiempo real para campos de texto
+ * Previene caracteres irrelevantes y espacios múltiples
+ */
+function setupTextInputValidation() {
+  const textInputs = document.querySelectorAll('input[type="text"], textarea');
+
+  textInputs.forEach(input => {
+    // Validación en tiempo real mientras se escribe
+    input.addEventListener('input', (e) => {
+      let value = e.target.value;
+
+      // Limpiar caracteres irrelevantes inmediatamente
+      value = cleanInvalidCharacters(value, input.id);
+
+      // Limitar espacios múltiples
+      value = value.replace(/\s{3,}/g, '  '); // Máximo 2 espacios consecutivos
+
+      // Actualizar valor si cambió
+      if (value !== e.target.value) {
+        e.target.value = value;
+        showTemporaryWarning(input, "Algunos caracteres fueron removidos automáticamente");
+      }
+
+      // Limpiar mensajes de error previos si el campo ahora es válido
+      clearFieldError(input);
+    });
+
+    // Validación final al salir del campo
+    input.addEventListener('blur', (e) => {
+      const value = e.target.value.trim();
+
+      if (value && hasInvalidPatterns(value)) {
+        showFieldError(input, "Contiene caracteres no permitidos");
+      }
+
+      // Limpiar espacios al inicio y final
+      e.target.value = value;
+    });
+
+    // Prevenir pegado de contenido peligroso
+    input.addEventListener('paste', (e) => {
+      setTimeout(() => {
+        let value = e.target.value;
+        value = cleanInvalidCharacters(value, input.id);
+        value = value.replace(/\s{3,}/g, '  ');
+        e.target.value = value;
+      }, 10);
+    });
+  });
+}
+
+/**
+ * Limpia caracteres no válidos según el tipo de campo
+ */
+function cleanInvalidCharacters(value, inputId) {
+  // Reglas específicas por campo
+  switch (inputId) {
+    case 'product-name':
+    case 'product-brand':
+    case 'product-model':
+      // Solo letras, números, espacios y signos básicos
+      return value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9\s\-.,()&]/g, '');
+
+    case 'product-year':
+      // Solo números, espacios, comas y guiones
+      return value.replace(/[^0-9\s,\-]/g, '');
+
+    case 'product-description':
+      // Texto descriptivo normal
+      return value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9\s\-.,()\n\r]/g, '');
+
+    default:
+      // Limpieza general: remover símbolos irrelevantes
+      return value.replace(/[►◄▲▼♦♣♠♥░▒▓█■□▪▫★☆♪♫♯♭]/g, '');
+  }
+}
+
+/**
+ * Muestra un aviso temporal que desaparece automáticamente
+ */
+function showTemporaryWarning(input, message) {
+  const existingWarning = input.parentElement.querySelector('.temp-warning');
+  if (existingWarning) {
+    existingWarning.remove();
+  }
+
+  const warning = document.createElement('span');
+  warning.classList.add('temp-warning');
+  warning.textContent = message;
+  warning.style.cssText = `
+    color: #ff9800; 
+    font-size: 12px; 
+    margin-top: 4px; 
+    display: block;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  `;
+
+  input.parentElement.appendChild(warning);
+
+  // Desvanecer y remover después de 3 segundos
+  setTimeout(() => {
+    warning.style.opacity = '0';
+    setTimeout(() => warning.remove(), 300);
+  }, 3000);
+}
+
+/**
+ * Limpia mensajes de error de un campo
+ */
+function clearFieldError(input) {
+  const errorElement = input.parentElement.querySelector('.error-message');
+  if (errorElement) {
+    errorElement.remove();
+  }
+  input.classList.remove('input-error');
+}
+
+/**
+ * Detecta patrones de caracteres irrelevantes (función importada de modal-validation.js)
+ */
+function hasInvalidPatterns(text) {
+  const patterns = [
+    /[►◄▲▼♦♣♠♥]+/g,
+    /[░▒▓█■□▪▫]+/g,
+    /[★☆♪♫♯♭]+/g,
+    /(.)\\1{4,}/g,
+    /[!@#$%^&*()+={}\\[\\]|\\:;"'<>?,.]{5,}/g,
+    /^\\s*[.\\-_~=+*#]{3,}\\s*$/g,
+    /^[0-9]{10,}$/g,
+  ];
+
+  return patterns.some(pattern => pattern.test(text));
+}
+
+/**
+ * Muestra error en un campo específico
+ */
+function showFieldError(input, message) {
+  clearFieldError(input);
+
+  const span = document.createElement("span");
+  span.classList.add("error-message");
+  span.textContent = message;
+  input.classList.add("input-error");
+  input.parentElement.appendChild(span);
 }
 

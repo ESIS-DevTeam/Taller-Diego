@@ -23,7 +23,7 @@ class AutoparteRepository:
         return self.db.query(Autoparte).filter(Autoparte.id == id).first()
     
     def get_by_name(self, nombre: str):
-        return self.db.query(Autoparte).filter(Autoparte.nombre == nombre).first()
+        return self.db.query(Autoparte).filter(Autoparte.nombre.ilike(nombre)).first()
 
     def update(self, id: int, autoparte_data: AutoparteCreate):
         autoparte = self.get_by_id(id)
@@ -48,4 +48,12 @@ class AutoparteRepository:
         return self.db.query(Autoparte).filter(Autoparte.modelo == modelo).all()
     
     def get_by_anio(self, anio: int):
-        return self.db.query(Autoparte).filter(Autoparte.anio == anio).all()
+        """
+        Busca autopartes compatibles con un año específico.
+        Funciona con formatos: "2020", "2018-2023", "2018, 2020, 2022"
+        """
+        anio_str = str(anio)
+        # Buscar donde el año aparezca en el string (exacto, en rango o en lista)
+        return self.db.query(Autoparte).filter(
+            Autoparte.anio.contains(anio_str)
+        ).all()

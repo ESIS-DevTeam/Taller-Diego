@@ -23,7 +23,7 @@ class ServicioRepository:
         return self.db.query(Servicio).filter(Servicio.id == id).first()
     
     def get_by_name(self, nombre: str):
-        return self.db.query(Servicio).filter(Servicio.nombre == nombre).first()
+        return self.db.query(Servicio).filter(Servicio.nombre.ilike(nombre)).first()
 
     def update(self, id: int, servicio_data: ServicioCreate):
         servicio = self.get_by_id(id)
