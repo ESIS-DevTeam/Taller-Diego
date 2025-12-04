@@ -4,7 +4,7 @@ from .producto_schema import ProductoBase
 
 class AutoparteBase(ProductoBase):
     modelo: str
-    anio: int
+    anio: str  # Formato: "2020", "2018-2023", o "2018, 2020, 2022"
 
 
 class AutoparteCreate(AutoparteBase):

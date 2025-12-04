@@ -41,4 +41,5 @@ class AutoparteService:
         return self.repo.get_by_modelo(modelo)
     
     def get_by_anio(self, anio: int):
+        """Busca autopartes compatibles con un año específico"""
         return self.repo.get_by_anio(anio)
