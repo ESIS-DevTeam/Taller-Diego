@@ -51,6 +51,13 @@ body {
 .main-container .container .section-login .context {
   text-align: center;
 }
+.main-container .container .section-login .context .login-logo {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 24px;
+  display: block;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.15));
+}
 .main-container .container .section-login .context h1 {
   font-size: 34px;
   font-weight: 800;
