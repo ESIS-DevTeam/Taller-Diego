@@ -42,5 +42,5 @@ export async function obtainToken(email, password) {
 
 export async function closeSesion() {
   localStorage.removeItem('supabase_token');
-  window.location.replace('../views/login.html');
+  window.location.replace('login.html');
 }
