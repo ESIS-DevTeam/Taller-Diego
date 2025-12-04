@@ -23,7 +23,7 @@ class AutoparteRepository:
         return self.db.query(Autoparte).filter(Autoparte.id == id).first()
     
     def get_by_name(self, nombre: str):
-        return self.db.query(Autoparte).filter(Autoparte.nombre == nombre).first()
+        return self.db.query(Autoparte).filter(Autoparte.nombre.ilike(nombre)).first()
 
     def update(self, id: int, autoparte_data: AutoparteCreate):
         autoparte = self.get_by_id(id)
