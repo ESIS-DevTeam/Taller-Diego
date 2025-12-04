@@ -3,6 +3,7 @@ import { loadComponent } from './utils/component-loader.js';
 import { fetchForBarCode } from './data-manager.js';
 import { showSuccess, showError, showWarning } from './utils/notification.js';
 import { resetBodyDefaults } from './utils/state-manager.js';
+import { escapeHtml } from './utils/sanitize.js';
 
 // Cargar header y sidebar dinámicamente (Hybrid)
 loadComponent("header", "includes/header.html");
@@ -261,8 +262,8 @@ async function processScannedProduct(barCode, reader) {
 function displayProductos(productos) {
   const dropdown = document.getElementById('producto-dropdown');
   const itemsHTML = productos.map(p => `
-    <div class="dropdown-item" data-id="${p.id}" data-precio="${p.precioVenta}" data-stock="${p.stock}" data-nombre="${p.nombre}">
-      ${p.nombre} ${p.marca ? `- ${p.marca}` : ''} (Stock: ${p.stock})
+    <div class="dropdown-item" data-id="${escapeHtml(p.id)}" data-precio="${escapeHtml(p.precioVenta)}" data-stock="${escapeHtml(p.stock)}" data-nombre="${escapeHtml(p.nombre)}">
+      ${escapeHtml(p.nombre)} ${p.marca ? `- ${escapeHtml(p.marca)}` : ''} (Stock: ${escapeHtml(p.stock)})
     </div>
   `).join('');
 
@@ -371,10 +372,10 @@ function updateVentaTable() {
 
   tbody.innerHTML = productosVenta.map((item, index) => `
     <div class="table-row" data-index="${index}">
-      <div class="table-cell">${item.nombre}</div>
-      <div class="table-cell editable-cantidad" data-index="${index}">${item.cantidad}</div>
-      <div class="table-cell">$${item.precio_unitario}</div>
-      <div class="table-cell">$${item.cantidad * item.precio_unitario}</div>
+      <div class="table-cell">${escapeHtml(item.nombre)}</div>
+      <div class="table-cell editable-cantidad" data-index="${index}">${escapeHtml(item.cantidad)}</div>
+      <div class="table-cell">$${escapeHtml(item.precio_unitario)}</div>
+      <div class="table-cell">$${escapeHtml(item.cantidad * item.precio_unitario)}</div>
       <div class="table-cell table-actions">
         <button class="btn-edit" data-index="${index}" title="Editar">
           <img class="img-edit" src="../assets/icons/edit.png" alt="Editar">
@@ -436,7 +437,7 @@ function editCantidad(index) {
             <input 
               type="text" 
               id="producto-nombre" 
-              value="${item.nombre}"
+              value="${escapeHtml(item.nombre)}"
               disabled
               style="background-color: #f5f5f5; cursor: not-allowed;"
             />
@@ -448,9 +449,9 @@ function editCantidad(index) {
               type="number" 
               id="cantidad-edit" 
               name="cantidad" 
-              value="${item.cantidad}"
+              value="${escapeHtml(item.cantidad)}"
               min="1"
-              max="${producto.stock}"
+              max="${escapeHtml(producto.stock)}"
               required
             />
           </div>

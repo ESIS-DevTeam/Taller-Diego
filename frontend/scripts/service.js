@@ -9,6 +9,7 @@ import { loadComponent } from "./utils/component-loader.js";
 import { showSuccess, showError, showWarning } from "./utils/notification.js";
 import { resetBodyDefaults } from "./utils/state-manager.js";
 import { deleteResource } from "./data-manager.js";
+import { escapeHtml } from "./utils/sanitize.js";
 
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:8000/api/v1'  // Desarrollo local
@@ -152,9 +153,9 @@ function renderServices(servicesToRender = filteredServices) {
   };
 
   serviceList.innerHTML = servicesToRender.map(service => `
-        <div class="service-row" data-service-id="${service.id}">
-            <div class="service-name" title="${service.nombre}">${truncate(service.nombre, 50)}</div>
-            <div class="service-description" title="${service.descripcion}">${truncate(service.descripcion, 100)}</div>
+        <div class="service-row" data-service-id="${escapeHtml(service.id)}">
+            <div class="service-name" title="${escapeHtml(service.nombre)}">${escapeHtml(truncate(service.nombre, 50))}</div>
+            <div class="service-description" title="${escapeHtml(service.descripcion)}">${escapeHtml(truncate(service.descripcion, 100))}</div>
             <div class="service-actions">
                 <button class="btn-edit" data-id="${service.id}" title="Editar">
                     <img class="img-edit" src="../assets/icons/edit.png" alt="Editar">
