@@ -4,6 +4,9 @@ from db.base import Base
 from core.value_objects import Cantidad, CantidadProductos
 from datetime import datetime, timezone
 
+# Delegar validaciones y comportamiento al dominio puro
+from backend.domain.venta import Venta as DomainVenta
+
 
 class Venta(Base):
     
@@ -19,46 +22,30 @@ class Venta(Base):
         self.fecha = fecha or datetime.now(timezone.utc)
 
     def agregar_producto(self, venta_producto: 'VentaProducto') -> None:
-
-        # Validar cantidad usando Value Object
-        cantidad_vo = Cantidad(venta_producto.cantidad)
-        
-        # Agregar a la lista de productos
-        self.productos.append(venta_producto)
+        # Crear un Aggregate Root de dominio que comparte la lista de productos
+        domain = DomainVenta(fecha=self.fecha, productos=self.productos)
+        domain.agregar_producto(venta_producto)
 
     def remover_producto(self, venta_producto: 'VentaProducto') -> None:
-
-        if venta_producto in self.productos:
-            self.productos.remove(venta_producto)
+        domain = DomainVenta(fecha=self.fecha, productos=self.productos)
+        domain.remover_producto(venta_producto)
 
     def obtener_cantidad_productos(self) -> int:
-
-        cantidad_vo = CantidadProductos(len(self.productos))
-        return cantidad_vo.value
+        domain = DomainVenta(fecha=self.fecha, productos=self.productos)
+        return domain.obtener_cantidad_productos()
 
     def tiene_productos(self) -> bool:
-
-        cantidad_vo = CantidadProductos(len(self.productos))
-        return not cantidad_vo.es_vacia()
+        domain = DomainVenta(fecha=self.fecha, productos=self.productos)
+        return domain.tiene_productos()
 
     def obtener_fecha(self) -> datetime:
         """Retorna la fecha de la venta."""
         return self.fecha
 
     def calcular_total(self) -> float:
-
-        total = 0.0
-        for vp in self.productos:
-            # Acceder al producto para obtener su precio
-            if hasattr(vp, 'producto') and vp.producto:
-                precio_venta = vp.producto.precioVenta
-                total += vp.cantidad * precio_venta
-        return total
+        domain = DomainVenta(fecha=self.fecha, productos=self.productos)
+        return domain.calcular_total()
 
     def obtener_cantidad_total_items(self) -> int:
-
-        total_items = sum(vp.cantidad for vp in self.productos)
-        # Validar con Value Object
-        if total_items > 0:
-            CantidadProductos(total_items)
-        return total_items
+        domain = DomainVenta(fecha=self.fecha, productos=self.productos)
+        return domain.obtener_cantidad_total_items()

@@ -6,9 +6,11 @@ from sqlalchemy.orm import Session
 from db.models import Venta
 from db.models import VentaProducto
 from db.models import Producto
+from backend.domain.venta import Venta as DomainVenta
+from repositories.ports.venta_repository_interface import VentaRepositoryInterface
 
 
-class VentaRepository:
+class VentaRepository(VentaRepositoryInterface):
     """
     Repositorio para Venta
     
@@ -20,6 +22,8 @@ class VentaRepository:
 
     def create(self, fecha: datetime):
         """Crea una venta simple sin productos."""
+        # Crear modelo de persistencia y devolverlo, delegando
+        # la lógica de negocio al Aggregate Root del dominio cuando sea necesario.
         venta = Venta(fecha=fecha)
         self.db.add(venta)
         self.db.commit()
@@ -52,11 +56,12 @@ class VentaRepository:
                 if producto.stock < cantidad:
                     raise ValueError(f"Stock insuficiente para producto {pid}")
                 
-                # Crear relación venta-producto
+                # Crear relación venta-producto persistente y delegar
+                # la validación al Aggregate Root de dominio, que comparte
+                # la lista `productos` del modelo persistente.
                 vp = VentaProducto(venta_id=venta.id, producto_id=pid, cantidad=cantidad)
-                
-                # Usar el método del Aggregate Root para agregar producto
-                venta.agregar_producto(vp)
+                domain = DomainVenta(fecha=venta.fecha, productos=venta.productos)
+                domain.agregar_producto(vp)
 
                 # Actualizar stock
                 producto.stock = producto.stock - cantidad

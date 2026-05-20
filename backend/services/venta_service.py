@@ -4,14 +4,26 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from repositories.venta_repo import VentaRepository
+from repositories.ports.venta_repository_interface import VentaRepositoryInterface
 from schemas.venta_schema import VentaCreate
 from core.value_objects import Cantidad, CantidadProductos
 
 
 class VentaService:
 
-    def __init__(self, db: Session):
-        self.repo = VentaRepository(db)
+    def __init__(self, db: Session | None = None, repo: VentaRepositoryInterface | None = None):
+        """Inicializa el servicio.
+
+        Se puede inyectar directamente un `repo` que implemente
+        `VentaRepositoryInterface` (recomendado para pruebas/DI). Si no
+        se proporciona repo, se usará el repositorio por defecto con `db`.
+        """
+        if repo is not None:
+            self.repo = repo
+        elif db is not None:
+            self.repo = VentaRepository(db)
+        else:
+            raise ValueError("Se debe pasar `db` o `repo` al inicializar VentaService")
 
     def create_venta(self, data: VentaCreate):
 
