@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import List
 
-from hexagonal.venta.ports.venta_driven_port import VentaRepository
+# from hexagonal.venta.ports.venta_driven_port import VentaRepository
+from backend.repositories.ports.venta_repository_interface import VentaRepositoryInterface
 from backend.domain.venta import Venta
 
 
