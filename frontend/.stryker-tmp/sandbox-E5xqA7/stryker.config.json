@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "scripts/componets/product-list/product-card.js"
+  ],
+  "testRunner": "jest",
+  "testRunnerNodeArgs": ["--experimental-vm-modules"],
+  "plugins": ["@stryker-mutator/jest-runner"],
+  "reporters": ["progress", "clear-text", "html"],
+  "coverageAnalysis": "perTest"
+}
