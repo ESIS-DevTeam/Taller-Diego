@@ -1,0 +1,130 @@
+# Pipeline sugerido para la sesión de laboratorio
+# Triggers: se dispara en `push` y `pull_request`.
+# Quality gate (valores mínimos aceptables):
+# - coverage: 80% (razón: balance entre seguridad y costo de mantenimiento. Asegura pruebas significativas sin exigir 100%.)
+# - mutation score: 70% (razón: refleja la capacidad de las pruebas para detectar cambios no triviales.)
+# Estas cifras deben discutirse por equipo; aquí son umbrales mínimos recomendados.
+
+name: CI - Tests & Quality
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run linter (flake8)
+        run: flake8 .
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install package
+        run: pip install -r requirements.txt
+
+  unit_tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run unit tests
+        run: pytest -q -k "not integration" --maxfail=1
+
+  integration_tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    needs: unit_tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run integration tests
+        run: pytest -q -m integration --maxfail=1
+
+  coverage:
+    name: Coverage report
+    runs-on: ubuntu-latest
+    needs: integration_tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run coverage
+        run: |
+          coverage run -m pytest
+          coverage xml -i
+          coverage report -m
+      - name: Enforce coverage threshold
+        run: |
+          COVERAGE_PERCENT=$(coverage report | tail -n 1 | awk '{print $4}' | sed 's/%//') || true
+          echo "Coverage percent: $COVERAGE_PERCENT"
+          if [ -z "$COVERAGE_PERCENT" ] || [ "$(echo "$COVERAGE_PERCENT < 80" | bc)" -eq 1 ]; then
+            echo "Coverage threshold not met: $COVERAGE_PERCENT% < 80%"; exit 1
+          fi
+
+  mutation:
+    name: Mutation testing
+    runs-on: ubuntu-latest
+    needs: coverage
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run mutation tests (mutmut)
+        run: |
+          set -e
+          pip install mutmut
+          # Ejecutar mutmut (puede tardar). En Ubuntu (runner) mutmut funciona nativamente.
+          mutmut run --paths-to-mutate backend/ || true
+          OUTPUT=$(mutmut results 2>&1 || true)
+          echo "$OUTPUT"
+          # Extraer números comunes (Killed / Survived) y calcular score
+          KILLED=$(echo "$OUTPUT" | grep -i "Killed" | awk -F: '{print $2}' | tr -d '[:space:]' || true)
+          SURVIVED=$(echo "$OUTPUT" | grep -i "Survived" | awk -F: '{print $2}' | tr -d '[:space:]' || true)
+          if [ -z "$KILLED" ] || [ -z "$SURVIVED" ]; then
+            echo "No se pudieron extraer resultados de mutmut; revisar salida arriba."; exit 1
+          fi
+          TOTAL=$((KILLED + SURVIVED))
+          SCORE=$((100 * KILLED / TOTAL))
+          echo "Mutation score: ${SCORE}% (Killed=${KILLED} Survived=${SURVIVED} Total=${TOTAL})"
+          if [ "$SCORE" -lt 70 ]; then
+            echo "Mutation score below threshold (70%)"; exit 1
+          fi
