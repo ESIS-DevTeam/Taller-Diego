@@ -128,3 +128,27 @@ jobs:
           if [ "$SCORE" -lt 70 ]; then
             echo "Mutation score below threshold (70%)"; exit 1
           fi
+
+  stryker:
+    name: Frontend mutation (Stryker)
+    runs-on: ubuntu-latest
+    needs: mutation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run Stryker
+        run: |
+          cd frontend
+          npm run stryker
+      - name: Upload Stryker reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: stryker-reports
+          path: frontend/reports/stryker || frontend/reports
