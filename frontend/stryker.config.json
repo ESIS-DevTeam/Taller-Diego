@@ -8,6 +8,12 @@
   "plugins": ["@stryker-mutator/jest-runner"],
   "reporters": ["progress", "clear-text", "html", "json"],
   "coverageAnalysis": "perTest",
+  "excludedMutations": ["StringLiteral"],
+  "thresholds": {
+    "high": 80,
+    "low": 70,
+    "break": 70
+  },
   "htmlReporter": {
     "fileName": "reports/mutation/mutation.html"
   },
