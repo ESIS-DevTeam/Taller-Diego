@@ -103,4 +103,32 @@ describe("generateProductCard", () => {
     const html = generateProductCard(baseProduct);
     expect(html).toContain('data-action="delete"');
   });
+
+  // ── HTML structure / class names ──────────────────────────────────────────
+  test("outer div has class product-item", () => {
+    const html = generateProductCard(baseProduct);
+    expect(html).toContain('class="product-item"');
+  });
+
+  test("renders product-name and product-desc CSS classes", () => {
+    const html = generateProductCard(baseProduct);
+    expect(html).toContain("product-name");
+    expect(html).toContain("product-desc");
+  });
+
+  test("edit button has btn-edit class", () => {
+    const html = generateProductCard(baseProduct);
+    expect(html).toContain("btn-edit");
+  });
+
+  test("delete button has btn-delete class", () => {
+    const html = generateProductCard(baseProduct);
+    expect(html).toContain("btn-delete");
+  });
+
+  test("img tags have correct alt text", () => {
+    const html = generateProductCard(baseProduct);
+    expect(html).toContain('alt="Editar"');
+    expect(html).toContain('alt="Eliminar"');
+  });
 });
