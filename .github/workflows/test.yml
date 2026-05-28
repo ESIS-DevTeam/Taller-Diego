@@ -10,6 +10,8 @@ name: CI - Tests & Quality
 on:
   push:
     branches: ["main", "master"]
+    tags:
+      - 'v*'
   pull_request:
     branches: ["main", "master"]
 
@@ -149,6 +151,7 @@ jobs:
           npm run stryker
       - name: Upload Stryker reports
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: stryker-reports
-          path: frontend/reports/stryker || frontend/reports
+          path: frontend/reports/mutation
