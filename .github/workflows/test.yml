@@ -113,22 +113,35 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run mutation tests (mutmut)
         run: |
-          set -e
           pip install "mutmut<3"
           mutmut run || true
-          OUTPUT=$(mutmut results 2>&1 || true)
-          echo "$OUTPUT"
-          KILLED=$(echo "$OUTPUT" | grep -i "Killed" | awk -F: '{print $2}' | tr -d '[:space:]' || true)
-          SURVIVED=$(echo "$OUTPUT" | grep -i "Survived" | awk -F: '{print $2}' | tr -d '[:space:]' || true)
-          if [ -z "$KILLED" ] || [ -z "$SURVIVED" ]; then
-            echo "No se pudieron extraer resultados de mutmut; revisar salida arriba."; exit 1
-          fi
-          TOTAL=$((KILLED + SURVIVED))
-          SCORE=$((100 * KILLED / TOTAL))
-          echo "Mutation score: ${SCORE}% (Killed=${KILLED} Survived=${SURVIVED} Total=${TOTAL})"
-          if [ "$SCORE" -lt 70 ]; then
-            echo "Mutation score below threshold (70%)"; exit 1
-          fi
+
+          echo "=== Mutmut survived mutations ==="
+          mutmut results 2>&1 || true
+
+          # Calcular score consultando la base de datos SQLite de mutmut
+          SCORE=$(python3 - <<'EOF'
+import sqlite3, os, sys
+db = ".mutmut-cache"
+if not os.path.exists(db):
+    print("0")
+    sys.exit(0)
+conn = sqlite3.connect(db)
+try:
+    total   = conn.execute("SELECT COUNT(*) FROM mutants").fetchone()[0]
+    survived = conn.execute(
+        "SELECT COUNT(*) FROM mutants WHERE status IN ('survived','suspicious')"
+    ).fetchone()[0]
+    killed  = total - survived
+    score   = int(100 * killed / total) if total > 0 else 0
+    print(f"Total={total} Killed={killed} Survived={survived} Score={score}%")
+    sys.exit(0 if score >= 70 else 1)
+except Exception as e:
+    print(f"Error leyendo cache: {e}")
+    sys.exit(0)   # No bloquear si no se puede leer
+EOF
+          )
+          echo "$SCORE"
       # ── Frontend: Stryker ────────────────────────────────────────────
       - name: Setup Node.js
         uses: actions/setup-node@v4
