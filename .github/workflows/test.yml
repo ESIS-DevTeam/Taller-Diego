@@ -98,27 +98,26 @@ jobs:
             echo "Coverage threshold not met: $COVERAGE_PERCENT% < 80%"; exit 1
           fi
 
-  mutation:
-    name: Mutation testing
+  mutation_stryker:
+    name: Mutation & Stryker
     runs-on: ubuntu-latest
     needs: coverage
     steps:
       - uses: actions/checkout@v4
+      # ── Backend: mutmut ──────────────────────────────────────────────
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install deps
+      - name: Install Python deps
         run: pip install -r requirements.txt
       - name: Run mutation tests (mutmut)
         run: |
           set -e
           pip install mutmut
-          # Ejecutar mutmut (puede tardar). En Ubuntu (runner) mutmut funciona nativamente.
           mutmut run --paths-to-mutate backend/ || true
           OUTPUT=$(mutmut results 2>&1 || true)
           echo "$OUTPUT"
-          # Extraer números comunes (Killed / Survived) y calcular score
           KILLED=$(echo "$OUTPUT" | grep -i "Killed" | awk -F: '{print $2}' | tr -d '[:space:]' || true)
           SURVIVED=$(echo "$OUTPUT" | grep -i "Survived" | awk -F: '{print $2}' | tr -d '[:space:]' || true)
           if [ -z "$KILLED" ] || [ -z "$SURVIVED" ]; then
@@ -130,25 +129,15 @@ jobs:
           if [ "$SCORE" -lt 70 ]; then
             echo "Mutation score below threshold (70%)"; exit 1
           fi
-
-  stryker:
-    name: Frontend mutation (Stryker)
-    runs-on: ubuntu-latest
-    needs: mutation
-    steps:
-      - uses: actions/checkout@v4
+      # ── Frontend: Stryker ────────────────────────────────────────────
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
       - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm ci
-      - name: Run Stryker
-        run: |
-          cd frontend
-          npm run stryker
+        run: cd frontend && npm ci
+      - name: Run Stryker (frontend mutation)
+        run: cd frontend && npm run stryker
       - name: Upload Stryker reports
         uses: actions/upload-artifact@v4
         if: always()
