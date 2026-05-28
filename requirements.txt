@@ -7,3 +7,8 @@ sqlalchemy
 python-multipart
 psycopg2-binary
 httpx
+# Dev / CI
+flake8
+pytest
+pytest-bdd
+coverage
