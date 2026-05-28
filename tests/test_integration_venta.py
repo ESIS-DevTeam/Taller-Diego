@@ -3,6 +3,7 @@ from datetime import datetime
 from backend.domain.venta import Venta
 from backend.repositories.inmemory.venta_inmemory_repo import InMemoryVentaRepository
 
+@pytest.mark.integration
 class TestIntegracionVenta:
     
     def setup_method(self):
