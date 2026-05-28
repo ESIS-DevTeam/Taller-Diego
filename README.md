@@ -54,6 +54,9 @@ $env:PYTHONPATH = "backend"
 6. Crea el archivo `.env` en la carpeta `backend` con la conexión a Supabase
 ```env
 DATABASE_URL="<link>"
+SUPABASE_URL="<link>"
+SUPABASE_ANON_KEY="<ANON PUBLIC KEY>>"
+JWT_SECRET="<SECRET KEY ES256>"
 ```
 7. Ejecuta el script para crear las tablas
 ```bash
