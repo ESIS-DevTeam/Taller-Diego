@@ -131,4 +131,23 @@ describe("generateProductCard", () => {
     expect(html).toContain('alt="Editar"');
     expect(html).toContain('alt="Eliminar"');
   });
+
+  // ── Null / undefined safety (kills OptionalChaining mutants) ──────────────
+  test("does not throw when product is null", () => {
+    expect(() => generateProductCard(null)).not.toThrow();
+  });
+
+  test("does not throw when product is undefined", () => {
+    expect(() => generateProductCard(undefined)).not.toThrow();
+  });
+
+  test("does not throw when product is an empty object", () => {
+    expect(() => generateProductCard({})).not.toThrow();
+  });
+
+  test("returns HTML string even with null product", () => {
+    const html = generateProductCard(null);
+    expect(typeof html).toBe("string");
+    expect(html.length).toBeGreaterThan(0);
+  });
 });
