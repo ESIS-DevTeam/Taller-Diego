@@ -114,8 +114,8 @@ jobs:
       - name: Run mutation tests (mutmut)
         run: |
           set -e
-          pip install mutmut
-          mutmut run --paths-to-mutate backend/ || true
+          pip install "mutmut<3"
+          mutmut run || true
           OUTPUT=$(mutmut results 2>&1 || true)
           echo "$OUTPUT"
           KILLED=$(echo "$OUTPUT" | grep -i "Killed" | awk -F: '{print $2}' | tr -d '[:space:]' || true)
