@@ -5,7 +5,7 @@ from core.value_objects import Cantidad, CantidadProductos
 from datetime import datetime, timezone
 
 # Delegar validaciones y comportamiento al dominio puro
-from backend.domain.venta import Venta as DomainVenta
+from domain.venta import Venta as DomainVenta
 
 
 class Venta(Base):

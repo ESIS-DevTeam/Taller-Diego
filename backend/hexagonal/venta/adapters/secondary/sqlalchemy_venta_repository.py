@@ -3,7 +3,7 @@ from sqlalchemy import Date, cast
 from sqlalchemy.orm import Session
 
 from db.models import Venta, VentaProducto, Producto
-from backend.domain.venta import Venta as DomainVenta
+from domain.venta import Venta as DomainVenta
 from hexagonal.venta.ports.venta_driven_port import VentaRepository
 
 
