@@ -1,8 +1,4 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-import httpx
 
-from core.config import settings
 
 _bearer_scheme = HTTPBearer(auto_error=False)
 
