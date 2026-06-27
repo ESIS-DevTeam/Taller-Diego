@@ -32,3 +32,6 @@ except Exception as e:
     sys.exit(0)  # No bloquear el pipeline por error de infraestructura
 finally:
     conn.close()
+
+
+print(variable_que_no_existe)
