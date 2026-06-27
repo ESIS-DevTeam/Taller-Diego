@@ -1,5 +1,3 @@
-import { handleApiError } from "./utils/error-handlers.js";
-
 /**
  * URL base para la API
  * @constant {string}
