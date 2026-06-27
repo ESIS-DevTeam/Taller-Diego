@@ -7,14 +7,6 @@ from api.v1.routes import producto_routes, autoparte_routes, orden_routes, servi
 from hexagonal.venta.adapters.primary.venta_api_adapter import router as venta_hex_router
 import time
 
-app = FastAPI(
-    title="Taller Diego API",
-    description="Sistema de gestión para taller mecánico",
-    version="1.0.0",
-    docs_url=None,
-    redoc_url="/redoc",
-    openapi_url="/openapi.json"
-)
 
 # Middleware de compresión gzip (reduce tamaño de respuestas)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
