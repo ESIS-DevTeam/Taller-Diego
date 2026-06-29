@@ -1,11 +1,16 @@
+from __future__ import annotations
 from sqlalchemy import Column, Integer, DateTime
 from sqlalchemy.orm import relationship
 from db.base import Base
 from core.value_objects import Cantidad, CantidadProductos
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from db.models.venta_producto import VentaProducto
 
 # Delegar validaciones y comportamiento al dominio puro
-from backend.domain.venta import Venta as DomainVenta
+from domain.venta import Venta as DomainVenta
 
 
 class Venta(Base):

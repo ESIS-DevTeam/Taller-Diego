@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import List
 
-from backend.core.value_objects import Cantidad, CantidadProductos
+from core.value_objects import Cantidad, CantidadProductos
 
 
 class Venta:
