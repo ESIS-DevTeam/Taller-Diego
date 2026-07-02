@@ -40,7 +40,7 @@
           .then(registration => {
           })
           .catch(error => {
-            console.log('❌ Error registrando Service Worker:', error);
+            console.error('Error registrando Service Worker:', error);
           });
       });
     }
@@ -63,17 +63,17 @@
   <div class="container">
     <main class="main-content">
 
-      <h1>Gestion de inventario</h1>
+      <h1>Gestión de inventario</h1>
 
       <!-- Botón para generar/ver códigos de barras (Nuevo) -->
       <div class="card" id="barcode-btn">
-        <a href="#">
-          <p>Codigo de barras</p>
+        <a href="#" role="button">
+          <p>Código de barras</p>
         </a>
       </div>
 
       <div class="card" id="open-modal-btn">
-        <a href="#">
+        <a href="#" role="button">
           <p>Nuevo producto</p>
         </a>
       </div>
