@@ -18,8 +18,8 @@ from backend.db import base as db_base
 db_base.Base.metadata.clear()
 
 from backend.core.value_objects import Email, Precio, EstadoPago, Garantia
-from db.models.orden import Orden
-from db.models.venta import Venta
+from backend.db.models.orden import Orden
+from backend.db.models.venta import Venta
 
 
 class ProductoStub:

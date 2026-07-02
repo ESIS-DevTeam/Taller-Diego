@@ -302,7 +302,7 @@ function filterProductos() {
 
   const filtered = productosDisponibles.filter(p =>
     p.nombre.toLowerCase().includes(search) ||
-    p.marca.toLowerCase().includes(search)
+    (p.marca || '').toLowerCase().includes(search)
   );
 
   displayProductos(filtered);
@@ -549,7 +549,7 @@ function removeProductoFromVenta(index) {
     <div class="modal-overlay" id="confirm-modal-overlay">
       <div class="modal-confirm">
         <div class="modal-icon">⚠️</div>
-        <h3>¿Estas seguro de eliminar el producto <strong>${truncatedName}</strong>?</h3>
+        <h3>¿Estás seguro de eliminar el producto <strong>${escapeHtml(truncatedName)}</strong>?</h3>
         <div class="modal-confirm-actions">
           <button class="btn-confirm-yes" id="confirm-delete">Sí</button>
           <button class="btn-confirm-no" id="cancel-delete">No</button>

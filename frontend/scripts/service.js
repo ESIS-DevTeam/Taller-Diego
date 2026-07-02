@@ -35,7 +35,7 @@ async function getServices() {
       method: 'GET',
       headers: {
         'cache-control': 'no-cache , no-store , must-revalidate',
-        'pragama': 'no-cache',
+        'pragma': 'no-cache',
         'expires': '0',
         'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
       }
@@ -282,7 +282,7 @@ function openEditServiceModal(serviceId) {
                             type="text" 
                             id="service-name" 
                             name="nombre" 
-                            value="${service.nombre}"
+                            value="${escapeHtml(service.nombre)}"
                             maxlength="100"
                             required
                         />
@@ -296,7 +296,7 @@ function openEditServiceModal(serviceId) {
                             rows="3"
                             maxlength="500"
                             required
-                        >${service.descripcion}</textarea>
+                        >${escapeHtml(service.descripcion)}</textarea>
                     </div>
                     <p class="form-hint">El precio se asigna directamente en la orden que use este servicio.</p>
                     
@@ -353,7 +353,7 @@ function openDeleteConfirmModal(serviceId) {
         <div class="modal-overlay" id="confirm-modal-overlay">
             <div class="modal-confirm">
                 <div class="modal-icon">⚠️</div>
-                <h3>¿Estas seguro de eliminar el servicio <strong>${truncatedName}</strong>?</h3>
+                <h3>¿Estás seguro de eliminar el servicio <strong>${escapeHtml(truncatedName)}</strong>?</h3>
                 <div class="modal-confirm-actions">
                     <button class="btn-confirm-yes" id="confirm-delete">Sí</button>
                     <button class="btn-confirm-no" id="cancel-delete">No</button>

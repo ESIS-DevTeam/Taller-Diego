@@ -17,7 +17,6 @@ const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
 const selectors = {
   cards: '.dashboard-card-grid .card',
-  quickActionsList: '.quick-actions .list-action',
 };
 
 // ========================================
@@ -44,7 +43,7 @@ function renderAlert(count) {
 
     const link = document.createElement('a');
     link.textContent = 'Ver productos';
-    link.href = '#/inventario';
+    link.href = 'inventory.html';
 
     alertContent.appendChild(h3);
     alertContent.appendChild(link);
@@ -112,21 +111,6 @@ async function renderCards() {
   }
 }
 
-/**
- * Vincula eventos a las acciones rápidas
- */
-function bindQuickActions() {
-  const list = $(selectors.quickActionsList);
-  if (!list) return;
-
-  list.addEventListener('click', (ev) => {
-    const li = ev.target.closest('li');
-    if (!li) return;
-    const text = li.textContent.trim();
-    // TODO: Implementar navegación o modales según la acción
-  });
-}
-
 // ========================================
 // INICIALIZACIÓN
 // ========================================
@@ -136,14 +120,11 @@ function bindQuickActions() {
  */
 async function init() {
   try {
-    // 1. Vincular eventos
-    bindQuickActions();
-
-    // 2. Cargar y renderizar alerta de bajo stock
+    // 1. Cargar y renderizar alerta de bajo stock
     const lowStockCount = await productUnderStock();
     renderAlert(lowStockCount);
 
-    // 3. Cargar y renderizar tarjetas
+    // 2. Cargar y renderizar tarjetas
     await renderCards();
 
 
