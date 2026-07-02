@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import date
 from schemas.servicio_schema import ServicioResponse
 from schemas.empleado_schema import EmpleadoResponse
@@ -16,8 +16,7 @@ class OrdenServicioBase(BaseModel):
 
 class OrdenServicioResponse(OrdenServicioBase):
     servicio: ServicioResponse | None = None
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrdenEmpleadoBase(BaseModel):
@@ -25,18 +24,16 @@ class OrdenEmpleadoBase(BaseModel):
 
 class OrdenEmpleadoResponse(OrdenEmpleadoBase):
     empleado: EmpleadoResponse | None = None
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrdenCreate(OrdenBase):
-    servicios: list[OrdenServicioBase] | None = []
-    empleados: list[OrdenEmpleadoBase] | None = []
+    servicios: list[OrdenServicioBase] = Field(default_factory=list)
+    empleados: list[OrdenEmpleadoBase] = Field(default_factory=list)
 
 class OrdenResponse(OrdenBase):
     id: int
     servicios: list[OrdenServicioResponse] | None = None
     empleados: list[OrdenEmpleadoResponse] | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

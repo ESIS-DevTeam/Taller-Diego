@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from schemas.producto_schema import ProductoResponse
 
@@ -18,13 +18,12 @@ class VentaProductoBase(BaseModel):
 class VentaProductoResponse(VentaProductoBase):
     producto: ProductoResponse | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 
 class VentaCreate(VentaBase):
-    productos: list[VentaProductoBase] | None = []
+    productos: list[VentaProductoBase] = Field(default_factory=list)
 
 
 
@@ -32,5 +31,4 @@ class VentaResponse(VentaBase):
     id: int
     productos: list[VentaProductoResponse] | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
