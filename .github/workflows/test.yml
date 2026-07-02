@@ -133,3 +133,75 @@ jobs:
         with:
           name: stryker-reports
           path: frontend/reports/mutation
+          
+  registro_cambios:
+    name: Registro de cambios aprobados
+    runs-on: ubuntu-latest
+    needs: mutation_stryker
+    if: github.event_name == 'push' && contains(fromJSON('["refs/heads/main","refs/heads/master"]'), github.ref)
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Obtener PR asociada al commit
+        id: pr_info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHA="${{ github.sha }}"
+          PR_JSON=$(gh api repos/${{ github.repository }}/commits/$SHA/pulls | jq '.[0]')
+          if [ "$PR_JSON" == "null" ] || [ -z "$PR_JSON" ]; then
+            echo "No se encontró PR asociada (push directo a la rama)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "$PR_JSON" > pr.json
+          echo "number=$(jq -r '.number' pr.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Armar entrada de log
+        if: steps.pr_info.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUM=${{ steps.pr_info.outputs.number }}
+          REPO=${{ github.repository }}
+
+          AUTHOR=$(jq -r '.user.login' pr.json)
+          TITLE=$(jq -r '.title' pr.json)
+          MERGED_AT=$(jq -r '.merged_at' pr.json)
+          URL=$(jq -r '.html_url' pr.json)
+
+          REVIEWERS=$(gh api repos/$REPO/pulls/$PR_NUM/reviews \
+            | jq -r '[.[] | select(.state=="APPROVED") | .user.login] | unique | join(",")')
+
+          COMMITS=$(gh api repos/$REPO/pulls/$PR_NUM/commits \
+            | jq -r '[.[].sha[0:7]] | join(",")')
+
+          # Si llegamos hasta este job, el quality gate (coverage + mutation) pasó
+          CHECK_RESULT="passed"
+
+          ENTRY=$(jq -nc \
+            --arg date "$MERGED_AT" --arg pr "$PR_NUM" --arg title "$TITLE" \
+            --arg author "$AUTHOR" --arg reviewers "$REVIEWERS" \
+            --arg commits "$COMMITS" --arg result "$CHECK_RESULT" \
+            --arg url "$URL" --arg sha "${{ github.sha }}" \
+            '{date:$date, pr:$pr, title:$title, author:$author, reviewers:$reviewers,
+              commits:$commits, check_result:$result, sha:$sha, url:$url}')
+
+          mkdir -p logs
+          echo "$ENTRY" >> logs/approved_changes.jsonl
+
+      - name: Commitear log actualizado
+        if: steps.pr_info.outputs.skip != 'true'
+        run: |
+          git config user.name "ci-bot"
+          git config user.email "ci-bot@users.noreply.github.com"
+          git add logs/approved_changes.jsonl
+          git diff --cached --quiet && echo "Sin cambios" || \
+            git commit -m "chore(log): registrar PR #${{ steps.pr_info.outputs.number }} [skip ci]"
+          git push
