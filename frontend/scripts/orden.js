@@ -113,6 +113,12 @@ async function loadVentaProducto() {
 
 let productosDisponibles = [];
 let productosVenta = [];
+let ventaRegistrandose = false;
+
+function formatCurrency(value) {
+  const amount = Number(value) || 0;
+  return `$${amount.toLocaleString('es-CL')}`;
+}
 
 async function initVentaProducto() {
   // Cargar productos desde el backend
@@ -260,7 +266,7 @@ function displayProductos(productos) {
   const dropdown = document.getElementById('producto-dropdown');
   const itemsHTML = productos.map(p => `
     <div class="dropdown-item" data-id="${escapeHtml(p.id)}" data-precio="${escapeHtml(p.precioVenta)}" data-stock="${escapeHtml(p.stock)}" data-nombre="${escapeHtml(p.nombre)}">
-      ${escapeHtml(p.nombre)} ${p.marca ? `- ${escapeHtml(p.marca)}` : ''} (Stock: ${escapeHtml(p.stock)})
+      ${escapeHtml(p.nombre)} ${p.marca ? `- ${escapeHtml(p.marca)}` : ''} - ${escapeHtml(formatCurrency(p.precioVenta))} (Stock: ${escapeHtml(p.stock)})
     </div>
   `).join('');
 
@@ -341,6 +347,11 @@ function addProductoToVenta() {
   // Verificar si el producto ya está en la venta
   const existingIndex = productosVenta.findIndex(p => p.producto_id === productoId);
   if (existingIndex >= 0) {
+    const nuevaCantidadTotal = productosVenta[existingIndex].cantidad + cantidad;
+    if (nuevaCantidadTotal > stock) {
+      showWarning(`Stock insuficiente. Disponible: ${stock}`);
+      return;
+    }
     productosVenta[existingIndex].cantidad += cantidad;
   } else {
     const producto = productosDisponibles.find(p => p.id === productoId);
@@ -577,9 +588,20 @@ function closeModal() {
 }
 
 async function registrarVenta() {
+  if (ventaRegistrandose) {
+    return;
+  }
+
   if (productosVenta.length === 0) {
     showWarning('Agrega al menos un producto a la venta');
     return;
+  }
+
+  ventaRegistrandose = true;
+  const registrarBtn = document.getElementById('registrar-venta-btn');
+  if (registrarBtn) {
+    registrarBtn.disabled = true;
+    registrarBtn.textContent = 'Registrando...';
   }
 
   const ventaData = {
@@ -616,6 +638,12 @@ async function registrarVenta() {
 
   } catch (error) {
     showError('Error al registrar venta: ' + error.message);
+  } finally {
+    ventaRegistrandose = false;
+    if (registrarBtn) {
+      registrarBtn.disabled = false;
+      registrarBtn.textContent = 'Registrar venta';
+    }
   }
 }
 

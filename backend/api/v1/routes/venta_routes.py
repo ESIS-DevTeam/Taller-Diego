@@ -34,28 +34,26 @@ def create_venta(
     
     Permite registrar ventas de productos con múltiples ítems y actualiza el inventario automáticamente.
     
-    **Validaciones:
-    - **Cliente**: Mínimo 3 caracteres, máximo 200
-    - **Productos**: Debe incluir al menos 1 producto
-    - **Cantidad**: Debe ser mayor a 0
-    - **Stock**: Verifica que haya suficiente stock disponible
-    - **Total**: Se calcula automáticamente según productos y cantidades
+    **Modelo actual del MVP:**
+    - fecha: fecha/hora de la venta.
+    - productos: lista de productos con `producto_id` y `cantidad`.
+
+    El cliente, método de pago y precio unitario histórico se incorporarán en
+    fases siguientes. Actualmente el precio se obtiene desde el producto y el
+    stock se descuenta automáticamente al registrar la venta.
     
     **Ejemplo de Request CORRECTO:
     ```json
     {
-        "cliente": "Juan Pérez",
-        "fecha_venta": "2025-12-04",
+        "fecha": "2025-12-04T10:30:00",
         "productos": [
             {
                 "producto_id": 15,
-                "cantidad": 2,
-                "precio_unitario": 250.00
+                "cantidad": 2
             },
             {
                 "producto_id": 14,
-                "cantidad": 1,
-                "precio_unitario": 400.00
+                "cantidad": 1
             }
         ]
     }
@@ -65,23 +63,17 @@ def create_venta(
     ```json
     {
         "id": 42,
-        "cliente": "Juan Pérez",
-        "fecha_venta": "2025-12-04",
-        "total": 900.00,
+        "fecha": "2025-12-04T10:30:00",
         "productos": [
             {
                 "id": 85,
                 "producto_id": 15,
-                "cantidad": 2,
-                "precio_unitario": 250.00,
-                "subtotal": 500.00
+                "cantidad": 2
             },
             {
                 "id": 86,
                 "producto_id": 14,
-                "cantidad": 1,
-                "precio_unitario": 400.00,
-                "subtotal": 400.00
+                "cantidad": 1
             }
         ]
     }
@@ -92,7 +84,6 @@ def create_venta(
     **1. Stock insuficiente:**
     ```json
     {
-        "cliente": "Juan Pérez",
         "productos": [
             {
                 "producto_id": 15,
@@ -106,7 +97,6 @@ def create_venta(
     **2. Sin productos:**
     ```json
     {
-        "cliente": "Juan Pérez",
         "productos": []  // Debe tener al menos 1 producto
     }
     ```
@@ -115,7 +105,6 @@ def create_venta(
     **3. Producto no existe:**
     ```json
     {
-        "cliente": "Juan Pérez",
         "productos": [
             {
                 "producto_id": 9999,  // No existe
@@ -127,9 +116,8 @@ def create_venta(
     **Error:** `404 Not Found - "Producto no encontrado"`
     
     **Nota:
-    - El stock se descuenta automáticamente al registrar la venta
-    - El total se calcula como: Σ(cantidad × precio_unitario)
-    - La fecha_venta es opcional (por defecto usa la fecha actual)
+    - El stock se descuenta automáticamente al registrar la venta.
+    - La fecha debe enviarse en formato datetime.
     
     **Autenticación:
     Requiere token JWT en header: `Authorization: Bearer <token>`
@@ -151,23 +139,17 @@ def list_ventas(
     [
         {
             "id": 42,
-            "cliente": "Juan Pérez",
-            "fecha_venta": "2025-12-04",
-            "total": 900.00,
+            "fecha": "2025-12-04T10:30:00",
             "productos": [
                 {
                     "id": 85,
                     "producto_id": 15,
-                    "cantidad": 2,
-                    "precio_unitario": 250.00,
-                    "subtotal": 500.00
+                    "cantidad": 2
                 },
                 {
                     "id": 86,
                     "producto_id": 14,
-                    "cantidad": 1,
-                    "precio_unitario": 400.00,
-                    "subtotal": 400.00
+                    "cantidad": 1
                 }
             ]
         }
@@ -176,14 +158,11 @@ def list_ventas(
     
     **Estructura de datos:
     - **id**: Identificador único de la venta
-    - **cliente**: Nombre del cliente
-    - **fecha_venta**: Fecha de la transacción
+    - **fecha**: Fecha/hora de la transacción
     - **total**: Monto total de la venta
     - **productos**: Array de productos vendidos con:
       - **producto_id**: ID del producto en inventario
       - **cantidad**: Unidades vendidas
-      - **precio_unitario**: Precio al momento de la venta
-      - **subtotal**: cantidad × precio_unitario
     
     **Autenticación:
     No requiere autenticación (público)

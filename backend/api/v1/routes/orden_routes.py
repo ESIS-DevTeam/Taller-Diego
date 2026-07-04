@@ -24,37 +24,36 @@ def create_orden(
     service: OrdenService = Depends(get_orden_service)
 ):
     """
-    Registra una nueva orden de trabajo
-    
-    Las órdenes de trabajo permiten gestionar servicios mecánicos con servicios y empleados asignados.
-    
-    **Validaciones:
-    - **Cliente**: Mínimo 3 caracteres, máximo 200
-    - **Placa**: Formato válido de placa vehicular
-    - **Estado**: Debe ser uno de: "pendiente", "en_proceso", "completado", "cancelado"
-    - **Servicios**: Debe incluir al menos 1 servicio
-    - **Empleados**: Puede incluir 0 o más empleados
+    Registra una orden de trabajo con el modelo actual del MVP.
+
+    **Importante para Fase 1:**
+    Este endpoint todavía no representa la recepción real por patente,
+    cliente y vehículo. Esa estructura se implementará en los nuevos módulos
+    de Cliente, Vehículo y OrdenServicio.
+
+    **Modelo actual:**
+    - garantia: entero entre 0 y 10.
+    - estadoPago: pendiente, parcial o completado.
+    - precio: monto base mayor a 0.
+    - fecha: fecha de la orden.
+    - servicios: lista opcional con `servicio_id` y `precio_servicio`.
+    - empleados: lista opcional con `empleado_id`.
     
     **Ejemplo de Request CORRECTO:
     ```json
     {
-        "cliente": "María González",
-        "placa": "ABC-123",
-        "vehiculo": "Toyota Corolla 2020",
-        "fecha_ingreso": "2025-12-04",
-        "fecha_salida": null,
-        "estado": "pendiente",
-        "observaciones": "Revisión general de motor y cambio de aceite",
+        "garantia": 1,
+        "estadoPago": "pendiente",
+        "precio": 1,
+        "fecha": "2025-12-04",
         "servicios": [
             {
                 "servicio_id": 5,
-                "cantidad": 1,
-                "precio_unitario": 150.00
+                "precio_servicio": 150
             },
             {
                 "servicio_id": 12,
-                "cantidad": 1,
-                "precio_unitario": 80.00
+                "precio_servicio": 80
             }
         ],
         "empleados": [
@@ -69,28 +68,20 @@ def create_orden(
     ```json
     {
         "id": 78,
-        "cliente": "María González",
-        "placa": "ABC-123",
-        "vehiculo": "Toyota Corolla 2020",
-        "fecha_ingreso": "2025-12-04",
-        "fecha_salida": null,
-        "estado": "pendiente",
-        "total": 230.00,
-        "observaciones": "Revisión general de motor y cambio de aceite",
+        "garantia": 1,
+        "estadoPago": "pendiente",
+        "precio": 231,
+        "fecha": "2025-12-04",
         "servicios": [
             {
                 "id": 120,
                 "servicio_id": 5,
-                "cantidad": 1,
-                "precio_unitario": 150.00,
-                "subtotal": 150.00
+                "precio_servicio": 150
             },
             {
                 "id": 121,
                 "servicio_id": 12,
-                "cantidad": 1,
-                "precio_unitario": 80.00,
-                "subtotal": 80.00
+                "precio_servicio": 80
             }
         ],
         "empleados": [
@@ -104,42 +95,34 @@ def create_orden(
     
     **Ejemplos de Requests INCORRECTOS:
     
-    **1. Estado inválido:**
+    **1. Estado de pago inválido:**
     ```json
     {
-        "cliente": "María González",
-        "estado": "finalizado"  // Debe ser: pendiente, en_proceso, completado, cancelado
+        "estadoPago": "finalizado"
     }
     ```
-    **Error:** `422 Unprocessable Entity - "Estado no válido"`
+    **Error:** `400 Bad Request - "Estado de pago inválido..."`
     
-    **2. Sin servicios:**
+    **2. Servicio inexistente:**
     ```json
     {
-        "cliente": "María González",
-        "servicios": []  // Debe tener al menos 1 servicio
-    }
-    ```
-    **Error:** `400 Bad Request - "La orden debe incluir al menos un servicio"`
-    
-    **3. Servicio no existe:**
-    ```json
-    {
-        "cliente": "María González",
         "servicios": [
             {
-                "servicio_id": 9999  // No existe
+                "servicio_id": 9999,
+                "precio_servicio": 100
             }
         ]
     }
     ```
-    **Error:** `404 Not Found - "Servicio no encontrado"`
+    **Error:** `400 Bad Request - "Servicio con id 9999 no existe"`
     
-    **Estados disponibles:
-    - **pendiente**: Orden creada, esperando inicio
-    - **en_proceso**: Trabajo en curso
-    - **completado**: Trabajo finalizado
-    - **cancelado**: Orden cancelada
+    **3. Precio inválido:**
+    ```json
+    {
+        "precio": 0
+    }
+    ```
+    **Error:** `400 Bad Request - "Precio debe ser mayor a 0"`
     
     **Autenticación:
     Requiere token JWT en header: `Authorization: Bearer <token>`
@@ -151,30 +134,26 @@ def list_ordens(
     service: OrdenService = Depends(get_orden_service)
 ):
     """
-    Obtiene el listado completo de órdenes de trabajo
-    
-    Retorna todas las órdenes registradas con servicios y empleados asignados.
+    Obtiene el listado completo de órdenes del modelo actual del MVP.
+
+    La respuesta incluye garantía, estado de pago, precio, fecha y relaciones
+    opcionales con servicios/empleados. Los datos de cliente, patente y vehículo
+    entrarán en Fase 1 con el nuevo flujo de recepción.
     
     **Response EXITOSA:
     ```json
     [
         {
             "id": 78,
-            "cliente": "María González",
-            "placa": "ABC-123",
-            "vehiculo": "Toyota Corolla 2020",
-            "fecha_ingreso": "2025-12-04",
-            "fecha_salida": null,
-            "estado": "pendiente",
-            "total": 230.00,
-            "observaciones": "Revisión general de motor",
+            "garantia": 1,
+            "estadoPago": "pendiente",
+            "precio": 151,
+            "fecha": "2025-12-04",
             "servicios": [
                 {
                     "id": 120,
                     "servicio_id": 5,
-                    "cantidad": 1,
-                    "precio_unitario": 150.00,
-                    "subtotal": 150.00
+                    "precio_servicio": 150
                 }
             ],
             "empleados": [
@@ -188,11 +167,10 @@ def list_ordens(
     ```
     
     **Estructura de datos:
-    - **placa**: Identificador del vehículo
-    - **vehiculo**: Descripción del vehículo
-    - **fecha_ingreso**: Cuándo ingresó el vehículo
-    - **fecha_salida**: Cuándo se entregó (puede ser null)
-    - **estado**: Estado actual de la orden
+    - **garantia**: Garantía actual expresada en años.
+    - **estadoPago**: Estado de pago de la orden.
+    - **precio**: Precio acumulado de la orden.
+    - **fecha**: Fecha de registro.
     - **servicios**: Array de servicios aplicados
     - **empleados**: Array de empleados asignados
     

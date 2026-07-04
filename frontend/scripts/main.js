@@ -43,7 +43,7 @@ function renderAlert(count) {
 
     const link = document.createElement('a');
     link.textContent = 'Ver productos';
-    link.href = 'inventory.html';
+    link.href = 'inventory.html?stock=bajo';
 
     alertContent.appendChild(h3);
     alertContent.appendChild(link);

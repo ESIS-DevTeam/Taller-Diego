@@ -1,7 +1,7 @@
 // Service Worker para caché offline
-const CACHE_NAME = 'taller-diego-v5';
-const STATIC_CACHE = 'static-v5';
-const API_CACHE = 'api-v5';
+const CACHE_NAME = 'taller-diego-v6';
+const STATIC_CACHE = 'static-v6';
+const API_CACHE = 'api-v6';
 
 // Assets estáticos para cachear
 const STATIC_ASSETS = [
@@ -79,14 +79,15 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Estrategia diferenciada según tipo de recurso
-  // HTML: Network First (siempre datos frescos)
-  // CSS/JS/Imágenes: Cache First (rendimiento)
+  // HTML/CSS/JS: Network First para evitar que el MVP muestre código viejo.
+  // Imágenes/fuentes: Cache First para rendimiento.
 
   const isHTMLRequest = request.headers.get('accept')?.includes('text/html') ||
     url.pathname.endsWith('.html');
+  const isCodeAsset = url.pathname.endsWith('.js') || url.pathname.endsWith('.css');
 
-  if (isHTMLRequest) {
-    // Network First para HTML - siempre intenta obtener contenido fresco
+  if (isHTMLRequest || isCodeAsset) {
+    // Network First para HTML/CSS/JS - siempre intenta obtener contenido fresco
     event.respondWith(
       fetch(request)
         .then(response => {
