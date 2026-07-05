@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import Response, HTMLResponse
 from fastapi.openapi.docs import get_swagger_ui_html
-from api.v1.routes import producto_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes, auth_routes, proforma_rapida_routes
+from api.v1.routes import producto_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes, auth_routes
 from hexagonal.venta.adapters.primary.venta_api_adapter import router as venta_hex_router
 import time
 
@@ -61,8 +61,6 @@ app.include_router(servicio_routes.router,
                    prefix="/api/v1/servicios", tags=["Servicios"])
 app.include_router(empleado_routes.router,
                    prefix="/api/v1/empleados", tags=["Empleados"])
-app.include_router(proforma_rapida_routes.router,
-                   prefix="/api/v1/proformas", tags=["Proformas Rapidas"])
 
 # Documentación personalizada con colores oscuros
 @app.get("/docs", include_in_schema=False)

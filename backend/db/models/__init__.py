@@ -7,4 +7,3 @@ from .servicio import Servicio
 from .orden_servicio import OrdenServicio
 from .empleado import Empleado
 from .orden_empleado import OrdenEmpleado
-from .proforma_rapida import ProformaRapida
