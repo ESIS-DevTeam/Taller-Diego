@@ -27,6 +27,7 @@ for model_name in (
     "orden_servicio",
     "empleado",
     "orden_empleado",
+    "proforma_rapida",
 ):
     module = importlib.import_module(f"db.models.{model_name}")
     sys.modules.setdefault(f"backend.db.models.{model_name}", module)

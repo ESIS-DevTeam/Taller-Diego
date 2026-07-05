@@ -312,6 +312,342 @@
   transform: translateY(-2px);
 }
 
+.proforma-page {
+  width: 100%;
+}
+.proforma-heading h1 {
+  margin: 0 0 8px;
+  font-size: 26px;
+  color: #1f2937;
+}
+.proforma-heading p {
+  margin: 0 0 18px;
+  color: #64748b;
+  font-size: 14px;
+}
+.proforma-info-banner {
+  background: #e7f8ed;
+  color: #08753c;
+  border: 1px solid #c7efd7;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+.proforma-layout,
+.proforma-saved-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 22px;
+  align-items: start;
+}
+.proforma-card {
+  background: #ffffff;
+  border: 1px solid #d8e4ef;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  padding: 22px;
+}
+.proforma-form label {
+  display: block;
+  color: #1f2937;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.proforma-form label span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+}
+.proforma-form input,
+.proforma-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-family: "Istok Web", sans-serif;
+  font-size: 14px;
+  background: #fff;
+}
+.proforma-form textarea {
+  resize: vertical;
+  min-height: 104px;
+}
+.proforma-form input:focus,
+.proforma-form textarea:focus {
+  border-color: #4b8fe1;
+  box-shadow: 0 0 0 3px rgba(75, 143, 225, 0.16);
+  outline: none;
+}
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+.form-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.proforma-form h3,
+.proforma-side h2,
+.proforma-side h3 {
+  margin: 8px 0 14px;
+  color: #1f2937;
+}
+.proforma-products-box {
+  border: 1px dashed #b8c7d9;
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 12px;
+  background: #f8fbff;
+}
+.proforma-product-row {
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.proforma-product-row .form-field.small {
+  max-width: 110px;
+}
+.proforma-productos-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.proforma-productos-list p {
+  margin: 0;
+  color: #64748b;
+}
+.proforma-product-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #dbe5ef;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.proforma-product-item span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 2px;
+}
+.proforma-product-item button,
+.proforma-list-actions button {
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #1f2937;
+  border-radius: 7px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.proforma-list-actions button.primary {
+  background: #2ecc71;
+  color: white;
+  border-color: #2ecc71;
+}
+.proforma-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+}
+.btn-save-proforma,
+.btn-primary-wide {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  background: #2ecc71;
+  color: white;
+  padding: 13px 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-save-proforma:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.btn-clear-proforma,
+.btn-secondary-wide {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: #1f2937;
+  padding: 13px 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-primary-wide,
+.btn-secondary-wide {
+  width: 100%;
+  display: block;
+  margin-top: 12px;
+}
+.proforma-side ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: grid;
+  gap: 10px;
+}
+.proforma-side li {
+  width: fit-content;
+  background: #e7f1ff;
+  color: #2f6dc5;
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.proforma-preview-box,
+.special-cases {
+  border: 1px solid #d9e4ef;
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 16px;
+}
+.proforma-preview-box p,
+.special-cases p {
+  margin: 5px 0;
+  font-size: 13px;
+  color: #475569;
+}
+.status-pill {
+  display: inline-block;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  margin: 6px 0;
+}
+.status-pill.success {
+  background: #dcfce7;
+  color: #08753c;
+}
+.status-pill.info {
+  background: #e7f1ff;
+  color: #2f6dc5;
+}
+.printable-preview {
+  padding: 18px;
+}
+.saved-summary h1 {
+  color: #159947;
+  margin: 0 0 12px;
+}
+.saved-summary h2 {
+  margin: 0 0 12px;
+  color: #1f2937;
+}
+.proforma-document {
+  color: #1f2937;
+}
+.proforma-doc-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 3px solid #2f80ed;
+  padding-bottom: 14px;
+}
+.proforma-doc-header h1 {
+  margin: 0;
+  color: #1f2937;
+}
+.proforma-doc-header h2 {
+  margin: 6px 0 0;
+  color: #2f80ed;
+  font-size: 16px;
+}
+.proforma-code {
+  background: #e7f1ff;
+  color: #1d4ed8;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 800;
+  height: fit-content;
+}
+.proforma-doc-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0;
+  color: #64748b;
+  font-size: 13px;
+}
+.proforma-doc-box,
+.proforma-doc-products {
+  border: 1px solid #d7e1ea;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fbfdff;
+}
+.proforma-doc-box p {
+  margin: 6px 0;
+}
+.proforma-doc-products {
+  margin-top: 14px;
+}
+.proforma-doc-products h3 {
+  margin: 0 0 8px;
+}
+.proforma-note {
+  margin-top: 14px;
+  background: #fff7df;
+  color: #8a5a00;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.history-search {
+  margin: 18px 0;
+}
+.history-search input {
+  width: min(520px, 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 15px;
+}
+.proforma-list {
+  display: grid;
+  gap: 12px;
+}
+.proforma-list-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d8e4ef;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+}
+.proforma-list-card h2 {
+  margin: 6px 0;
+  color: #1f2937;
+}
+.proforma-list-card p {
+  margin: 0 0 6px;
+  color: #475569;
+}
+.proforma-list-card small {
+  color: #64748b;
+}
+.proforma-list-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.empty-state,
+.error-state {
+  background: #fff;
+  border-radius: 8px;
+  padding: 18px;
+  color: #64748b;
+}
+
 /* ========== MODALES ========== */
 .modal-overlay {
   position: fixed;
