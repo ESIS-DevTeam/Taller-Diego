@@ -1,0 +1,160 @@
+// ========================================
+// MÓDULO PERSONAL — gestión de mecánicos
+// (usa las clases ot- de orden-modulo.css)
+// ========================================
+@use 'variables' as v;
+
+$verde: #10b981;
+$azul-oscuro: #16283c;
+
+.personal-section {
+  padding: v.spacing(md);
+}
+
+.personal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: v.spacing(md);
+  flex-wrap: wrap;
+}
+
+.per-tabla-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.per-tabla-head,
+.per-fila {
+  display: grid;
+  grid-template-columns: 2.2fr 1.4fr 1fr 1.4fr 0.9fr 1.1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 18px;
+}
+
+.per-tabla-head {
+  background: v.color(bg-light);
+  border-bottom: 1px solid v.color(border);
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: v.color(text-muted);
+}
+
+.per-fila {
+  border-bottom: 1px solid #f0f2f5;
+  font-size: v.$font-size-sm;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: #fafbfc; }
+}
+
+.per-mecanico {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  strong { display: block; color: v.color(primary); }
+  small { color: v.color(text-muted); font-size: 11px; }
+}
+
+.per-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: $azul-oscuro;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.per-avatar-off { background: #9aa4b1; }
+}
+
+.per-correo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.per-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.per-btn-icono {
+  width: 30px;
+  height: 30px;
+  border: 1px solid v.color(border);
+  border-radius: v.$border-radius-sm;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  color: v.color(text);
+
+  &:hover { background: v.color(bg-light); }
+
+  &.per-btn-eliminar:hover {
+    background: #fdf1ed;
+    border-color: rgba(#e0532f, 0.4);
+  }
+}
+
+// Switch activo/inactivo
+.per-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  display: inline-block;
+  flex-shrink: 0;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .per-slider {
+    position: absolute;
+    inset: 0;
+    background: #cfd6de;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+  }
+
+  input:checked + .per-slider {
+    background: $verde;
+
+    &::before { transform: translateX(18px); }
+  }
+}
+
+@include v.media(md) {
+  .per-tabla-head { display: none; }
+
+  .per-fila {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .per-acciones { justify-content: flex-start; }
+}

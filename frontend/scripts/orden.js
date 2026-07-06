@@ -4,6 +4,10 @@ import { fetchForBarCode } from './data-manager.js';
 import { showSuccess, showError, showWarning } from './utils/notification.js';
 import { resetBodyDefaults } from './utils/state-manager.js';
 import { escapeHtml } from './utils/sanitize.js';
+import { initRecepcion } from './orden/recepcion.js';
+import { initHistorial } from './orden/historial.js';
+import { initPendientes } from './orden/pendientes.js';
+import { initRevisados } from './orden/revisados.js';
 
 // Cargar header y sidebar dinámicamente (Hybrid)
 loadComponent("header", "includes/header.html");
@@ -33,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mostrar el sidebar secundario por defecto al cargar la página
   showOrdenSidebar();
 
-  // Cargar venta de producto por defecto
-  loadSection('venta-producto');
+  // Cargar recepción de servicios por defecto (módulo ORDEN)
+  loadSection('servicios');
   barcodeReader();
 });
 
@@ -66,28 +70,16 @@ function loadSection(section) {
       loadVentaProducto();
       break;
     case 'servicios':
-      ordenContent.innerHTML = `
-        <h2>Servicios</h2>
-        <p>Gestión de servicios...</p>
-      `;
+      initRecepcion(ordenContent);
       break;
     case 'historial-servicios':
-      ordenContent.innerHTML = `
-        <h2>Historial de Servicios</h2>
-        <p>Ver historial de servicios...</p>
-      `;
+      initHistorial(ordenContent);
       break;
     case 'pendiente':
-      ordenContent.innerHTML = `
-        <h2>Pendiente</h2>
-        <p>Órdenes pendientes...</p>
-      `;
+      initPendientes(ordenContent);
       break;
     case 'revisado':
-      ordenContent.innerHTML = `
-        <h2>Revisado</h2>
-        <p>Órdenes revisadas...</p>
-      `;
+      initRevisados(ordenContent);
       break;
     default:
       ordenContent.innerHTML = '<p>Selecciona una opción del menú</p>';

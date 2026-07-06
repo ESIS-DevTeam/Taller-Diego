@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../styles/css/side_bar.css">
   <link rel="stylesheet" href="../styles/css/header.css">
   <link rel="stylesheet" href="../styles/css/orden.css">
+  <link rel="stylesheet" href="../styles/css/orden-modulo.css">
   <link rel="stylesheet" href="../styles/css/notification.css">
   <link rel="stylesheet" href="../styles/css/modal-confirm.css">
   <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
@@ -21,15 +22,18 @@
     <!-- Sidebar principal -->
     <div id="side-bar-container" class="side-bar-container"></div>
     
-    <!-- Sidebar secundario de Operaciones -->
+    <!-- Sidebar secundario del módulo ORDEN -->
     <div id="orden-sidebar" class="orden-sidebar">
-      <div class="orden-sidebar-header">OPERACIONES</div>
+      <div class="orden-sidebar-header">MÓDULO ORDEN</div>
       <ul class="orden-sidebar-menu">
-        <li><a href="#" class="active" data-section="venta-producto">Venta de producto</a></li>
-        <li><a href="#" data-section="servicios">Servicios</a></li>
+        <li><a href="#" class="active" data-section="servicios">Servicios</a></li>
         <li><a href="#" data-section="historial-servicios">Historial de servicios</a></li>
-        <li><a href="#" data-section="pendiente">Pendiente</a></li>
-        <li><a href="#" data-section="revisado">Revisado</a></li>
+        <li><a href="#" data-section="pendiente">Trabajos pendientes</a></li>
+        <li><a href="#" data-section="revisado">Revisados</a></li>
+      </ul>
+      <div class="orden-sidebar-header orden-sidebar-separador">OPERACIONES</div>
+      <ul class="orden-sidebar-menu">
+        <li><a href="#" data-section="venta-producto">Venta de productos</a></li>
       </ul>
     </div>
 

@@ -1,0 +1,299 @@
+// ========================================
+// PROFORMAS 1 y 2 — página imprimible
+// (layout basado en el diseño de Figma)
+// ========================================
+@use 'variables' as v;
+
+$azul-oscuro: #16283c;
+$verde: #10b981;
+$rojo: #e0532f;
+
+body {
+  margin: 0;
+  font-family: v.$font-base;
+  background: #e9edf2;
+  color: v.color(text);
+}
+
+// Barra superior (solo pantalla)
+.pf-toolbar {
+  background: $azul-oscuro;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  font-size: v.$font-size-sm;
+  font-weight: 700;
+
+  .pf-btn-imprimir {
+    font-family: v.$font-base;
+    font-size: v.$font-size-sm;
+    font-weight: 700;
+    background: $verde;
+    color: #fff;
+    border: none;
+    border-radius: v.$border-radius-md;
+    padding: 9px 18px;
+    cursor: pointer;
+
+    &:hover { background: #0d9668; }
+  }
+}
+
+.pf-cargando, .pf-error {
+  text-align: center;
+  padding: v.spacing(xl);
+  color: v.color(text-muted);
+}
+
+.pf-error { color: v.color(error); }
+
+// ---------- Documento ----------
+
+.pf-documento {
+  background: #fff;
+  max-width: 860px;
+  margin: 24px auto;
+  box-shadow: v.$shadow-md;
+  min-height: 900px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pf-header {
+  background: $azul-oscuro;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 26px 40px;
+
+  .pf-header-marca {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    h1 { margin: 0; font-size: 20px; letter-spacing: 1px; }
+    p { margin: 2px 0 0; font-size: 11px; opacity: 0.75; }
+  }
+
+  .pf-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: $verde;
+    flex-shrink: 0;
+  }
+
+  .pf-header-contacto {
+    text-align: right;
+    font-size: 11px;
+
+    p { margin: 3px 0; opacity: 0.85; }
+  }
+}
+
+.pf-cuerpo {
+  flex: 1;
+  padding: 30px 40px;
+}
+
+.pf-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+
+  h2 { margin: 0; font-size: 19px; color: v.color(primary); letter-spacing: 0.5px; }
+  p { margin: 4px 0 0; font-size: 12px; color: v.color(text-muted); }
+
+  .pf-codigo {
+    border: 1px solid v.color(border);
+    border-radius: v.$border-radius-md;
+    padding: 8px 16px;
+    text-align: right;
+
+    span { display: block; font-size: 9px; letter-spacing: 1px; color: v.color(text-muted); }
+    strong { color: #0d9668; font-size: 16px; letter-spacing: 0.5px; }
+  }
+}
+
+.pf-fecha-row {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  background: v.color(bg-light);
+  border: 1px solid v.color(border);
+  border-radius: v.$border-radius-md;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+
+  div span { display: block; font-size: 9px; letter-spacing: 1px; color: v.color(text-muted); }
+  div strong { font-size: 14px; }
+
+  .pf-chip {
+    margin-left: auto;
+    background: #e8edf3;
+    color: v.color(text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+}
+
+.pf-dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.pf-tarjeta {
+  border: 1px solid v.color(border);
+  border-radius: v.$border-radius-md;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: v.color(primary);
+    border-left: 4px solid $verde;
+    padding-left: 8px;
+  }
+
+  p { margin: 0; font-size: 13px; line-height: 1.6; }
+}
+
+.pf-dos-columnas .pf-tarjeta { margin-bottom: 0; }
+
+.pf-linea {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+
+  span { color: v.color(text-muted); }
+}
+
+.pf-servicio-estimado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e8f8f2;
+  border: 1px solid #a7dcc6;
+  border-radius: v.$border-radius-md;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+
+  span { display: block; font-size: 11px; color: v.color(text-muted); }
+  strong { font-size: 15px; color: v.color(primary); }
+
+  .pf-precio-estimado {
+    text-align: right;
+
+    span { font-size: 9px; letter-spacing: 1px; }
+    strong { color: #0d9668; font-size: 19px; }
+  }
+}
+
+.pf-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: v.color(text-muted);
+    border-bottom: 1px solid v.color(border);
+    padding: 6px 4px;
+  }
+
+  td {
+    padding: 8px 4px;
+    border-bottom: 1px solid #f0f2f5;
+  }
+
+  .pf-num { text-align: right; white-space: nowrap; }
+
+  .pf-extra {
+    background: #d1fae5;
+    color: #047857;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+}
+
+.pf-totales {
+  margin-top: 12px;
+  border-top: 2px solid $azul-oscuro;
+  padding-top: 8px;
+
+  .pf-linea strong { font-size: 14px; }
+
+  .pf-saldo strong { color: #0d9668; }
+  .pf-saldo-pendiente strong { color: $rojo; }
+}
+
+.pf-nota {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  color: v.color(text-muted);
+  line-height: 1.5;
+
+  .pf-nota-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: v.color(warning);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+}
+
+.pf-firmas {
+  display: flex;
+  justify-content: space-around;
+  background: v.color(bg-light);
+  padding: 36px 40px 28px;
+  margin-top: auto;
+
+  div { text-align: center; }
+
+  .pf-firma-linea {
+    width: 190px;
+    border-bottom: 1.5px solid v.color(text);
+    margin-bottom: 8px;
+  }
+
+  span { font-size: 11px; color: v.color(text-muted); }
+}
+
+// ---------- Impresión ----------
+
+@media print {
+  body { background: #fff; }
+
+  .no-print { display: none !important; }
+
+  .pf-documento {
+    margin: 0;
+    max-width: none;
+    box-shadow: none;
+    min-height: auto;
+  }
+
+  .pf-header {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

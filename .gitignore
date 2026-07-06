@@ -4,3 +4,5 @@ venv/
 .qodo
 .env
 node_modules/
+*.db
+taller_local.db

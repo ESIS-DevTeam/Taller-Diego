@@ -41,9 +41,17 @@ export function loadSideBar() {
                 
                 <!-- Opción de navegación: Personal -->
                 <li>
-                    <a href="#" data-pending-feature="personal">
+                    <a href="personal.html">
                         <img src="../assets/icons/leader.png" alt="Personal" class="icon">
                         <span>Personal</span>
+                    </a>
+                </li>
+
+                <!-- Opción de navegación: Caja -->
+                <li>
+                    <a href="caja.html">
+                        <img src="../assets/icons/report.png" alt="Caja" class="icon">
+                        <span>Caja</span>
                     </a>
                 </li>
             </ul>

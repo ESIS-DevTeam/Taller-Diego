@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../scripts/utils/auth-guard.js"></script>
+  <title>Proforma - Taller de Diego</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../styles/css/proforma.css">
+  <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="pf-toolbar no-print">
+    <span id="pf-toolbar-titulo">Vista previa de impresión — Proforma</span>
+    <button id="pf-imprimir" class="pf-btn-imprimir">🖨 Imprimir</button>
+  </div>
+
+  <div id="pf-documento" class="pf-documento">
+    <p class="pf-cargando">Cargando proforma…</p>
+  </div>
+
+  <script type="module" src="../scripts/proforma.js"></script>
+</body>
+</html>
