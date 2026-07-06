@@ -177,8 +177,12 @@ def delete_empleado(id: int, service: EmpleadoService = Depends(get_empleado_ser
 
     Raises:
         HTTPException(404): Si el empleado no existe.
+        HTTPException(409): Si tiene servicios registrados (desactivar en su lugar).
     """
-    empleado = service.delete_empleado(id)
+    try:
+        empleado = service.delete_empleado(id)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     if not empleado:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
     return {"detail": "Empleado eliminado"}

@@ -112,6 +112,99 @@ class Cantidad:
         return f"Cantidad({self._value})"
 
 
+class Placa:
+    """Value Object para representar la placa (patente) de un vehículo.
+
+    Normaliza a mayúsculas y sin espacios/guiones. Acepta formatos
+    alfanuméricos de 5 a 8 caracteres (ej: AB123CD, ABCD12).
+    """
+
+    def __init__(self, value: str):
+        if not isinstance(value, str):
+            raise ValueError("Placa debe ser un texto")
+        normalizada = re.sub(r"[\s\-]", "", value).upper()
+        if not re.fullmatch(r"[A-Z0-9]{5,8}", normalizada):
+            raise ValueError(
+                "Placa inválida. Debe tener entre 5 y 8 caracteres alfanuméricos (ej: AB123CD)")
+        self._value: Final[str] = normalizada
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, Placa) and self._value == other._value
+
+    def __hash__(self) -> int:
+        return hash(self._value)
+
+    def __repr__(self) -> str:
+        return f"Placa({self._value})"
+
+
+class MetodoPago:
+    """Value Object para el método de pago de un abono (efectivo o tarjeta)."""
+
+    METODOS_VALIDOS = {"efectivo", "tarjeta"}
+
+    def __init__(self, value: str):
+        if not isinstance(value, str) or value.lower() not in self.METODOS_VALIDOS:
+            raise ValueError(
+                f"Método de pago inválido. Debe ser uno de: {', '.join(sorted(self.METODOS_VALIDOS))}")
+        self._value: Final[str] = value.lower()
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, MetodoPago) and self._value == other._value
+
+    def __hash__(self) -> int:
+        return hash(self._value)
+
+    def __repr__(self) -> str:
+        return f"MetodoPago({self._value})"
+
+
+class EstadoOrdenTrabajo:
+    """Value Object para el estado de una orden de trabajo del taller."""
+
+    ESTADOS_VALIDOS = {"en_proceso", "esperando_repuestos",
+                       "listo", "entregado", "cancelado"}
+
+    # Transiciones permitidas desde cada estado
+    TRANSICIONES = {
+        "en_proceso": {"esperando_repuestos", "listo", "cancelado"},
+        "esperando_repuestos": {"en_proceso", "listo", "cancelado"},
+        "listo": {"en_proceso", "entregado", "cancelado"},
+        "entregado": set(),
+        "cancelado": set(),
+    }
+
+    def __init__(self, value: str):
+        if not isinstance(value, str) or value.lower() not in self.ESTADOS_VALIDOS:
+            raise ValueError(
+                f"Estado de orden inválido. Debe ser uno de: {', '.join(sorted(self.ESTADOS_VALIDOS))}")
+        self._value: Final[str] = value.lower()
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+    def puede_transicionar_a(self, nuevo: "EstadoOrdenTrabajo") -> bool:
+        return nuevo.value in self.TRANSICIONES[self._value]
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, EstadoOrdenTrabajo) and self._value == other._value
+
+    def __hash__(self) -> int:
+        return hash(self._value)
+
+    def __repr__(self) -> str:
+        return f"EstadoOrdenTrabajo({self._value})"
+
+
 class CantidadProductos:
     """Value Object para representar la cantidad de productos diferentes en una venta."""
     

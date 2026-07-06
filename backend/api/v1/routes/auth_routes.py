@@ -1,8 +1,21 @@
 from fastapi import APIRouter
-from schemas.auth_schema import LoginRequest, LoginResponse
+from schemas.auth_schema import LoginRequest, LoginResponse, RefreshRequest
 from services.auth_service import AuthService
 
 router = APIRouter(tags=["Autenticación"])
+
+
+@router.post("/refresh", response_model=LoginResponse, summary="Renovar sesión")
+async def refresh(body: RefreshRequest):
+    """
+    Renueva la sesión con el refresh token entregado en el login.
+
+    Supabase rota el refresh token: la respuesta incluye un **nuevo**
+    `refresh_token` que reemplaza al anterior. Igual que `/login`,
+    siempre retorna HTTP 200 y el resultado va en el campo `success`.
+    """
+    auth_service = AuthService()
+    return await auth_service.refresh(body.refresh_token)
 
 @router.post("/login", response_model=LoginResponse, summary="Iniciar sesión")
 async def login(credentials: LoginRequest):

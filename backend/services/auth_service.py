@@ -62,9 +62,11 @@ class AuthService:
                     success=True,
                     message="Inicio de sesión exitoso",
                     access_token=data.get("access_token"),
+                    refresh_token=data.get("refresh_token"),
+                    expires_in=data.get("expires_in"),
                     user_email=data.get("user", {}).get("email")
                 )
-                
+
         except httpx.RequestError as e:
             return LoginResponse(
                 success=False,
@@ -74,4 +76,58 @@ class AuthService:
             return LoginResponse(
                 success=False,
                 message=f"Error inesperado durante la autenticación: {str(e)}"
+            )
+
+    async def refresh(self, refresh_token: str) -> LoginResponse:
+        """
+        Renueva la sesión usando el refresh token de Supabase.
+        Devuelve un nuevo access_token y un nuevo refresh_token
+        (Supabase rota el refresh token en cada uso).
+        """
+        if not self.supabase_url or not self.anon_key:
+            return LoginResponse(
+                success=False,
+                message="Configuración de autenticación incompleta"
+            )
+
+        refresh_endpoint = f"{self.supabase_url}/auth/v1/token?grant_type=refresh_token"
+
+        headers = {
+            "apikey": self.anon_key,
+            "Content-Type": "application/json"
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                response = await client.post(
+                    refresh_endpoint,
+                    headers=headers,
+                    json={"refresh_token": refresh_token}
+                )
+
+                if response.status_code != 200:
+                    return LoginResponse(
+                        success=False,
+                        message="La sesión expiró. Inicia sesión nuevamente."
+                    )
+
+                data = response.json()
+                return LoginResponse(
+                    success=True,
+                    message="Sesión renovada",
+                    access_token=data.get("access_token"),
+                    refresh_token=data.get("refresh_token"),
+                    expires_in=data.get("expires_in"),
+                    user_email=data.get("user", {}).get("email")
+                )
+
+        except httpx.RequestError as e:
+            return LoginResponse(
+                success=False,
+                message=f"Error de conexión con el servicio de autenticación: {str(e)}"
+            )
+        except Exception as e:
+            return LoginResponse(
+                success=False,
+                message=f"Error inesperado al renovar la sesión: {str(e)}"
             )
