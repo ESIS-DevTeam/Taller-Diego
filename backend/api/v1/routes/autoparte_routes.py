@@ -220,7 +220,12 @@ def update_autoparte(
     Raises:
         HTTPException(404): Si la autoparte no existe.
     """
-    autoparte = service.update_autoparte(id, data)
+    try:
+        autoparte = service.update_autoparte(id, data)
+    except ValueError as exc:
+        # Nombre duplicado o autoparte inexistente
+        status = 404 if "no existe" in str(exc) else 400
+        raise HTTPException(status_code=status, detail=str(exc)) from exc
     if not autoparte:
         raise HTTPException(status_code=404, detail="Autoparte no encontrada")
     return autoparte

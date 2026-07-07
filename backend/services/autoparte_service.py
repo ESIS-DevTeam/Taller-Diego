@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from repositories.autoparte_repo import AutoparteRepository
+from repositories.producto_repo import ProductoRepository
 from schemas.autoparte_schema import AutoparteCreate
 from core.cache import cache
 
@@ -9,10 +10,12 @@ class AutoparteService:
 
     def __init__(self, db: Session):
         self.repo = AutoparteRepository(db)
-    
+        # Para validar nombres contra TODOS los productos (autopartes incluidas)
+        self.producto_repo = ProductoRepository(db)
+
     def create_autoparte(self, data: AutoparteCreate):
-        if self.repo.get_by_name(data.nombre):
-            raise ValueError("Ya existe una autoparte con ese nombre")
+        if self.producto_repo.get_by_name(data.nombre):
+            raise ValueError("Ya existe un producto con ese nombre")
         autoparte_data = data
         autoparte = self.repo.create(autoparte_data)
         
@@ -34,7 +37,12 @@ class AutoparteService:
         autoparte = self.repo.get_by_id(id)
         if not autoparte:
             raise ValueError("La autoparte no existe")
-        
+
+        # No permitir renombrar a un nombre que ya usa OTRO producto
+        existente = self.producto_repo.get_by_name(data.nombre)
+        if existente and existente.id != id:
+            raise ValueError("Ya existe un producto con ese nombre")
+
         result = self.repo.update(id, data)
         
         # Invalidar caché de productos

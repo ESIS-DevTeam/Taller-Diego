@@ -37,5 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  cargarSeccion('cierre');
+  // Deep-link desde el dashboard: caja.html#deudores abre esa sección directo
+  const secciones = ['cierre', 'notas', 'reportes', 'deudores'];
+  const hash = window.location.hash.replace('#', '');
+  const inicial = secciones.includes(hash) ? hash : 'cierre';
+  menuItems.forEach(link => link.classList.toggle('active', link.dataset.section === inicial));
+  cargarSeccion(inicial);
 });

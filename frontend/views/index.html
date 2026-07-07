@@ -27,83 +27,140 @@
   <!-- Contenedor principal del dashboard -->
   <div class="main-content">
     <div class="content">
-      <!-- Sección de bienvenida y alertas -->
+
+      <!-- Bienvenida + fecha destacada del día -->
       <section class="welcome-alert">
-        <h2>¡Bienvenido Diego!</h2>
-        <!-- Alerta de productos con bajo stock (se carga dinámicamente) -->
-        <div class="alert-content">
-          <!-- Los datos se cargan dinámicamente desde main.js -->
+        <div class="welcome-row">
+          <div class="welcome-text">
+            <h2>¡Bienvenido Diego!</h2>
+            <p class="welcome-sub">Este es el resumen de tu taller</p>
+          </div>
+          <div class="fecha-hoy" id="fecha-hoy" role="status">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+              <path d="M3 9h18M8 3v4M16 3v4"></path>
+            </svg>
+            <div>
+              <span class="fecha-hoy-label">Hoy</span>
+              <span class="fecha-hoy-valor" id="fecha-hoy-valor">Cargando fecha…</span>
+            </div>
+          </div>
         </div>
+
+        <!-- Franja de alerta (bajo stock / sin conexión / todo en orden) -->
+        <div class="alert-content" id="alerta-banner" hidden></div>
       </section>
 
-      <!-- Grid de tarjetas con estadísticas principales -->
-      <section class="dashboard-card-grid">
-        <!-- Tarjeta: Total de productos en inventario (se carga dinámicamente) -->
-        <article class="card">
-          <h3>Productos en inventario</h3>
-          <p><!-- Los datos se cargan dinámicamente desde main.js --></p>
-          <a href="inventory.html">Ver inventario <img src="../assets/icons/right-arrow.png" alt="" class="arrow"></a>
+      <!-- KPIs principales del negocio -->
+      <section class="dashboard-card-grid" aria-label="Indicadores del día">
+
+        <article class="kpi kpi-verde" id="kpi-ingresos">
+          <div class="k-top">
+            <span class="k-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2v20M17 6.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 1.8 2.6 5 3.3 5 1.6 5 3.7-2.2 3-5 3-5-1.1-5-3">
+                </path>
+              </svg>
+            </span>
+            Ingresos de hoy
+          </div>
+          <p class="k-val skeleton">&nbsp;</p>
+          <p class="k-sub">&nbsp;</p>
+          <a class="k-link" href="caja.html#cierre">Ver cierre de caja <span aria-hidden="true">→</span></a>
         </article>
 
-        <!-- Tarjeta: Total de ventas recientes -->
-        <article class="card">
-          <h3>Ventas recientes</h3>
-          <p>$250.000</p>
-          <a href="orden.html">Ver ventas <img src="../assets/icons/right-arrow.png" alt="" class="arrow"></a>
+        <article class="kpi kpi-azul" id="kpi-pendientes">
+          <div class="k-top">
+            <span class="k-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M14.7 6.3a4.5 4.5 0 0 0-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 0 0 6-6L14 13l-3-3z"></path>
+              </svg>
+            </span>
+            Trabajos pendientes
+          </div>
+          <p class="k-val skeleton">&nbsp;</p>
+          <p class="k-sub">&nbsp;</p>
+          <a class="k-link" href="orden.html#pendiente">Ver pendientes <span aria-hidden="true">→</span></a>
         </article>
 
-        <!-- Tarjeta: Servicios activos (se carga dinámicamente) -->
-        <article class="card">
-          <h3>Servicios activos</h3>
-          <p><!-- Los datos se cargan dinámicamente desde main.js --></p>
-          <a href="service.html">Gestionar <img src="../assets/icons/right-arrow.png" alt="" class="arrow"></a>
+        <article class="kpi kpi-rojo" id="kpi-deudores">
+          <div class="k-top">
+            <span class="k-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="10" cy="8" r="3.5"></circle>
+                <path d="M3.5 20c.8-3.4 3.4-5 6.5-5 1.6 0 3 .4 4.2 1.2M17 8v4M17 15.5v.5"></path>
+              </svg>
+            </span>
+            Clientes deudores
+          </div>
+          <p class="k-val skeleton">&nbsp;</p>
+          <p class="k-sub">&nbsp;</p>
+          <a class="k-link" href="caja.html#deudores">Ver deudores <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="kpi kpi-amarillo" id="kpi-notas">
+          <div class="k-top">
+            <span class="k-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M6 3h9l4 4v14H6zM15 3v4h4M9 12h6M9 16h6"></path>
+              </svg>
+            </span>
+            Notas pendientes
+          </div>
+          <p class="k-val skeleton">&nbsp;</p>
+          <p class="k-sub">&nbsp;</p>
+          <a class="k-link" href="caja.html#notas">Ver notas <span aria-hidden="true">→</span></a>
         </article>
       </section>
 
-      <!-- Sección inferior con acciones rápidas y actividades recientes -->
+      <!-- Fila secundaria: inventario y catálogo de servicios -->
+      <section class="dashboard-sec-grid" aria-label="Inventario y servicios">
+        <article class="kpi kpi-sec" id="kpi-productos">
+          <div>
+            <div class="k-top">Productos en inventario</div>
+            <p class="k-val skeleton">&nbsp;</p>
+          </div>
+          <a class="k-link" href="inventory.html">Ver inventario <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="kpi kpi-sec" id="kpi-servicios">
+          <div>
+            <div class="k-top">Servicios en catálogo</div>
+            <p class="k-val skeleton">&nbsp;</p>
+          </div>
+          <a class="k-link" href="service.html">Gestionar <span aria-hidden="true">→</span></a>
+        </article>
+      </section>
+
+      <!-- Sección inferior: acciones rápidas y actividades recientes -->
       <section class="botton-actions">
-        <!-- Sección izquierda: Acciones rápidas -->
         <section class="quick-actions">
           <h3 class="title-h3">Acciones rápidas</h3>
           <ul class="list-action">
-            <!-- Botones de acciones principales -->
+            <li class="card-action card-action-primaria"><a href="orden.html"><span>+ Orden de servicio</span></a></li>
             <li class="card-action"><a href="service.html"><span>+ Nuevo servicio</span></a></li>
-            <li class="card-action" id="open-modal-btn"><a href="inventory.html?open=new-product"><span>+ Agregar
-                  producto</span></a></li>
-            <li class="card-action"><a href="orden.html"><span>+ Orden de servicio</span></a></li>
-            <li class="card-action"><a href="#" data-pending-feature="personal"><span>+ Registrar personal</span></a></li>
-            <li class="card-action"><a href="#" data-pending-feature="reportes"><span>Generar reporte</span></a></li>
+            <li class="card-action"><a href="inventory.html?open=new-product"><span>+ Agregar producto</span></a></li>
+            <li class="card-action"><a href="personal.html"><span>+ Registrar personal</span></a></li>
+            <li class="card-action"><a href="caja.html#reportes"><span>Ver Reportes</span></a></li>
           </ul>
         </section>
 
-        <!-- Sección derecha: Actividades recientes -->
         <section class="recent-activities">
           <h3 class="title-h3">Actividades recientes</h3>
-          <ul class="list-recent-activities">
-            <!-- Actividad 1: Servicio completado -->
-            <li class="item-recent-activities">
-              <img src="../assets/icons/checked.svg" alt="" class="checked">
+          <ul class="list-recent-activities" id="lista-actividades">
+            <!-- Se llena dinámicamente desde main.js con datos reales -->
+            <li class="item-recent-activities item-skeleton"><span class="dot skeleton"></span>
               <div class="item-recent-activities-text">
-                <p>Se completó el servicio de "Cambio de Frenos" para Juan Pérez.</p>
-                <time datetime="2025-11-03T12:00">Hace 2 horas</time>
+                <p class="skeleton">&nbsp;</p>
               </div>
             </li>
-
-            <!-- Actividad 2: Producto añadido al inventario -->
-            <li class="item-recent-activities">
-              <img src="../assets/icons/checked.svg" alt="" class="checked">
+            <li class="item-recent-activities item-skeleton"><span class="dot skeleton"></span>
               <div class="item-recent-activities-text">
-                <p>Se añadió "Aceite Sintético 5W-30" al inventario.</p>
-                <time datetime="2025-11-03T07:00">Hace 5 horas</time>
+                <p class="skeleton">&nbsp;</p>
               </div>
             </li>
-
-            <!-- Actividad 3: Nuevo servicio programado -->
-            <li class="item-recent-activities">
-              <img src="../assets/icons/checked.svg" alt="" class="checked">
+            <li class="item-recent-activities item-skeleton"><span class="dot skeleton"></span>
               <div class="item-recent-activities-text">
-                <p>Nuevo servicio programado para María López: "Revisión de motor".</p>
-                <time datetime="2025-11-02">Ayer</time>
+                <p class="skeleton">&nbsp;</p>
               </div>
             </li>
           </ul>
@@ -112,7 +169,7 @@
     </div>
   </div>
 
-  <!-- Script principal: maneja DOM y carga datos dinámicos desde data-manager.js -->
+  <!-- Script principal: maneja DOM y carga datos dinámicos -->
   <script type="module" src="../scripts/header-actions.js"></script>
   <script type="module" src="../scripts/main.js"></script>
 </body>

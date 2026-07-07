@@ -737,3 +737,29 @@
     }
   }
 }
+// ========================================
+// VALIDACIÓN DE CAMPOS (avisos de error)
+// Estas reglas existían solo en el CSS compilado;
+// se traen al SCSS para no perderlas al recompilar.
+// ========================================
+
+.error-message {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.temp-warning {
+  color: #ff9800;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}

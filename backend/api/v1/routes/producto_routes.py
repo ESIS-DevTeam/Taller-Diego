@@ -278,7 +278,11 @@ def update_producto(
     **Autenticación:**
     Requiere token JWT en header: `Authorization: Bearer <token>`
     """
-    producto = service.update_producto(id, data)
+    try:
+        producto = service.update_producto(id, data)
+    except ValueError as exc:
+        # Nombre duplicado u otra validación de negocio
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if not producto:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return producto

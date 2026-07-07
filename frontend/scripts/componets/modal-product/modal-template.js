@@ -2,10 +2,36 @@ import { fetchFromApi } from '../../data-manager.js';
 import { fetchFromImagen } from '../../utils/store/manager-image.js';
 import { CATEGORIAS_PRODUCTOS } from './constants.js';
 
-export function generateCategoryOptions(selectedCategory = '', disabled = false) {
-  return CATEGORIAS_PRODUCTOS.map(cat =>
+export function generateCategoryOptions(selectedCategory = '', disabled = false, categorias = CATEGORIAS_PRODUCTOS) {
+  return categorias.map(cat =>
     `<option value="${cat}" ${selectedCategory === cat ? 'selected' : ''} ${disabled ? 'disabled' : ''}>${cat}</option>`
   ).join('');
+}
+
+/**
+ * Une las categorías base con las que ya existen en los productos de la BD,
+ * para que una categoría creada con "Otra…" siga apareciendo en el select.
+ */
+async function obtenerCategoriasDisponibles(categoriaActual = '') {
+  const categorias = [...CATEGORIAS_PRODUCTOS];
+
+  try {
+    const productos = await fetchFromApi('productos');
+    for (const p of productos || []) {
+      if (p.categoria && !categorias.includes(p.categoria)) {
+        categorias.push(p.categoria);
+      }
+    }
+  } catch (e) {
+    // Sin conexión: se usa la lista base
+  }
+
+  // Asegurar que la categoría del producto en edición esté en la lista
+  if (categoriaActual && !categorias.includes(categoriaActual)) {
+    categorias.push(categoriaActual);
+  }
+
+  return categorias.sort((a, b) => a.localeCompare(b, 'es'));
 }
 
 export async function generateModalHTML(type = 'add', id = null) {
@@ -45,7 +71,8 @@ export async function generateModalHTML(type = 'add', id = null) {
     }
   }
 
-  const categoryOptions = generateCategoryOptions(data.categoria, isReadOnly);
+  const categoriasDisponibles = await obtenerCategoriasDisponibles(data.categoria);
+  const categoryOptions = generateCategoryOptions(data.categoria, isReadOnly, categoriasDisponibles);
   const isAutoparte = data.tipo === 'autoparte' || data.modelo || data.anio;
 
   return `
@@ -74,7 +101,13 @@ export async function generateModalHTML(type = 'add', id = null) {
                   <select id="product-category" name="product-category" ${required} ${disabled}>
                       <option value="" disabled ${!data.categoria ? 'selected' : ''}>Selecciona una categoría</option>
                       ${categoryOptions}
+                      ${!isReadOnly ? '<option value="__otra__">+ Otra categoría…</option>' : ''}
                   </select>
+              </div>
+              <div class="form-group" id="otra-categoria-group" hidden>
+                  <label for="product-category-other" class="form-label">Nueva categoría</label>
+                  <input maxlength="30" type="text" id="product-category-other" name="product-category-other"
+                         placeholder="Ej: Herramientas">
               </div>
               <div class="form-group">
                   <label for="product-stock" class="form-label">Stock</label>

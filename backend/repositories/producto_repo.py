@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from db.models import Producto
@@ -18,7 +19,8 @@ class ProductoRepository:
         return producto
 
     def get_all(self):
-        return self.db.query(Producto).all()
+        # Orden alfabético por nombre (requerimiento del cliente)
+        return self.db.query(Producto).order_by(func.lower(Producto.nombre).asc()).all()
     
     def get_by_id(self, id: int):
         return self.db.query(Producto).filter(Producto.id == id).first()
