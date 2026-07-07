@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from db.models import Venta, VentaProducto, Producto
 from domain.venta import Venta as DomainVenta
 from hexagonal.venta.ports.venta_driven_port import VentaRepository
+from core.cache import cache
 
 
 class SqlAlchemyVentaRepository(VentaRepository):
@@ -37,7 +38,10 @@ class SqlAlchemyVentaRepository(VentaRepository):
                 domain = DomainVenta(fecha=venta.fecha, productos=venta.productos)
                 domain.agregar_producto(vp)
                 producto.stock = producto.stock - cantidad
+                cache.delete(f'producto_{pid}')
             self.db.commit()
+            # El stock cambió: refrescar el caché de productos
+            cache.invalidate_pattern('productos')
             self.db.refresh(venta)
             return venta
         except Exception:

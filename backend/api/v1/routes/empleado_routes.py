@@ -56,8 +56,14 @@ def create_empleado(
     
     **Autenticación:**
     Requiere token JWT en header: `Authorization: Bearer <token>`
+
+    **Errores:**
+    - 400 Bad Request: Si ya existe un empleado con ese nombre
     """
-    return service.create_empleado(data)
+    try:
+        return service.create_empleado(data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=list[EmpleadoResponse], summary="Listar todos los empleados")
 def list_empleados(

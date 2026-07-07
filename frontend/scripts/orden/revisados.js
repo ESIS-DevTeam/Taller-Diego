@@ -4,7 +4,7 @@
  */
 import { escapeHtml } from '../utils/sanitize.js';
 import { showSuccess, showError, showWarning } from '../utils/notification.js';
-import { apiOrden, formatCLP, formatFecha, formatHora } from './format.js';
+import { apiOrden, formatCLP, formatFecha, formatHora, parseFecha } from './format.js';
 
 let ordenes = [];
 let filtroPlaca = '';
@@ -45,9 +45,9 @@ async function recargar() {
 }
 
 function esHoy(fecha) {
-  const d = new Date(fecha);
-  const hoy = new Date();
-  return d.toDateString() === hoy.toDateString();
+  const d = parseFecha(fecha);
+  if (!d) return false;
+  return d.toDateString() === new Date().toDateString();
 }
 
 function renderLista() {

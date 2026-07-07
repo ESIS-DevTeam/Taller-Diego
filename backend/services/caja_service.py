@@ -9,7 +9,30 @@ Fuentes de dinero del sistema:
 
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, time as dtime, timedelta, timezone
+
+
+def _rango_utc(desde: date, hasta: date) -> tuple[datetime, datetime]:
+    """Convierte un rango de días LOCALES [desde, hasta] al intervalo
+    UTC naive [inicio, fin) equivalente. Las fechas en la BD se guardan
+    en UTC; sin esta conversión los movimientos de la noche caerían en
+    el día siguiente del cierre de caja."""
+    tz_local = datetime.now().astimezone().tzinfo
+    inicio = (datetime.combine(desde, dtime.min).replace(tzinfo=tz_local)
+              .astimezone(timezone.utc).replace(tzinfo=None))
+    fin = (datetime.combine(hasta + timedelta(days=1), dtime.min)
+           .replace(tzinfo=tz_local).astimezone(timezone.utc)
+           .replace(tzinfo=None))
+    return inicio, fin
+
+
+def _a_fecha_local(valor: datetime | None) -> date | None:
+    """Convierte un datetime UTC naive de la BD a la fecha local."""
+    if valor is None:
+        return None
+    if valor.tzinfo is None:
+        valor = valor.replace(tzinfo=timezone.utc)
+    return valor.astimezone().date()
 
 from db.models.venta import Venta
 from db.models.venta_producto import VentaProducto
@@ -36,25 +59,25 @@ class CajaService:
     # =====================================================
 
     def _ventas_en_rango(self, desde: date, hasta: date):
-        """Ventas de productos en [desde, hasta] con su total calculado.
-        Devuelve lista de (fecha, total)."""
+        """Ventas de productos en los días locales [desde, hasta] con su
+        total calculado. Devuelve lista de (fecha, total)."""
+        inicio, fin = _rango_utc(desde, hasta)
         filas = (self.db.query(Venta.id, Venta.fecha,
                                func.coalesce(func.sum(
                                    VentaProducto.cantidad * Producto.precioVenta), 0))
                  .join(VentaProducto, VentaProducto.venta_id == Venta.id)
                  .join(Producto, Producto.id == VentaProducto.producto_id)
-                 .filter(func.date(Venta.fecha) >= desde,
-                         func.date(Venta.fecha) <= hasta)
+                 .filter(Venta.fecha >= inicio, Venta.fecha < fin)
                  .group_by(Venta.id, Venta.fecha)
                  .all())
         return [(f[1], int(f[2])) for f in filas]
 
     def _pagos_en_rango(self, desde: date, hasta: date):
-        """Cobros de órdenes de servicio en [desde, hasta].
+        """Cobros de órdenes de servicio en los días locales [desde, hasta].
         Devuelve lista de (fecha, monto, metodo)."""
+        inicio, fin = _rango_utc(desde, hasta)
         filas = (self.db.query(Pago.fecha, Pago.monto, Pago.metodo)
-                 .filter(func.date(Pago.fecha) >= desde,
-                         func.date(Pago.fecha) <= hasta)
+                 .filter(Pago.fecha >= inicio, Pago.fecha < fin)
                  .all())
         return [(f[0], int(f[1]), f[2]) for f in filas]
 
@@ -71,10 +94,12 @@ class CajaService:
         cobros_efectivo = sum(m for _, m, met in pagos if met == "efectivo")
         cobros_tarjeta = sum(m for _, m, met in pagos if met == "tarjeta")
 
-        # Egresos: notas pagadas ese día
+        # Egresos: notas pagadas ese día (día local convertido a rango UTC)
+        inicio, fin = _rango_utc(fecha, fecha)
         notas_pagadas = (self.db.query(NotaPago)
                          .filter(NotaPago.estado == "pagada",
-                                 func.date(NotaPago.fecha_pago) == fecha)
+                                 NotaPago.fecha_pago >= inicio,
+                                 NotaPago.fecha_pago < fin)
                          .all())
         compras = [n for n in notas_pagadas if n.tipo == "compra"]
         gastos = [n for n in notas_pagadas if n.tipo == "gasto"]
@@ -259,23 +284,37 @@ class CajaService:
         if (hasta - desde).days > 400:
             raise ValueError("El rango máximo del reporte es de 400 días")
 
+        # Una sola consulta por tabla para TODO el rango; los intervalos
+        # se agrupan en memoria (evita 2 consultas por bucket → lento
+        # contra una BD remota).
+        ventas = self._ventas_en_rango(desde, hasta)
+        pagos = self._pagos_en_rango(desde, hasta)
+        ventas_local = [(_a_fecha_local(f), t) for f, t in ventas]
+        pagos_local = [(_a_fecha_local(f), m, met) for f, m, met in pagos]
+
         puntos = []
         for inicio, fin, etiqueta in self._generar_buckets(desde, hasta, agrupar):
-            t = self._totales_en_rango(inicio, fin)
+            prod = sum(t for f, t in ventas_local if inicio <= f <= fin)
+            serv = sum(m for f, m, _ in pagos_local if inicio <= f <= fin)
+            trans = (sum(1 for f, _ in ventas_local if inicio <= f <= fin)
+                     + sum(1 for f, _, _ in pagos_local if inicio <= f <= fin))
             puntos.append({
                 "etiqueta": etiqueta,
                 "fecha_inicio": inicio,
-                "productos": t["productos"],
-                "servicios": t["servicios"],
-                "total": t["productos"] + t["servicios"],
-                "transacciones": t["transacciones"],
+                "productos": prod,
+                "servicios": serv,
+                "total": prod + serv,
+                "transacciones": trans,
             })
 
         total_prod = sum(p["productos"] for p in puntos)
         total_serv = sum(p["servicios"] for p in puntos)
         total_gral = total_prod + total_serv
         total_trans = sum(p["transacciones"] for p in puntos)
-        totales = self._totales_en_rango(desde, hasta)
+        totales = {
+            "efectivo": sum(m for _, m, met in pagos_local if met == "efectivo"),
+            "tarjeta": sum(m for _, m, met in pagos_local if met == "tarjeta"),
+        }
 
         # ------ Resumen en lenguaje simple para el cliente ------
         mejor = max(puntos, key=lambda p: p["total"], default=None)
@@ -345,7 +384,8 @@ class CajaService:
             vencimiento = None
             estado = "pendiente"
             if o.fecha_entrega:
-                vencimiento = (o.fecha_entrega + timedelta(days=PLAZO_DEUDA_DIAS)).date()
+                entrega_local = _a_fecha_local(o.fecha_entrega)
+                vencimiento = entrega_local + timedelta(days=PLAZO_DEUDA_DIAS)
                 if vencimiento < hoy:
                     estado = "vencida"
             cliente = o.vehiculo.cliente if o.vehiculo else None

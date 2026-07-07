@@ -29,13 +29,37 @@ export function formatCLP(value) {
 }
 
 /**
+ * Convierte una fecha del backend a Date local correctamente:
+ * - "2026-07-06T21:30:00" (datetime UTC sin 'Z') → se interpreta como UTC.
+ * - "2026-07-06" (solo fecha) → se interpreta como día local (no se corre un día).
+ * @param {string|Date} value
+ * @returns {Date|null}
+ */
+export function parseFecha(value) {
+  if (!value) return null;
+  if (value instanceof Date) return isNaN(value) ? null : value;
+  const s = String(value);
+  // Solo fecha (YYYY-MM-DD): construir como fecha LOCAL
+  const soloFecha = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (soloFecha) {
+    return new Date(+soloFecha[1], +soloFecha[2] - 1, +soloFecha[3]);
+  }
+  // Datetime sin zona horaria: el backend guarda en UTC → añadir 'Z'
+  let iso = s;
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}/.test(s) && !/(Z|[+-]\d{2}:?\d{2})$/.test(s)) {
+    iso = `${s}Z`;
+  }
+  const d = new Date(iso);
+  return isNaN(d) ? null : d;
+}
+
+/**
  * Formatea fecha corta: "05/07/2026"
  * @param {string|Date} value
  */
 export function formatFecha(value) {
-  if (!value) return '—';
-  const d = new Date(value);
-  if (isNaN(d)) return '—';
+  const d = parseFecha(value);
+  if (!d) return '—';
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
@@ -44,9 +68,8 @@ export function formatFecha(value) {
  * @param {string|Date} value
  */
 export function formatHora(value) {
-  if (!value) return '—';
-  const d = new Date(value);
-  if (isNaN(d)) return '—';
+  const d = parseFecha(value);
+  if (!d) return '—';
   return `${d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false })} hrs`;
 }
 

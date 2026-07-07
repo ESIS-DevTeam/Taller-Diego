@@ -6,6 +6,15 @@ from db.models.cliente import Cliente
 from db.models.vehiculo import Vehiculo
 from db.models.pago import Pago
 from db.models.producto import Producto
+from core.cache import cache
+
+
+def _invalidar_cache_productos(producto_id: int | None = None) -> None:
+    """El stock cambió: invalida el caché de productos para que el
+    inventario refleje el valor real de inmediato."""
+    if producto_id is not None:
+        cache.delete(f'producto_{producto_id}')
+    cache.invalidate_pattern('productos')
 
 
 class OrdenTrabajoRepository:
@@ -187,6 +196,7 @@ class OrdenTrabajoRepository:
                 precio_unitario=producto.precioVenta,
             ))
             self.db.commit()
+            _invalidar_cache_productos(producto_id)
             return self.get_by_id(orden.id)
         except Exception:
             self.db.rollback()
@@ -223,6 +233,7 @@ class OrdenTrabajoRepository:
                 producto.stock += item.cantidad
             self.db.delete(item)
             self.db.commit()
+            _invalidar_cache_productos(item.producto_id)
             return self.get_by_id(orden.id)
         except Exception:
             self.db.rollback()
@@ -239,6 +250,7 @@ class OrdenTrabajoRepository:
                         .with_for_update().first())
             if producto:
                 producto.stock += item.cantidad
+                _invalidar_cache_productos(item.producto_id)
 
     def save(self, orden: OrdenTrabajo) -> OrdenTrabajo:
         try:
