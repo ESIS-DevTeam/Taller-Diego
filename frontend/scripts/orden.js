@@ -37,8 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mostrar el sidebar secundario por defecto al cargar la página
   showOrdenSidebar();
 
-  // Cargar recepción de servicios por defecto (módulo ORDEN)
-  loadSection('servicios');
+  // Deep-link desde el dashboard: orden.html#pendiente abre esa sección directo
+  const seccionesValidas = ['servicios', 'historial-servicios', 'pendiente', 'revisado', 'venta-producto'];
+  const hash = window.location.hash.replace('#', '');
+  const seccionInicial = seccionesValidas.includes(hash) ? hash : 'servicios';
+  document.querySelectorAll('.orden-sidebar-menu a').forEach(link => {
+    link.classList.toggle('active', link.dataset.section === seccionInicial);
+  });
+  loadSection(seccionInicial);
   barcodeReader();
 });
 
