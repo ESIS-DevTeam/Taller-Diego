@@ -289,6 +289,7 @@ export function setupModalEvents(type = 'add', productId = null) {
   setupTextInputValidation(); // Nueva función para validar texto en tiempo real
   setupCloseHandlers(modalOverlay, btnCancel, btnClose);
   setupAutopartToggle(autopartCheckbox);
+  setupCategoryOther();
   setupPreviewImage('product-img', 'product-preview');
 
   // Configurar código de barras si existe (solo en modo view/edit)
@@ -300,6 +301,20 @@ export function setupModalEvents(type = 'add', productId = null) {
   if (type !== 'view') {
     setupFormSubmit(form, autopartCheckbox, type, productId);
   }
+}
+
+/**
+ * Muestra u oculta el cuadro "Nueva categoría" cuando el usuario
+ * elige "+ Otra categoría…" en el select.
+ */
+function setupCategoryOther() {
+  const select = document.getElementById('product-category');
+  const group = document.getElementById('otra-categoria-group');
+  if (!select || !group) return;
+
+  const toggle = () => { group.hidden = select.value !== '__otra__'; };
+  toggle();
+  select.addEventListener('change', toggle);
 }
 
 function setupAutopartToggle(autopartCheckbox) {
@@ -375,10 +390,21 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       return;
     }
 
+    // Si eligió "+ Otra categoría…", tomar el valor del cuadro de texto
+    let categoriaFinal = rawCategoria;
+    if (rawCategoria === '__otra__') {
+      categoriaFinal = form['product-category-other']?.value || '';
+      if (!sanitizeText(categoriaFinal)) {
+        showFieldError(form['product-category-other'], 'Escribe el nombre de la nueva categoría');
+        showNotification('Escribe el nombre de la nueva categoría', 'error');
+        return;
+      }
+    }
+
     let formData = {
       nombre: sanitizeText(rawNombre),
       marca: sanitizeText(rawMarca),
-      categoria: sanitizeText(rawCategoria),
+      categoria: sanitizeText(categoriaFinal),
       stock: parseInt(form['product-stock'].value, 10) || 0,
       stockMin: parseInt(form['product-min-stock'].value, 10) || 0,
       precioCompra: parseFloat(form['product-purchase-price'].value) || 0,
@@ -425,6 +451,27 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       return; // Detener el envío si hay errores de validación
     }
 
+    // ========================================
+    // VALIDACIÓN DE NOMBRE DUPLICADO (sin distinguir mayúsculas)
+    // Aviso inmediato; el backend valida de nuevo como respaldo.
+    // ========================================
+    try {
+      const productosExistentes = await fetchFromApi('productos');
+      const nombreNuevo = formData.nombre.toLowerCase();
+      const duplicado = (productosExistentes || []).find(p =>
+        (p.nombre || '').trim().toLowerCase() === nombreNuevo &&
+        (!isEdit || p.id !== Number(productId))
+      );
+      if (duplicado) {
+        showNotification('Ya existe un producto con ese nombre en el inventario', 'error');
+        showFieldError(form['product-name'], 'Ya existe un producto con este nombre en el inventario');
+        form['product-name'].focus();
+        return;
+      }
+    } catch (e) {
+      // Sin conexión: el backend hará la validación final
+    }
+
     // El año ya está validado como string (soporta rangos: "2018-2023" o listas: "2018, 2020")
     // No convertir a número, mantener como string
 
@@ -465,7 +512,13 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
       await renderProducts(null, true);
 
     } catch (error) {
-      showNotification("Error al crear producto: " + error.message, "error");
+      const detalle = error?.detail || error?.message || 'Error desconocido';
+      // Si el backend rechazó por nombre duplicado, marcar el campo
+      if (/ya existe/i.test(detalle)) {
+        showFieldError(form['product-name'], 'Ya existe un producto con este nombre en el inventario');
+        form['product-name'].focus();
+      }
+      showNotification(`Error al ${isEdit ? 'actualizar' : 'crear'} producto: ${detalle}`, 'error');
     }
   });
 }

@@ -5,6 +5,9 @@
 
 import { showNotification } from "./notification.js";
 
+const isDevelopment = typeof window !== "undefined"
+  && ["localhost", "127.0.0.1"].includes(window.location.hostname);
+
 /**
  * 
  * @param {Error} error - error lanzado por la api o el sistema 
@@ -18,7 +21,7 @@ export function handleApiError(error, context = {}) {
   const isGraveError = error.status >= 500 || error.message?.includes("Failed to fetch");
   
   // Log básico del error (solo en desarrollo si es necesario)
-  if (process.env.NODE_ENV === 'development') {
+  if (isDevelopment) {
     console.error("Error capturado:", {
       error: error.message,
       status: error.status,
@@ -30,7 +33,7 @@ export function handleApiError(error, context = {}) {
 
   if(isGraveError) {
     // Log detallado para errores graves (solo en desarrollo)
-    if (process.env.NODE_ENV === 'development') {
+    if (isDevelopment) {
       console.error("Stack trace:", error.stack);
       console.error("Detalles completos:", {
         error,

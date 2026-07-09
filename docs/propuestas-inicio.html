@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inicio · Propuestas de rediseño — Taller de Diego</title>
+<style>
+  /* ============ tokens del documento (chrome de la página, no del mockup) ============ */
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --ink: #1c2733;
+    --ink-soft: #5b6a79;
+    --line: #d9e0e7;
+    --accent: #0d9668;
+    --accent-ink: #0a7a55;
+    --chip-bg: #e3ece8;
+    --shadow: 0 10px 30px rgba(28, 39, 51, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141a21;
+      --surface: #1d2530;
+      --ink: #e8edf2;
+      --ink-soft: #98a6b3;
+      --line: #303b48;
+      --accent: #2fb98a;
+      --accent-ink: #4ecfa2;
+      --chip-bg: #24313a;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #eef1f4; --surface: #ffffff; --ink: #1c2733; --ink-soft: #5b6a79;
+    --line: #d9e0e7; --accent: #0d9668; --accent-ink: #0a7a55; --chip-bg: #e3ece8;
+    --shadow: 0 10px 30px rgba(28, 39, 51, .10);
+  }
+  :root[data-theme="dark"] {
+    --bg: #141a21; --surface: #1d2530; --ink: #e8edf2; --ink-soft: #98a6b3;
+    --line: #303b48; --accent: #2fb98a; --accent-ink: #4ecfa2; --chip-bg: #24313a;
+    --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Istok Web", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ============ cabecera del documento ============ */
+  .doc-head { margin-bottom: 28px; }
+  .doc-head .eyebrow {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent-ink); font-weight: 700; margin: 0 0 6px;
+  }
+  .doc-head h1 {
+    margin: 0 0 10px; font-size: clamp(26px, 4vw, 34px); line-height: 1.15;
+    text-wrap: balance; font-weight: 800;
+  }
+  .doc-head p { margin: 0; max-width: 62ch; color: var(--ink-soft); }
+
+  /* ============ selector de propuestas ============ */
+  .tabs {
+    display: flex; gap: 8px; margin: 26px 0 18px; flex-wrap: wrap;
+  }
+  .tab {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 999px; padding: 10px 18px; font: inherit; font-weight: 700;
+    font-size: 14px; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .tab:hover { border-color: var(--accent); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab small { font-weight: 400; opacity: .85; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel-note {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 20px; margin: 0 0 18px; display: grid; gap: 6px;
+  }
+  .panel-note strong { font-size: 15px; }
+  .panel-note ul { margin: 4px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: 14px; }
+  .panel-note li { margin: 2px 0; }
+  .panel-note li::marker { color: var(--accent); }
+
+  /* ============ marco del mockup ============ */
+  .frame {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 14px; overflow-x: auto;
+  }
+  .frame-bar {
+    display: flex; align-items: center; gap: 6px; padding: 0 4px 12px;
+  }
+  .frame-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
+  .frame-bar span { margin-left: 10px; font-size: 12px; color: var(--ink-soft); }
+
+  /* ============ base común del mockup de la app (siempre claro: es la app) ============ */
+  .app {
+    min-width: 940px; border-radius: 10px; overflow: hidden;
+    font-family: "Istok Web", "Segoe UI", system-ui, sans-serif;
+    display: grid; grid-template-columns: 88px 1fr; grid-template-rows: 56px 1fr;
+    grid-template-areas: "side head" "side main";
+    border: 1px solid #dde3ea;
+    color: #1a242f;
+  }
+  .app .head {
+    grid-area: head; background: #fff; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #e5eaf0;
+  }
+  .app .head .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; letter-spacing: .5px; }
+  .app .head .brand i {
+    width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+    color: #fff; font-style: normal; font-size: 13px; font-weight: 800;
+  }
+  .app .head .out { font-size: 12px; color: #7f8c8d; display: flex; align-items: center; gap: 6px; }
+  .app .side { grid-area: side; padding: 14px 0; display: flex; flex-direction: column; gap: 2px; }
+  .app .side a {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 4px; color: #c7d2dc; font-size: 10.5px; text-decoration: none; font-weight: 600;
+  }
+  .app .side svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .app .main { grid-area: main; padding: 22px 26px; overflow: hidden; }
+
+  .app h2 { margin: 0; font-size: 20px; font-weight: 800; }
+  .app .fecha { font-size: 12.5px; color: #7f8c8d; margin-top: 2px; }
+
+  /* banner de alerta compartido */
+  .banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    border-radius: 10px; padding: 11px 16px; margin: 16px 0 18px; font-size: 13.5px; font-weight: 700;
+  }
+  .banner .b-btn {
+    background: #fff; border-radius: 7px; padding: 6px 14px; font-size: 12.5px;
+    font-weight: 800; white-space: nowrap;
+  }
+
+  /* tarjetas KPI compartidas */
+  .kpis { display: grid; gap: 12px; }
+  .kpi {
+    background: #fff; border: 1px solid #e5eaf0; border-radius: 12px; padding: 13px 15px;
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+  .kpi .k-top { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 1px; font-weight: 700; color: #7f8c8d; text-transform: uppercase; }
+  .kpi .k-top i { width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; }
+  .kpi .k-val { font-size: 24px; font-weight: 800; color: #1a242f; font-variant-numeric: tabular-nums; }
+  .kpi .k-sub { font-size: 11.5px; color: #7f8c8d; }
+  .kpi .k-link { font-size: 12px; font-weight: 700; text-decoration: none; margin-top: 6px; }
+  .chip {
+    display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 10.5px; font-weight: 700;
+  }
+
+  /* acciones rápidas compartidas */
+  .acciones h3, .lista-lateral h3 {
+    font-size: 13px; font-weight: 800; margin: 0 0 10px; padding-bottom: 7px; border-bottom: 2px solid #e5eaf0;
+  }
+  .btn-acc {
+    border-radius: 8px; padding: 11px 15px; color: #fff; font-size: 12.5px; font-weight: 700;
+    display: flex; align-items: center; white-space: nowrap;
+  }
+  .item-act { display: flex; gap: 9px; font-size: 12.5px; align-items: flex-start; }
+  .item-act .dot { width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; color: #fff; font-size: 10px; font-weight: 800; margin-top: 1px; }
+  .item-act p { margin: 0; color: #374151; font-weight: 600; line-height: 1.45; }
+  .item-act time { font-size: 10.5px; color: #9ca3af; }
+
+  /* ============ PROPUESTA A — teal, panel completo ============ */
+  .app-a { background: #f1f5f9; }
+  .app-a .side { background: #16283c; }
+  .app-a .side a.on { color: #fff; border-left: 3px solid #10b981; background: rgba(16,185,129,.12); }
+  .app-a .head .brand i { background: #0d9668; }
+  .app-a .banner { background: #8b2727; color: #fff; }
+  .app-a .banner .b-btn { color: #8b2727; }
+  .app-a .kpis { grid-template-columns: repeat(4, 1fr); }
+  .app-a .kpi-verde i { background: #d1fae5; } .app-a .kpi-azul i { background: #dbeafe; }
+  .app-a .kpi-rojo i { background: #fee2e2; } .app-a .kpi-amarillo i { background: #fef3c7; }
+  .app-a .kpi-verde .k-val { color: #0d9668; }
+  .app-a .kpi-rojo .k-val { color: #c0392b; }
+  .app-a .chip-vencida { background: #fee2e2; color: #c0392b; }
+  .app-a .kpis-sec { grid-template-columns: repeat(2, 1fr); margin-top: 12px; }
+  .app-a .kpis-sec .kpi { flex-direction: row; align-items: center; justify-content: space-between; }
+  .app-a .kpis-sec .k-val { font-size: 19px; }
+  .app-a .k-link { color: #0d9668; }
+  .app-a .bajo { display: grid; grid-template-columns: 38% 1fr; gap: 22px; margin-top: 20px; }
+  .app-a .btn-acc { background: #16283c; margin-bottom: 8px; }
+  .app-a .btn-acc.primario { background: #0d9668; }
+  .app-a .item-act { margin-bottom: 11px; }
+  .app-a .dot-ok { background: #10b981; } .app-a .dot-pago { background: #3d6fb5; } .app-a .dot-nuevo { background: #f9a825; }
+
+  /* ============ PROPUESTA B — teal, sin actividades, foco en atención ============ */
+  .app-b { background: #f1f5f9; }
+  .app-b .side { background: #16283c; }
+  .app-b .side a.on { color: #fff; border-left: 3px solid #10b981; background: rgba(16,185,129,.12); }
+  .app-b .head .brand i { background: #0d9668; }
+  .app-b .kpis { grid-template-columns: repeat(4, 1fr); margin-top: 18px; }
+  .app-b .kpi { padding: 16px 17px; }
+  .app-b .kpi .k-val { font-size: 28px; }
+  .app-b .kpi-verde i { background: #d1fae5; } .app-b .kpi-azul i { background: #dbeafe; }
+  .app-b .kpi-rojo i { background: #fee2e2; } .app-b .kpi-amarillo i { background: #fef3c7; }
+  .app-b .kpi-verde .k-val { color: #0d9668; }
+  .app-b .kpi-rojo .k-val { color: #c0392b; }
+  .app-b .k-link { color: #0d9668; }
+  .app-b .bajo { display: grid; grid-template-columns: 1fr 42%; gap: 22px; margin-top: 20px; }
+  .app-b .atencion { background: #fff; border: 1px solid #e5eaf0; border-radius: 12px; padding: 15px 17px; }
+  .app-b .atencion h3 { border-bottom: 2px solid #e5eaf0; }
+  .app-b .fila-at { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid #f0f3f6; font-size: 12.5px; }
+  .app-b .fila-at:last-child { border-bottom: none; }
+  .app-b .fila-at p { margin: 0; font-weight: 600; color: #374151; }
+  .app-b .fila-at .chip { flex-shrink: 0; }
+  .app-b .chip-critico { background: #fee2e2; color: #c0392b; }
+  .app-b .chip-aviso { background: #fef3c7; color: #9a6b00; }
+  .app-b .chip-info { background: #dbeafe; color: #1e50a0; }
+  .app-b .fila-at a { color: #0d9668; font-weight: 800; font-size: 12px; text-decoration: none; white-space: nowrap; }
+  .app-b .acciones-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+  .app-b .btn-acc { background: #16283c; }
+  .app-b .btn-acc.primario { background: #0d9668; }
+
+  /* ============ PROPUESTA C — azul unificado ============ */
+  .app-c { background: #d8e8f5; }
+  .app-c .side { background: #1e3a5f; }
+  .app-c .side a.on { color: #fff; border-left: 3px solid #7db3e8; background: rgba(125,179,232,.15); }
+  .app-c .head .brand i { background: #1e3a5f; }
+  .app-c .banner { background: #8b2727; color: #fff; }
+  .app-c .banner .b-btn { color: #8b2727; }
+  .app-c .kpis { grid-template-columns: repeat(4, 1fr); }
+  .app-c .kpi { border-color: #d3e2ef; }
+  .app-c .kpi i { background: #dbeafe; }
+  .app-c .kpi-verde .k-val { color: #1d4ed8; }
+  .app-c .kpi-rojo .k-val { color: #c0392b; }
+  .app-c .chip-vencida { background: #fee2e2; color: #c0392b; }
+  .app-c .k-link { color: #1d4ed8; }
+  .app-c .kpis-sec { grid-template-columns: repeat(2, 1fr); margin-top: 12px; }
+  .app-c .kpis-sec .kpi { flex-direction: row; align-items: center; justify-content: space-between; }
+  .app-c .kpis-sec .k-val { font-size: 19px; }
+  .app-c .bajo { display: grid; grid-template-columns: 38% 1fr; gap: 22px; margin-top: 20px; }
+  .app-c .btn-acc { background: #1e3a5f; margin-bottom: 8px; }
+  .app-c .item-act { margin-bottom: 11px; }
+  .app-c .dot-ok { background: #1d4ed8; } .app-c .dot-pago { background: #3d6fb5; } .app-c .dot-nuevo { background: #f9a825; }
+
+  /* ============ tabla comparativa ============ */
+  .compara { margin-top: 40px; }
+  .compara h2 { font-size: 20px; margin: 0 0 12px; }
+  .tabla-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-soft); }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { font-weight: 700; }
+  .si { color: var(--accent-ink); font-weight: 700; }
+  .no { color: var(--ink-soft); }
+
+  .cierre {
+    margin-top: 28px; background: var(--chip-bg); border-radius: 12px; padding: 18px 22px;
+    font-size: 14.5px; color: var(--ink);
+  }
+  .cierre strong { color: var(--accent-ink); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="doc-head">
+    <p class="eyebrow">Taller de Diego · Módulo Inicio</p>
+    <h1>Tres propuestas para el panel de inicio</h1>
+    <p>Todas usan <strong>datos reales que el backend ya puede entregar hoy</strong> (ingresos del día, trabajos pendientes, deudores, notas de pago, bajo stock). Los números que ves son de ejemplo con formato chileno (CLP). Cambia de pestaña para comparar.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-panel="pa">Propuesta A <small>· Panel completo</small></button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="pb">Propuesta B <small>· Sin actividades</small></button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="pc">Propuesta C <small>· Azul unificado</small></button>
+  </div>
+
+  <!-- ==================== PROPUESTA A ==================== -->
+  <section class="panel active" id="pa">
+    <div class="panel-note">
+      <strong>A · Panel completo — paleta teal del sistema (la que ya usan Orden, Personal y Caja)</strong>
+      <ul>
+        <li>4 KPIs de negocio arriba: ingresos de hoy, trabajos pendientes, deudores con monto, notas por vencer.</li>
+        <li>Inventario y servicios se conservan, pero pasan a una fila secundaria más compacta.</li>
+        <li><b>Actividades recientes se queda</b>, con datos reales: últimas órdenes y pagos desde la API.</li>
+        <li>"Registrar personal" y "Generar reporte" ahora sí llevan a Personal y Caja.</li>
+      </ul>
+    </div>
+    <div class="frame">
+      <div class="frame-bar"><i></i><i></i><i></i><span>Inicio — Propuesta A</span></div>
+      <div class="app app-a">
+        <div class="side">
+          <a class="on" href="#pa"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</a>
+          <a href="#pa"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Inventario</a>
+          <a href="#pa"><svg viewBox="0 0 24 24"><path d="M4 8h16v11H4zM9 8V5h6v3M4 12h16"/></svg>Servicios</a>
+          <a href="#pa"><svg viewBox="0 0 24 24"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg>Orden</a>
+          <a href="#pa"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-5.5 7-5.5s6 1.5 7 5.5"/></svg>Personal</a>
+          <a href="#pa"><svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>Caja</a>
+        </div>
+        <div class="head">
+          <div class="brand"><i>T</i>TALLER DE DIEGO</div>
+          <div class="out">martes 7 de julio · Salir ⏻</div>
+        </div>
+        <div class="main">
+          <h2>¡Bienvenido Diego!</h2>
+          <div class="fecha">Resumen de hoy, martes 7 de julio de 2026</div>
+
+          <div class="banner">¡Hay 5 productos por agotarse!<span class="b-btn">Ver productos</span></div>
+
+          <div class="kpis">
+            <div class="kpi kpi-verde">
+              <div class="k-top"><i></i>Ingresos de hoy</div>
+              <div class="k-val">$184.000</div>
+              <div class="k-sub">3 pagos recibidos</div>
+              <a class="k-link" href="#pa">Ver cierre de caja →</a>
+            </div>
+            <div class="kpi kpi-azul">
+              <div class="k-top"><i></i>Trabajos pendientes</div>
+              <div class="k-val">4</div>
+              <div class="k-sub">2 esperan revisión</div>
+              <a class="k-link" href="#pa">Ver pendientes →</a>
+            </div>
+            <div class="kpi kpi-rojo">
+              <div class="k-top"><i></i>Clientes deudores</div>
+              <div class="k-val">$325.000</div>
+              <div class="k-sub">3 clientes con deuda</div>
+              <a class="k-link" href="#pa">Ver deudores →</a>
+            </div>
+            <div class="kpi kpi-amarillo">
+              <div class="k-top"><i></i>Notas por vencer</div>
+              <div class="k-val">2 <span class="chip chip-vencida">1 vencida</span></div>
+              <div class="k-sub">próximos 7 días</div>
+              <a class="k-link" href="#pa">Ver notas →</a>
+            </div>
+          </div>
+
+          <div class="kpis kpis-sec">
+            <div class="kpi">
+              <div>
+                <div class="k-top">Productos en inventario</div>
+                <div class="k-val">180</div>
+              </div>
+              <a class="k-link" href="#pa">Ver inventario →</a>
+            </div>
+            <div class="kpi">
+              <div>
+                <div class="k-top">Servicios en catálogo</div>
+                <div class="k-val">12</div>
+              </div>
+              <a class="k-link" href="#pa">Gestionar →</a>
+            </div>
+          </div>
+
+          <div class="bajo">
+            <div class="acciones">
+              <h3>Acciones rápidas</h3>
+              <div class="btn-acc primario">+ Orden de servicio</div>
+              <div class="btn-acc">+ Nuevo servicio</div>
+              <div class="btn-acc">+ Agregar producto</div>
+              <div class="btn-acc">+ Registrar personal</div>
+              <div class="btn-acc">Generar reporte</div>
+            </div>
+            <div class="lista-lateral">
+              <h3>Actividades recientes <span style="font-weight:400;font-size:11px;color:#9ca3af">(datos reales de la API)</span></h3>
+              <div class="item-act"><span class="dot dot-ok">✓</span><div><p>Orden PF1-2026-0038 entregada — Toyota Yaris · GJKL-82</p><time>Hoy, 11:40</time></div></div>
+              <div class="item-act"><span class="dot dot-pago">$</span><div><p>Pago recibido $95.000 (efectivo) — orden PF1-2026-0036</p><time>Hoy, 10:15</time></div></div>
+              <div class="item-act"><span class="dot dot-nuevo">+</span><div><p>Nueva recepción — Chevrolet Sail · HXTR-34, diagnóstico de frenos</p><time>Hoy, 09:02</time></div></div>
+              <div class="item-act"><span class="dot dot-ok">✓</span><div><p>Orden PF1-2026-0035 pasó a "Revisado" — mecánico Carlos M.</p><time>Ayer, 18:20</time></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROPUESTA B ==================== -->
+  <section class="panel" id="pb">
+    <div class="panel-note">
+      <strong>B · Solo lo esencial — sin actividades; en su lugar, una lista de "Requiere atención hoy"</strong>
+      <ul>
+        <li>KPIs más grandes y protagonistas; el bajo stock deja de ser banner y entra a la lista de atención.</li>
+        <li><b>Actividades recientes se elimina</b>: se reemplaza por avisos accionables (qué hacer, no qué pasó).</li>
+        <li>Cada aviso tiene severidad (crítico / aviso / info) y un enlace directo para resolverlo.</li>
+        <li>Es la opción más "de dueño de negocio": todo lo que aparece pide una acción.</li>
+      </ul>
+    </div>
+    <div class="frame">
+      <div class="frame-bar"><i></i><i></i><i></i><span>Inicio — Propuesta B</span></div>
+      <div class="app app-b">
+        <div class="side">
+          <a class="on" href="#pb"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</a>
+          <a href="#pb"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Inventario</a>
+          <a href="#pb"><svg viewBox="0 0 24 24"><path d="M4 8h16v11H4zM9 8V5h6v3M4 12h16"/></svg>Servicios</a>
+          <a href="#pb"><svg viewBox="0 0 24 24"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg>Orden</a>
+          <a href="#pb"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-5.5 7-5.5s6 1.5 7 5.5"/></svg>Personal</a>
+          <a href="#pb"><svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>Caja</a>
+        </div>
+        <div class="head">
+          <div class="brand"><i>T</i>TALLER DE DIEGO</div>
+          <div class="out">martes 7 de julio · Salir ⏻</div>
+        </div>
+        <div class="main">
+          <h2>¡Bienvenido Diego!</h2>
+          <div class="fecha">Resumen de hoy, martes 7 de julio de 2026</div>
+
+          <div class="kpis">
+            <div class="kpi kpi-verde">
+              <div class="k-top"><i></i>Ingresos de hoy</div>
+              <div class="k-val">$184.000</div>
+              <div class="k-sub">3 pagos recibidos</div>
+              <a class="k-link" href="#pb">Cierre de caja →</a>
+            </div>
+            <div class="kpi kpi-azul">
+              <div class="k-top"><i></i>Trabajos pendientes</div>
+              <div class="k-val">4</div>
+              <div class="k-sub">2 esperan revisión</div>
+              <a class="k-link" href="#pb">Ver pendientes →</a>
+            </div>
+            <div class="kpi kpi-rojo">
+              <div class="k-top"><i></i>Deuda por cobrar</div>
+              <div class="k-val">$325.000</div>
+              <div class="k-sub">3 clientes</div>
+              <a class="k-link" href="#pb">Ver deudores →</a>
+            </div>
+            <div class="kpi kpi-amarillo">
+              <div class="k-top"><i></i>Inventario</div>
+              <div class="k-val">180</div>
+              <div class="k-sub">12 servicios en catálogo</div>
+              <a class="k-link" href="#pb">Ver inventario →</a>
+            </div>
+          </div>
+
+          <div class="bajo">
+            <div class="atencion">
+              <h3>Requiere atención hoy</h3>
+              <div class="fila-at"><p>5 productos por agotarse (stock bajo el mínimo)</p><span class="chip chip-critico">Crítico</span><a href="#pb">Resolver →</a></div>
+              <div class="fila-at"><p>Nota de pago "Repuestos González" venció ayer — $60.000</p><span class="chip chip-critico">Vencida</span><a href="#pb">Pagar →</a></div>
+              <div class="fila-at"><p>Juan Contreras debe $120.000 hace 9 días (Nissan V16 · KDXB-21)</p><span class="chip chip-aviso">Deuda</span><a href="#pb">Cobrar →</a></div>
+              <div class="fila-at"><p>Nota "Arriendo local julio" vence en 3 días — $250.000</p><span class="chip chip-aviso">Por vencer</span><a href="#pb">Ver nota →</a></div>
+              <div class="fila-at"><p>2 órdenes llevan más de 5 días en "Pendiente"</p><span class="chip chip-info">Revisar</span><a href="#pb">Ver órdenes →</a></div>
+            </div>
+            <div class="acciones">
+              <h3>Acciones rápidas</h3>
+              <div class="acciones-grid">
+                <div class="btn-acc primario">+ Orden de servicio</div>
+                <div class="btn-acc">+ Nuevo servicio</div>
+                <div class="btn-acc">+ Agregar producto</div>
+                <div class="btn-acc">+ Registrar personal</div>
+                <div class="btn-acc">+ Nota de pago</div>
+                <div class="btn-acc">Generar reporte</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROPUESTA C ==================== -->
+  <section class="panel" id="pc">
+    <div class="panel-note">
+      <strong>C · Azul unificado — conserva la identidad azul actual, pero con un solo sistema de color</strong>
+      <ul>
+        <li>Misma información que la Propuesta A (KPIs de negocio + fila secundaria).</li>
+        <li>Los 4 azules distintos de hoy se unifican: fondo #D8E8F5, sidebar/botones #1E3A5F, enlaces #1D4ED8.</li>
+        <li><b>Actividades recientes se queda</b> en versión compacta con datos reales.</li>
+        <li>Contra: quedaría distinta a Orden/Personal/Caja, que ya usan la paleta teal — el sistema se vería partido en dos.</li>
+      </ul>
+    </div>
+    <div class="frame">
+      <div class="frame-bar"><i></i><i></i><i></i><span>Inicio — Propuesta C</span></div>
+      <div class="app app-c">
+        <div class="side">
+          <a class="on" href="#pc"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</a>
+          <a href="#pc"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Inventario</a>
+          <a href="#pc"><svg viewBox="0 0 24 24"><path d="M4 8h16v11H4zM9 8V5h6v3M4 12h16"/></svg>Servicios</a>
+          <a href="#pc"><svg viewBox="0 0 24 24"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg>Orden</a>
+          <a href="#pc"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-5.5 7-5.5s6 1.5 7 5.5"/></svg>Personal</a>
+          <a href="#pc"><svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>Caja</a>
+        </div>
+        <div class="head">
+          <div class="brand"><i>T</i>TALLER DE DIEGO</div>
+          <div class="out">martes 7 de julio · Salir ⏻</div>
+        </div>
+        <div class="main">
+          <h2>¡Bienvenido Diego!</h2>
+          <div class="fecha">Resumen de hoy, martes 7 de julio de 2026</div>
+
+          <div class="banner">¡Hay 5 productos por agotarse!<span class="b-btn">Ver productos</span></div>
+
+          <div class="kpis">
+            <div class="kpi kpi-verde">
+              <div class="k-top"><i></i>Ingresos de hoy</div>
+              <div class="k-val">$184.000</div>
+              <div class="k-sub">3 pagos recibidos</div>
+              <a class="k-link" href="#pc">Ver cierre de caja →</a>
+            </div>
+            <div class="kpi">
+              <div class="k-top"><i></i>Trabajos pendientes</div>
+              <div class="k-val">4</div>
+              <div class="k-sub">2 esperan revisión</div>
+              <a class="k-link" href="#pc">Ver pendientes →</a>
+            </div>
+            <div class="kpi kpi-rojo">
+              <div class="k-top"><i></i>Clientes deudores</div>
+              <div class="k-val">$325.000</div>
+              <div class="k-sub">3 clientes con deuda</div>
+              <a class="k-link" href="#pc">Ver deudores →</a>
+            </div>
+            <div class="kpi">
+              <div class="k-top"><i></i>Notas por vencer</div>
+              <div class="k-val">2 <span class="chip chip-vencida">1 vencida</span></div>
+              <div class="k-sub">próximos 7 días</div>
+              <a class="k-link" href="#pc">Ver notas →</a>
+            </div>
+          </div>
+
+          <div class="kpis kpis-sec">
+            <div class="kpi">
+              <div>
+                <div class="k-top">Productos en inventario</div>
+                <div class="k-val">180</div>
+              </div>
+              <a class="k-link" href="#pc">Ver inventario →</a>
+            </div>
+            <div class="kpi">
+              <div>
+                <div class="k-top">Servicios en catálogo</div>
+                <div class="k-val">12</div>
+              </div>
+              <a class="k-link" href="#pc">Gestionar →</a>
+            </div>
+          </div>
+
+          <div class="bajo">
+            <div class="acciones">
+              <h3>Acciones rápidas</h3>
+              <div class="btn-acc">+ Orden de servicio</div>
+              <div class="btn-acc">+ Nuevo servicio</div>
+              <div class="btn-acc">+ Agregar producto</div>
+              <div class="btn-acc">+ Registrar personal</div>
+              <div class="btn-acc">Generar reporte</div>
+            </div>
+            <div class="lista-lateral">
+              <h3>Actividades recientes <span style="font-weight:400;font-size:11px;color:#9ca3af">(datos reales de la API)</span></h3>
+              <div class="item-act"><span class="dot dot-ok">✓</span><div><p>Orden PF1-2026-0038 entregada — Toyota Yaris · GJKL-82</p><time>Hoy, 11:40</time></div></div>
+              <div class="item-act"><span class="dot dot-pago">$</span><div><p>Pago recibido $95.000 (efectivo) — orden PF1-2026-0036</p><time>Hoy, 10:15</time></div></div>
+              <div class="item-act"><span class="dot dot-nuevo">+</span><div><p>Nueva recepción — Chevrolet Sail · HXTR-34, diagnóstico de frenos</p><time>Hoy, 09:02</time></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== COMPARATIVA ==================== -->
+  <div class="compara">
+    <h2>Comparación rápida</h2>
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr><th>Criterio</th><th>A · Panel completo</th><th>B · Solo lo esencial</th><th>C · Azul unificado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>KPIs de negocio (ingresos, pendientes, deudores, notas)</td><td class="si">Sí, 4 tarjetas</td><td class="si">Sí, 4 tarjetas grandes</td><td class="si">Sí, 4 tarjetas</td></tr>
+          <tr><td>Inventario y servicios</td><td class="si">Fila secundaria</td><td class="si">Dentro de la 4.ª tarjeta</td><td class="si">Fila secundaria</td></tr>
+          <tr><td>Actividades recientes</td><td class="si">Se queda (datos reales)</td><td class="no">Se elimina → "Requiere atención hoy"</td><td class="si">Compacta (datos reales)</td></tr>
+          <tr><td>Coherencia con Orden/Personal/Caja</td><td class="si">Total (misma paleta teal)</td><td class="si">Total (misma paleta teal)</td><td class="no">Parcial — el sistema queda en 2 paletas</td></tr>
+          <tr><td>Esfuerzo de implementación</td><td>Medio</td><td>Medio-alto (lógica de avisos)</td><td>Medio</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="cierre">
+    <strong>Mi recomendación:</strong> Propuesta <strong>A</strong> como base (coherente con el resto del sistema y conserva las actividades que el cliente ya conoce, ahora con datos reales), tomando de la <strong>B</strong> la idea de los avisos con severidad para una segunda iteración. También se pueden combinar: A con la lista "Requiere atención hoy" en lugar del banner rojo. Dime cuál eliges o qué mezcla quieres y lo implemento.
+  </div>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', x === t ? 'true' : 'false'));
+    panels.forEach(p => p.classList.toggle('active', p.id === t.dataset.panel));
+  }));
+</script>
+
+</html>

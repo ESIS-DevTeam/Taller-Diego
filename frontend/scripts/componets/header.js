@@ -18,6 +18,5 @@ export function loadHeader(param) {
               <img src="../assets/icons/salida.png" alt="Logo de cerrar sesión">
           </div>
       </div>
-      <script type="module" src="../scripts/header-actions.js"></script>
     `;
 }

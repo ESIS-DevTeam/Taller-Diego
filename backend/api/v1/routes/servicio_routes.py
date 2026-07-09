@@ -27,17 +27,18 @@ def create_servicio(
     
     Los servicios representan trabajos mecánicos que pueden ser asignados a órdenes.
     
-    **Validaciones:**
-    - Nombre: Mínimo 3 caracteres, máximo 200
-    - Descripción: Mínimo 10 caracteres, máximo 500
-    - Precio: Debe ser mayor a 0
+    **Modelo actual del MVP:**
+    - nombre
+    - descripcion
+
+    El precio del servicio todavía no pertenece al catálogo base. En el flujo
+    actual se registra como `precio_servicio` al asociar el servicio a una orden.
     
     **Ejemplo de Request correcto:**
     ```json
     {
         "nombre": "Cambio de aceite y filtro",
-        "descripcion": "Servicio completo de cambio de aceite sintético y reemplazo de filtro de aceite",
-        "precio": 150.00
+        "descripcion": "Servicio completo de cambio de aceite sintético y reemplazo de filtro de aceite"
     }
     ```
     
@@ -46,8 +47,7 @@ def create_servicio(
     {
         "id": 5,
         "nombre": "Cambio de aceite y filtro",
-        "descripcion": "Servicio completo de cambio de aceite sintético...",
-        "precio": 150.00
+        "descripcion": "Servicio completo de cambio de aceite sintético..."
     }
     ```
     
@@ -74,14 +74,12 @@ def list_servicios(
         {
             "id": 5,
             "nombre": "Cambio de aceite y filtro",
-            "descripcion": "Servicio completo de cambio de aceite...",
-            "precio": 150.00
+            "descripcion": "Servicio completo de cambio de aceite..."
         },
         {
             "id": 12,
             "nombre": "Alineación y balanceo",
-            "descripcion": "Alineación computarizada y balanceo de 4 ruedas",
-            "precio": 80.00
+            "descripcion": "Alineación computarizada y balanceo de 4 ruedas"
         }
     ]
     ```
@@ -104,8 +102,7 @@ def get_servicio(id: int, service: ServicioService = Depends(get_servicio_servic
     {
         "id": 5,
         "nombre": "Cambio de aceite y filtro",
-        "descripcion": "Servicio completo de cambio de aceite sintético...",
-        "precio": 150.00
+        "descripcion": "Servicio completo de cambio de aceite sintético..."
     }
     ```
     

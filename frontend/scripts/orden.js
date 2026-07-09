@@ -4,6 +4,10 @@ import { fetchForBarCode } from './data-manager.js';
 import { showSuccess, showError, showWarning } from './utils/notification.js';
 import { resetBodyDefaults } from './utils/state-manager.js';
 import { escapeHtml } from './utils/sanitize.js';
+import { initRecepcion } from './orden/recepcion.js';
+import { initHistorial } from './orden/historial.js';
+import { initPendientes } from './orden/pendientes.js';
+import { initRevisados } from './orden/revisados.js';
 
 // Cargar header y sidebar dinámicamente (Hybrid)
 loadComponent("header", "includes/header.html");
@@ -33,8 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mostrar el sidebar secundario por defecto al cargar la página
   showOrdenSidebar();
 
-  // Cargar venta de producto por defecto
-  loadSection('venta-producto');
+  // Deep-link desde el dashboard: orden.html#pendiente abre esa sección directo
+  const seccionesValidas = ['servicios', 'historial-servicios', 'pendiente', 'revisado', 'venta-producto'];
+  const hash = window.location.hash.replace('#', '');
+  const seccionInicial = seccionesValidas.includes(hash) ? hash : 'servicios';
+  document.querySelectorAll('.orden-sidebar-menu a').forEach(link => {
+    link.classList.toggle('active', link.dataset.section === seccionInicial);
+  });
+  loadSection(seccionInicial);
   barcodeReader();
 });
 
@@ -66,28 +76,16 @@ function loadSection(section) {
       loadVentaProducto();
       break;
     case 'servicios':
-      ordenContent.innerHTML = `
-        <h2>Servicios</h2>
-        <p>Gestión de servicios...</p>
-      `;
+      initRecepcion(ordenContent);
       break;
     case 'historial-servicios':
-      ordenContent.innerHTML = `
-        <h2>Historial de Servicios</h2>
-        <p>Ver historial de servicios...</p>
-      `;
+      initHistorial(ordenContent);
       break;
     case 'pendiente':
-      ordenContent.innerHTML = `
-        <h2>Pendiente</h2>
-        <p>Órdenes pendientes...</p>
-      `;
+      initPendientes(ordenContent);
       break;
     case 'revisado':
-      ordenContent.innerHTML = `
-        <h2>Revisado</h2>
-        <p>Órdenes revisadas...</p>
-      `;
+      initRevisados(ordenContent);
       break;
     default:
       ordenContent.innerHTML = '<p>Selecciona una opción del menú</p>';
@@ -113,6 +111,12 @@ async function loadVentaProducto() {
 
 let productosDisponibles = [];
 let productosVenta = [];
+let ventaRegistrandose = false;
+
+function formatCurrency(value) {
+  const amount = Number(value) || 0;
+  return `$${amount.toLocaleString('es-CL')}`;
+}
 
 async function initVentaProducto() {
   // Cargar productos desde el backend
@@ -260,7 +264,7 @@ function displayProductos(productos) {
   const dropdown = document.getElementById('producto-dropdown');
   const itemsHTML = productos.map(p => `
     <div class="dropdown-item" data-id="${escapeHtml(p.id)}" data-precio="${escapeHtml(p.precioVenta)}" data-stock="${escapeHtml(p.stock)}" data-nombre="${escapeHtml(p.nombre)}">
-      ${escapeHtml(p.nombre)} ${p.marca ? `- ${escapeHtml(p.marca)}` : ''} (Stock: ${escapeHtml(p.stock)})
+      ${escapeHtml(p.nombre)} ${p.marca ? `- ${escapeHtml(p.marca)}` : ''} - ${escapeHtml(formatCurrency(p.precioVenta))} (Stock: ${escapeHtml(p.stock)})
     </div>
   `).join('');
 
@@ -302,7 +306,7 @@ function filterProductos() {
 
   const filtered = productosDisponibles.filter(p =>
     p.nombre.toLowerCase().includes(search) ||
-    p.marca.toLowerCase().includes(search)
+    (p.marca || '').toLowerCase().includes(search)
   );
 
   displayProductos(filtered);
@@ -341,6 +345,11 @@ function addProductoToVenta() {
   // Verificar si el producto ya está en la venta
   const existingIndex = productosVenta.findIndex(p => p.producto_id === productoId);
   if (existingIndex >= 0) {
+    const nuevaCantidadTotal = productosVenta[existingIndex].cantidad + cantidad;
+    if (nuevaCantidadTotal > stock) {
+      showWarning(`Stock insuficiente. Disponible: ${stock}`);
+      return;
+    }
     productosVenta[existingIndex].cantidad += cantidad;
   } else {
     const producto = productosDisponibles.find(p => p.id === productoId);
@@ -549,7 +558,7 @@ function removeProductoFromVenta(index) {
     <div class="modal-overlay" id="confirm-modal-overlay">
       <div class="modal-confirm">
         <div class="modal-icon">⚠️</div>
-        <h3>¿Estas seguro de eliminar el producto <strong>${truncatedName}</strong>?</h3>
+        <h3>¿Estás seguro de eliminar el producto <strong>${escapeHtml(truncatedName)}</strong>?</h3>
         <div class="modal-confirm-actions">
           <button class="btn-confirm-yes" id="confirm-delete">Sí</button>
           <button class="btn-confirm-no" id="cancel-delete">No</button>
@@ -577,9 +586,20 @@ function closeModal() {
 }
 
 async function registrarVenta() {
+  if (ventaRegistrandose) {
+    return;
+  }
+
   if (productosVenta.length === 0) {
     showWarning('Agrega al menos un producto a la venta');
     return;
+  }
+
+  ventaRegistrandose = true;
+  const registrarBtn = document.getElementById('registrar-venta-btn');
+  if (registrarBtn) {
+    registrarBtn.disabled = true;
+    registrarBtn.textContent = 'Registrando...';
   }
 
   const ventaData = {
@@ -616,6 +636,12 @@ async function registrarVenta() {
 
   } catch (error) {
     showError('Error al registrar venta: ' + error.message);
+  } finally {
+    ventaRegistrandose = false;
+    if (registrarBtn) {
+      registrarBtn.disabled = false;
+      registrarBtn.textContent = 'Registrar venta';
+    }
   }
 }
 

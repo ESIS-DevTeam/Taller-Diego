@@ -7,7 +7,7 @@
  * de fecha y generación del PDF con códigos de barras.
  */
 
-import { countFromApi, fetchFromApi } from "../data-manager.js";
+import { fetchFromApi } from "../data-manager.js";
 import { showNotification } from "../utils/notification.js";
 
 // ========================================
@@ -433,6 +433,7 @@ async function generatePDF(products, optionLabel, options = {}) {
     let itemHeight = barcodeHeight + 4; // Código + padding mínimo
     if (options.includeProductName) itemHeight += 10;
     if (options.includeCategory) itemHeight += 8;
+    if (options.includePrice) itemHeight += 6;
 
     let currentY = margin;
     let currentCol = 0;
@@ -450,7 +451,7 @@ async function generatePDF(products, optionLabel, options = {}) {
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100);
-        doc.text(`${optionLabel} | ${products.length} productos | ${new Date().toLocaleDateString('es-PE')}`, pageWidth / 2, currentY, { align: 'center' });
+        doc.text(`${optionLabel} | ${products.length} productos | ${new Date().toLocaleDateString('es-CL')}`, pageWidth / 2, currentY, { align: 'center' });
 
         currentY += 6;
 
@@ -519,6 +520,16 @@ async function generatePDF(products, optionLabel, options = {}) {
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(100);
             doc.text(`Cat: ${product.categoria}`, x + colWidth / 2, textY + 1, { align: 'center' });
+            textY += 5;
+        }
+
+        // Precio de venta en CLP (antes se ignoraba esta opción)
+        if (options.includePrice && product.precioVenta) {
+            doc.setFontSize(cols >= 4 ? 7 : 8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(13, 110, 81);
+            doc.text(`$ ${Number(product.precioVenta).toLocaleString('es-CL')}`, x + colWidth / 2, textY + 1, { align: 'center' });
+            doc.setTextColor(0);
         }
 
         // Siguiente columna o fila
@@ -599,10 +610,17 @@ async function loadJsPDF() {
             return;
         }
 
+        // Primero la copia local (funciona sin internet); CDN como respaldo
         const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        script.src = '../scripts/lib/jspdf.umd.min.js';
         script.onload = () => resolve();
-        script.onerror = () => reject(new Error('No se pudo cargar jsPDF'));
+        script.onerror = () => {
+            const cdn = document.createElement('script');
+            cdn.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            cdn.onload = () => resolve();
+            cdn.onerror = () => reject(new Error('No se pudo cargar jsPDF'));
+            document.head.appendChild(cdn);
+        };
         document.head.appendChild(script);
     });
 }
@@ -882,9 +900,9 @@ async function generatePDFPreview(products, optionLabel, options) {
 
     let currentY = margin;
     let currentCol = 0;
-    let cantProduct= await countFromApi('productos');
-    // Solo mostrar primeros 6 productos como preview
-    const previewProducts = products.slice(0, cantProduct);
+    // Solo mostrar los primeros 6 productos como vista previa
+    // (antes se pedía el total a la API y se mostraban todos)
+    const previewProducts = products.slice(0, 6);
 
     if (options.includeHeader) {
         doc.setFillColor(0, 91, 182);
@@ -942,7 +960,8 @@ async function generatePDFPreview(products, optionLabel, options) {
             doc.setFontSize(8);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(0, 91, 182);
-            doc.text(`S/ ${parseFloat(product.precioVenta).toFixed(2)}`, x + colWidth / 2, textY, { align: 'center' });
+            // Moneda chilena (CLP), no soles
+            doc.text(`$ ${Number(product.precioVenta).toLocaleString('es-CL')}`, x + colWidth / 2, textY, { align: 'center' });
         }
 
         currentCol++;

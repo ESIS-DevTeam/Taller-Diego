@@ -10,5 +10,8 @@ class Empleado(Base):
     apellidos = Column(String, nullable=False)
     estado = Column(String, nullable=False, default="activo")
     especialidad = Column(String, nullable=False)
+    documento = Column(String(30), nullable=True)
+    telefono = Column(String(20), nullable=True)
+    correo = Column(String, nullable=True)
 
     ordenes = relationship("OrdenEmpleado", back_populates="empleado")

@@ -1,6 +1,5 @@
 from .producto_schema import ProductoBase
-from pydantic import field_validator
-import re
+from pydantic import ConfigDict
 
 
 class AutoparteBase(ProductoBase):
@@ -18,5 +17,4 @@ class AutoparteResponse(AutoparteBase):
     codBarras: str | None = None
     img: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

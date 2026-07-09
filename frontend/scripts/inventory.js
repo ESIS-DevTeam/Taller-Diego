@@ -3,7 +3,8 @@ import { renderProducts } from "./componets/product-list/product-list.js";
 import { setupProductActions } from "./componets/product-list/product-actions.js";
 import { loadFilterUI } from "./componets/filter-product/filter-loader.js";
 import { setupFilterEvents } from "./componets/filter-product/filter-events.js";
-import { initializeSearch } from "./componets/filter-product/filter-handler.js";
+import { applyFilters, initializeSearch } from "./componets/filter-product/filter-handler.js";
+import { updateFilterState } from "./componets/filter-product/filtro-state.js";
 import { fetchFromApi } from "./data-manager.js";
 import { bindBarcodeButton } from "./componets/modal-pdfcod.js";
 import { loadComponent } from "./utils/component-loader.js";
@@ -60,12 +61,31 @@ async function initializeInventory() {
     // 7. Configurar acciones de productos  
     setupProductActions();
 
+    applyInitialFiltersFromUrl();
+
   } catch (error) {
     const productList = document.getElementById("product-list");
     if (productList) {
       productList.innerHTML = '<p class="error-state">Error al cargar productos. Por favor, recarga la página.</p>';
     }
   }
+}
+
+function applyInitialFiltersFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const shouldShowLowStock = params.get('stock') === 'bajo' || params.get('lowStock') === 'true';
+
+  if (!shouldShowLowStock) {
+    return;
+  }
+
+  const stockCheckbox = document.querySelector('[data-low-stock]');
+  if (stockCheckbox) {
+    stockCheckbox.checked = true;
+  }
+
+  updateFilterState('lowStock', true);
+  applyFilters();
 }
 
 function setupMobileInventoryMenu() {

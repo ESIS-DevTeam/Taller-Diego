@@ -1,22 +1,10 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 import re
 
 
 class ProductoBase(BaseModel):
     nombre: str
     descripcion: str
-    
-    @field_validator('nombre', 'descripcion', 'marca', 'categoria')
-    @classmethod
-    def sanitize_html(cls, v: str) -> str:
-        """Prevenir inyección de scripts HTML/JavaScript"""
-        if v is None:
-            return v
-        # Eliminar tags HTML y scripts
-        v = re.sub(r'<[^>]*>', '', v)
-        # Eliminar caracteres peligrosos
-        v = re.sub(r'[<>"\']', '', v)
-        return v.strip()
     precioCompra: float
     precioVenta: float
     marca: str
@@ -48,5 +36,4 @@ class ProductoResponse(ProductoBase):
     img: str | None = None
     tipo: str | None = None
 
-class Config:
-    from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

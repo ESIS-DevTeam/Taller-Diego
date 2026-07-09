@@ -57,6 +57,10 @@ class ProductoService:
         return self.repo.get_by_barcode(codBarras)
     
     def update_producto(self, id: int, data: ProductoCreate):
+        # No permitir renombrar a un nombre que ya usa OTRO producto
+        existente = self.repo.get_by_name(data.nombre)
+        if existente and existente.id != id:
+            raise ValueError("Ya existe un producto con ese nombre")
         producto = self.repo.update(id, data)
         
         # Invalidar caché

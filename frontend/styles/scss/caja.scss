@@ -1,0 +1,394 @@
+// ========================================
+// MÓDULO CAJA — cierre diario, notas de pago,
+// reportes de ventas y clientes deudores
+// (usa las clases ot- de orden-modulo.css y
+//  la grilla per- de personal.css)
+// ========================================
+@use 'variables' as v;
+
+$verde: #10b981;
+$verde-oscuro: #0d9668;
+$azul-oscuro: #16283c;
+$azul-productos: #3d6fb5;
+$rojo: #e0532f;
+$amarillo-suave: #fff8e1;
+
+.caja-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: v.spacing(md);
+  flex-wrap: wrap;
+}
+
+.caja-fecha-input {
+  font-family: v.$font-base;
+  font-size: v.$font-size-sm;
+  padding: 9px 12px;
+  border: 1px solid v.color(border);
+  border-radius: v.$border-radius-md;
+  background: #fff;
+  color: v.color(text);
+}
+
+// ---------- Tarjetas de totales ----------
+
+.caja-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: v.spacing(md);
+  margin-bottom: v.spacing(md);
+
+  @include v.media(md) { grid-template-columns: 1fr; }
+}
+
+.caja-tarjeta {
+  margin-bottom: 0;
+
+  .caja-tarjeta-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: v.color(text-muted);
+
+    small { font-weight: 400; letter-spacing: 0; text-transform: none; }
+
+    &.caja-punto-verde::before,
+    &.caja-punto-rojo::before,
+    &.caja-punto-azul::before,
+    &.caja-punto-amarillo::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border-radius: v.$border-radius-sm;
+      flex-shrink: 0;
+    }
+
+    &.caja-punto-verde::before { background: #d1fae5; }
+    &.caja-punto-rojo::before { background: #fee2e2; }
+    &.caja-punto-azul::before { background: #dbeafe; }
+    &.caja-punto-amarillo::before { background: #fef3c7; }
+  }
+
+  .caja-monto {
+    display: block;
+    font-size: 26px;
+    margin: 6px 0 2px;
+    color: v.color(primary);
+  }
+
+  small { color: v.color(text-muted); font-size: 12px; }
+
+  &.caja-tarjeta-balance { border: 2px solid $azul-oscuro; }
+}
+
+.rep-punto {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+// ---------- Cierre diario ----------
+
+.caja-dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: v.spacing(md);
+
+  @include v.media(md) { grid-template-columns: 1fr; }
+}
+
+.caja-linea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: v.$border-radius-sm;
+  font-size: v.$font-size-sm;
+
+  &:nth-child(even) { background: v.color(bg-light); }
+
+  small { color: v.color(text-muted); }
+
+  &.caja-linea-total {
+    background: #eef2f6;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+}
+
+.caja-metodos {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.caja-nota-pie {
+  font-size: 12px;
+  color: v.color(text-muted);
+  margin: 10px 0 0;
+}
+
+.caja-banner-explicacion { margin-top: v.spacing(md); }
+
+.caja-banner-alerta {
+  background: $amarillo-suave;
+  border-color: #fde68a;
+  margin-top: v.spacing(md);
+
+  .ot-banner-dot { background: #f59e0b; }
+  strong { color: #a16207; }
+}
+
+// ---------- Notas de pago ----------
+
+.caja-notas-head,
+.caja-nota-fila {
+  display: grid;
+  grid-template-columns: 1.8fr 1.4fr 0.9fr 1fr 1fr 1.3fr;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 18px;
+}
+
+.caja-notas-head {
+  background: v.color(bg-light);
+  border-bottom: 1px solid v.color(border);
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: v.color(text-muted);
+}
+
+.caja-nota-fila {
+  border-bottom: 1px solid #f0f2f5;
+  font-size: v.$font-size-sm;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: #fafbfc; }
+
+  strong { color: v.color(primary); }
+  small { display: block; color: v.color(text-muted); font-size: 11px; }
+}
+
+// ---------- Deudores ----------
+
+.caja-deu-head,
+.caja-deu-fila {
+  display: grid;
+  grid-template-columns: 2fr 1.1fr 1.1fr 1fr 1fr 1.2fr;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 18px;
+}
+
+.caja-deu-head {
+  background: v.color(bg-light);
+  border-bottom: 1px solid v.color(border);
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: v.color(text-muted);
+}
+
+.caja-deu-fila {
+  border-bottom: 1px solid #f0f2f5;
+  font-size: v.$font-size-sm;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: #fafbfc; }
+}
+
+.ot-btn-mini-alto {
+  padding: 7px 12px !important;
+  font-size: 12px !important;
+}
+
+// ---------- Reportes de ventas ----------
+
+.caja-reporte-filtros {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.caja-rango {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  span { color: v.color(text-muted); }
+}
+
+.rep-grafico-card { padding: v.spacing(md) v.spacing(lg); }
+
+.rep-grafico-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: v.spacing(sm);
+
+  h3 { margin: 0; font-size: v.$font-size-base; color: v.color(primary); }
+}
+
+.rep-leyenda {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: v.color(text);
+
+  i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: -1px;
+  }
+}
+
+.rep-grafico-scroll {
+  position: relative;
+  overflow-x: auto;
+}
+
+.rep-svg {
+  width: 100%;
+  min-width: 520px;
+  height: auto;
+  display: block;
+}
+
+.rep-baseline {
+  stroke: v.color(border);
+  stroke-width: 1;
+}
+
+.rep-eje {
+  font-family: v.$font-base;
+  font-size: 11px;
+  fill: v.color(text-muted);
+}
+
+.rep-barra { transition: opacity 0.15s; }
+.rep-hit:hover ~ .rep-barra { opacity: 1; }
+
+.rep-tooltip {
+  position: absolute;
+  background: $azul-oscuro;
+  color: #fff;
+  border-radius: v.$border-radius-md;
+  padding: 10px 12px;
+  font-size: 12px;
+  pointer-events: none;
+  min-width: 170px;
+  box-shadow: v.$shadow-md;
+  z-index: 5;
+
+  strong { display: block; margin-bottom: 6px; }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+
+    b { margin-left: auto; }
+  }
+
+  i {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .rep-tooltip-total {
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    margin-top: 4px;
+    padding-top: 6px;
+  }
+}
+
+// Resumen simple
+.rep-resumen { margin-top: v.spacing(md); }
+
+.rep-resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: v.spacing(md);
+  margin: v.spacing(sm) 0 v.spacing(md);
+
+  @include v.media(md) { grid-template-columns: 1fr; }
+}
+
+.rep-resumen-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: v.color(bg-light);
+  border: 1px solid v.color(border);
+  border-radius: v.$border-radius-md;
+  padding: 12px 14px;
+
+  .rep-resumen-icono { font-size: 20px; }
+
+  strong { display: block; font-size: 13px; color: v.color(primary); }
+  small { color: v.color(text-muted); font-size: 12px; }
+}
+
+.rep-proporcion {
+  p {
+    font-size: 13px;
+    font-weight: 700;
+    color: v.color(text);
+    margin: 0 0 8px;
+  }
+}
+
+.rep-barra-doble {
+  display: flex;
+  height: 34px;
+  border-radius: v.$border-radius-md;
+  overflow: hidden;
+  gap: 2px; // separador entre segmentos
+  background: v.color(bg-light);
+
+  .rep-barra-prod,
+  .rep-barra-serv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 0;
+    transition: width 0.4s ease;
+  }
+
+  .rep-barra-prod { background: $azul-productos; }
+  .rep-barra-serv { background: $verde-oscuro; }
+}
+
+.rep-proporcion-leyenda {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: v.color(text);
+  flex-wrap: wrap;
+
+  i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: -1px;
+  }
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../scripts/utils/auth-guard.js"></script>
+  <title>Taller de Mecánica Diego - Caja</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../styles/css/side_bar.css">
+  <link rel="stylesheet" href="../styles/css/header.css">
+  <link rel="stylesheet" href="../styles/css/orden.css">
+  <link rel="stylesheet" href="../styles/css/orden-modulo.css">
+  <link rel="stylesheet" href="../styles/css/caja.css">
+  <link rel="stylesheet" href="../styles/css/notification.css">
+  <link rel="stylesheet" href="../styles/css/modal-confirm.css">
+  <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header dinámico -->
+  <div id="header"></div>
+
+  <div class="container">
+    <!-- Sidebar principal -->
+    <div id="side-bar-container" class="side-bar-container"></div>
+
+    <!-- Sidebar secundario del módulo CAJA -->
+    <div id="orden-sidebar" class="orden-sidebar">
+      <div class="orden-sidebar-header">MÓDULO CAJA</div>
+      <ul class="orden-sidebar-menu">
+        <li><a href="#" class="active" data-section="cierre">Cierre diario</a></li>
+        <li><a href="#" data-section="notas">Notas de pago</a></li>
+        <li><a href="#" data-section="reportes">Reportes de ventas</a></li>
+        <li><a href="#" data-section="deudores">Clientes deudores</a></li>
+      </ul>
+    </div>
+
+    <!-- Contenido principal -->
+    <main class="main-content with-orden-sidebar">
+      <section class="orden-section">
+        <div id="caja-content">
+          <p>Cargando…</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Contenedor para modales -->
+  <div id="modal-container"></div>
+
+  <script type="module" src="../scripts/header-actions.js"></script>
+  <script type="module" src="../scripts/caja.js"></script>
+</body>
+</html>

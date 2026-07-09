@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../scripts/utils/auth-guard.js"></script>
+  <title>Taller de Mecánica Diego - Personal</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../styles/css/side_bar.css">
+  <link rel="stylesheet" href="../styles/css/header.css">
+  <link rel="stylesheet" href="../styles/css/orden-modulo.css">
+  <link rel="stylesheet" href="../styles/css/personal.css">
+  <link rel="stylesheet" href="../styles/css/notification.css">
+  <link rel="stylesheet" href="../styles/css/modal-confirm.css">
+  <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header dinámico -->
+  <div id="header"></div>
+
+  <div class="container">
+    <!-- Sidebar principal -->
+    <div id="side-bar-container" class="side-bar-container"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <section class="personal-section" id="personal-content">
+        <p>Cargando personal…</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Contenedor para modales -->
+  <div id="modal-container"></div>
+
+  <script type="module" src="../scripts/header-actions.js"></script>
+  <script type="module" src="../scripts/personal.js"></script>
+</body>
+</html>

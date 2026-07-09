@@ -4,8 +4,11 @@ from pydantic import ConfigDict
 class EmpleadoBase(BaseModel):
     nombres: str
     apellidos: str
-    estado: str
+    estado: str = "activo"
     especialidad: str
+    documento: str | None = None
+    telefono: str | None = None
+    correo: str | None = None
 
 class EmpleadoCreate(EmpleadoBase):
     pass

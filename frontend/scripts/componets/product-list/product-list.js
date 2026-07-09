@@ -45,6 +45,11 @@ export async function renderProducts(products = null, skipCache = false) {
       return;
     }
 
+    // Orden alfabético por nombre (respaldo del orden que ya aplica el backend)
+    products = [...products].sort((a, b) =>
+      (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' })
+    );
+
     // Usar DocumentFragment para renderizado eficiente
     const fragment = document.createDocumentFragment();
     const tempDiv = document.createElement('div');
