@@ -6,7 +6,7 @@ class ProductoBase(BaseModel):
     nombre: str
     descripcion: str
     precioCompra: float
-    precioVenta: float
+    precio_venta: float  # BREAKING: antes se llamaba precioVenta
     marca: str
     categoria: str
     stock: int
