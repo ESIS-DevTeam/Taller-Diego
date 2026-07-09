@@ -104,3 +104,33 @@ app/
 ├── requirements.txt          # Dependencias de Python
 └── README.md                 # Documentación del proyecto
 ```
+---
+
+## Política de Versionamiento (SemVer 2.0.0)
+
+Este proyecto sigue **Semantic Versioning 2.0.0** (Preston-Werner, 2013). La versión se expresa como `vMAJOR.MINOR.PATCH` y cada segmento comunica a los consumidores de la API (`/api/v1`) qué clase de cambio se introdujo.
+
+- **MAJOR** (`vX.0.0`): cualquier cambio **incompatible** en la API pública del backend.
+  *Ejemplo:* renombrar o eliminar un campo de la respuesta de `GET /api/v1/productos` (p. ej. `precioVenta` → `precio_venta`), cambiar el tipo de un campo, o eliminar un endpoint. El frontend y cualquier consumidor deben adaptar su código antes de actualizar.
+- **MINOR** (`v0.X.0`): funcionalidad **nueva y retrocompatible**.
+  *Ejemplo:* agregar el módulo CAJA con sus endpoints `GET /api/v1/caja/cierre`, `/notas`, `/deudores` sin alterar los endpoints existentes. Los consumidores pueden actualizar sin riesgo.
+- **PATCH** (`v0.0.X`): **corrección retrocompatible** de errores, sin cambiar la interfaz pública.
+  *Ejemplo:* validar el nombre duplicado al editar un producto (`PUT /api/v1/productos/{id}` ahora responde `400` ante duplicado); la firma del endpoint no cambia.
+- **Pre-release** (`vX.Y.Z-rc.1`): versiones de validación previas a un release oficial. No se despliegan a producción; sirven para pruebas de integración.
+
+### Clasificación de los cambios del sprint
+
+| Cambio | Tipo | Justificación |
+|---|---|---|
+| Rediseño del dashboard de Inicio con KPIs reales (`/caja/cierre`, `/ordenes-trabajo`, `/caja/deudores`, `/caja/notas`) | **MINOR** | Funcionalidad nueva retrocompatible: no altera ningún endpoint existente. |
+| Validación de nombre duplicado al editar producto/autoparte (HTTP 400) | **PATCH** | Corrección de un defecto (antes permitía duplicados); interfaz pública sin cambios. |
+| Renombrar campos de la respuesta de `GET /api/v1/productos` | **MAJOR** | Breaking change: los consumidores dejan de encontrar los campos originales. |
+
+### Proceso de Release
+
+1. Clasificar el cambio según la política anterior y acordar `vX.Y.Z`.
+2. Crear la etiqueta firmada: `git tag -s vX.Y.Z -m "descripción del release"`.
+3. Verificar la firma: `git tag -v vX.Y.Z`.
+4. Publicar: `git push origin vX.Y.Z`.
+5. Sincronizar el despliegue declarativo: `argocd app sync taller-diego`.
+6. Ante un release defectuoso: `argocd app rollback taller-diego` + `git revert` (nunca modificar el clúster a mano).

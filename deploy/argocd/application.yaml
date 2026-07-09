@@ -1,0 +1,30 @@
+# ========================================
+# ArgoCD Application — Pipeline GitOps del Taller de Diego
+# El repositorio Git es la única fuente de verdad:
+# targetRevision apunta a la ETIQUETA FIRMADA del release,
+# nunca a una rama móvil.
+#
+# Aplicar:    kubectl apply -f deploy/argocd/application.yaml
+# Sincronizar: argocd app sync taller-diego
+# Rollback:    argocd app rollback taller-diego
+# ========================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: taller-diego
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ESIS-DevTeam/Taller-Diego.git
+    # Release desplegado: SIEMPRE una etiqueta firmada (SemVer), no una rama
+    targetRevision: v1.2.0
+    path: deploy/k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: taller-diego
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    # Sin automated: la promoción del release es una decisión explícita
+    # (argocd app sync) que queda registrada para auditoría (IEEE 828-2012)
