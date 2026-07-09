@@ -22,7 +22,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 # Middleware de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://192.168.1.100:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
