@@ -1,0 +1,9 @@
+# No incluir en la imagen: secretos, cachés y entornos locales
+backend/.env
+**/__pycache__
+venv/
+dist/
+frontend/
+docs/
+tests/
+.git/
