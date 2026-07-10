@@ -1,0 +1,38 @@
+# Estado declarado del backend — reconciliado por ArgoCD.
+# La imagen usa la MISMA versión que la etiqueta Git del release (inmutable).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taller-diego-backend
+  labels:
+    app: taller-diego-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taller-diego-backend
+  template:
+    metadata:
+      labels:
+        app: taller-diego-backend
+    spec:
+      containers:
+        - name: backend
+          # Versión = tag Git del release (nunca :latest)
+          image: ghcr.io/esis-devteam/taller-diego:v1.2.0
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: taller-diego-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: taller-diego-backend
+spec:
+  selector:
+    app: taller-diego-backend
+  ports:
+    - port: 8000
+      targetPort: 8000

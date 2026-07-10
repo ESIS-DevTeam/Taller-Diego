@@ -1,14 +1,16 @@
-fastapi
-pydantic
-pydantic[email]
-uvicorn
-pydantic-settings
-sqlalchemy
-python-multipart
-psycopg2-binary
-httpx
+# Dependencias fijadas a versión exacta (dependency pinning)
+# para builds reproducibles — ver Política de Versionamiento (README).
+# Lockfile completo con dependencias transitivas: requirements.lock.txt
+fastapi==0.121.0
+pydantic[email]==2.12.4
+uvicorn==0.38.0
+pydantic-settings==2.11.0
+sqlalchemy==2.0.44
+python-multipart==0.0.20
+psycopg2-binary==2.9.11
+httpx==0.28.1
 # Dev / CI
-flake8
-pytest
-pytest-bdd
-coverage
+flake8==7.3.0
+pytest==9.0.3
+pytest-bdd==8.1.0
+coverage==7.14.0
