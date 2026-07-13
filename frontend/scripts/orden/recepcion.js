@@ -6,6 +6,7 @@
 import { escapeHtml } from '../utils/sanitize.js';
 import { showSuccess, showError, showWarning } from '../utils/notification.js';
 import { debounce } from '../utils/debounce.js';
+import { getValidToken } from '../utils/store/manager-key.js';
 import { apiOrden, API_BASE_URL, formatCLP } from './format.js';
 
 let mecanicos = [];
@@ -115,7 +116,7 @@ function renderFormulario() {
 
 async function cargarMecanicos() {
   try {
-    const token = localStorage.getItem('supabase_token');
+    const token = await getValidToken();
     const resp = await fetch(`${API_BASE_URL}/empleados/`, {
       headers: { 'Authorization': token ? `Bearer ${token}` : '' },
     });
@@ -136,7 +137,7 @@ async function cargarMecanicos() {
 
 async function cargarServicios() {
   try {
-    const token = localStorage.getItem('supabase_token');
+    const token = await getValidToken();
     const resp = await fetch(`${API_BASE_URL}/servicios/`, {
       headers: { 'Authorization': token ? `Bearer ${token}` : '' },
     });
@@ -202,14 +203,21 @@ async function autocompletar(vehiculo) {
 
   const banner = document.getElementById('recepcion-banner');
   if (banner) {
+    const nombreCliente = vehiculo.cliente?.nombre || '';
+    const esRecurrente = visitas >= 1;
     banner.className = 'ot-banner ot-banner-reconocido';
     banner.innerHTML = `
-      <span class="ot-banner-dot"></span>
-      <div>
+      <span class="ot-banner-check" aria-hidden="true">✓</span>
+      <div class="ot-banner-reconocido-texto">
         <strong>Vehículo reconocido · ${escapeHtml(vehiculo.placa)}</strong>
-        <p>Ya existe en el historial. Cargamos los datos del cliente automáticamente — verifica y continúa.</p>
+        <p>${esRecurrente
+          ? `Cliente recurrente${nombreCliente ? ': <b>' + escapeHtml(nombreCliente) + '</b>' : ''}. Cargamos sus datos automáticamente — verifica y continúa.`
+          : 'Ya existe en el historial. Cargamos los datos del cliente automáticamente — verifica y continúa.'}</p>
       </div>
-      <span class="ot-chip">${escapeHtml(visitas)} visita${visitas === 1 ? '' : 's'} previa${visitas === 1 ? '' : 's'}</span>`;
+      <span class="ot-visitas-badge">
+        <strong>${escapeHtml(visitas)}</strong>
+        <small>visita${visitas === 1 ? '' : 's'}<br>previa${visitas === 1 ? '' : 's'}</small>
+      </span>`;
   }
 }
 

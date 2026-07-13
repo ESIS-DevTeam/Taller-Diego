@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from datetime import datetime, timezone
 from db.models.orden_trabajo import OrdenTrabajo, OrdenTrabajoServicio, OrdenTrabajoProducto
@@ -27,13 +27,17 @@ class OrdenTrabajoRepository:
     # ---------- Carga con relaciones ----------
 
     def _query_completa(self):
+        # joinedload solo para relaciones "a uno"; las colecciones usan
+        # selectinload para evitar el producto cartesiano (servicios ×
+        # productos × pagos multiplicaba las filas transferidas desde
+        # Supabase y hacía lentas las listas).
         return self.db.query(OrdenTrabajo).options(
             joinedload(OrdenTrabajo.vehiculo).joinedload(Vehiculo.cliente),
             joinedload(OrdenTrabajo.mecanico),
-            joinedload(OrdenTrabajo.servicios),
-            joinedload(OrdenTrabajo.productos).joinedload(
+            selectinload(OrdenTrabajo.servicios),
+            selectinload(OrdenTrabajo.productos).joinedload(
                 OrdenTrabajoProducto.producto),
-            joinedload(OrdenTrabajo.pagos),
+            selectinload(OrdenTrabajo.pagos),
         )
 
     def get_by_id(self, orden_id: int) -> OrdenTrabajo | None:
@@ -65,14 +69,32 @@ class OrdenTrabajoRepository:
                      .order_by(Vehiculo.placa)
                      .limit(limit)
                      .all())
-        resultado = []
-        for v in vehiculos:
-            visitas = (self.db.query(func.count(OrdenTrabajo.id))
-                       .filter(OrdenTrabajo.vehiculo_id == v.id,
-                               OrdenTrabajo.estado != "cancelado")
-                       .scalar()) or 0
-            resultado.append((v, visitas))
-        return resultado
+        return self._con_visitas(vehiculos)
+
+    def vehiculos_recientes(self, limit: int = 8) -> list[tuple[Vehiculo, int]]:
+        """Últimos vehículos registrados (para el listado por defecto del
+        historial). Devuelve pares (vehiculo, cantidad_de_visitas)."""
+        vehiculos = (self.db.query(Vehiculo)
+                     .options(joinedload(Vehiculo.cliente))
+                     .order_by(Vehiculo.id.desc())
+                     .limit(limit)
+                     .all())
+        return self._con_visitas(vehiculos)
+
+    def _con_visitas(self, vehiculos: list[Vehiculo]) -> list[tuple[Vehiculo, int]]:
+        """Añade el conteo de visitas en UNA sola consulta agrupada
+        (antes era una consulta por vehículo → lento con BD remota)."""
+        if not vehiculos:
+            return []
+        ids = [v.id for v in vehiculos]
+        conteos = dict(
+            self.db.query(OrdenTrabajo.vehiculo_id, func.count(OrdenTrabajo.id))
+            .filter(OrdenTrabajo.vehiculo_id.in_(ids),
+                    OrdenTrabajo.estado != "cancelado")
+            .group_by(OrdenTrabajo.vehiculo_id)
+            .all()
+        )
+        return [(v, conteos.get(v.id, 0)) for v in vehiculos]
 
     def contar_visitas(self, vehiculo_id: int) -> int:
         return (self.db.query(func.count(OrdenTrabajo.id))

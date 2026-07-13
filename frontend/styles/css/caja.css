@@ -38,7 +38,7 @@
   font-size: 10px;
   letter-spacing: 1px;
   font-weight: 700;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .caja-tarjeta .caja-tarjeta-titulo small {
   font-weight: 400;
@@ -71,7 +71,7 @@
   color: #1A242F;
 }
 .caja-tarjeta small {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 12px;
 }
 .caja-tarjeta.caja-tarjeta-balance {
@@ -108,7 +108,7 @@
   background: #f8f9fa;
 }
 .caja-linea small {
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .caja-linea.caja-linea-total {
   background: #eef2f6;
@@ -125,7 +125,7 @@
 
 .caja-nota-pie {
   font-size: 12px;
-  color: #7f8c8d;
+  color: #5d6b78;
   margin: 10px 0 0;
 }
 
@@ -160,7 +160,7 @@
   font-size: 10px;
   letter-spacing: 1px;
   font-weight: 700;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 
 .caja-nota-fila {
@@ -178,7 +178,7 @@
 }
 .caja-nota-fila small {
   display: block;
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 11px;
 }
 
@@ -197,7 +197,7 @@
   font-size: 10px;
   letter-spacing: 1px;
   font-weight: 700;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 
 .caja-deu-fila {
@@ -227,7 +227,7 @@
   gap: 8px;
 }
 .caja-rango span {
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 
 .rep-grafico-card {
@@ -281,7 +281,7 @@
 .rep-eje {
   font-family: "Istok Web", sans-serif;
   font-size: 11px;
-  fill: #7f8c8d;
+  fill: #5d6b78;
 }
 
 .rep-barra {
@@ -364,7 +364,7 @@
   color: #1A242F;
 }
 .rep-resumen-item small {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 12px;
 }
 

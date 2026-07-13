@@ -7,7 +7,7 @@
   margin: 0;
 }
 .ot-page-header .ot-subtitle {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 14px;
   margin: 4px 0 0;
 }
@@ -39,11 +39,11 @@
   font-weight: 700;
 }
 .ot-vacio small {
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 
 .ot-vacio-texto {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 14px;
   font-style: italic;
 }
@@ -64,7 +64,7 @@
 .ot-banner p {
   margin: 2px 0 0;
   font-size: 13px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-banner .ot-banner-dot {
   width: 14px;
@@ -80,11 +80,62 @@
   background: #10b981;
 }
 .ot-banner.ot-banner-reconocido {
-  background: #eaf2fb;
-  border-color: #bcd4ef;
+  background: #e7f2ff;
+  border-color: #005bb6;
+  border-width: 2px;
+  border-left-width: 6px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 10px rgba(0, 91, 182, 0.12);
 }
-.ot-banner.ot-banner-reconocido .ot-banner-dot {
+.ot-banner.ot-banner-reconocido .ot-banner-reconocido-texto strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: #005bb6;
+  letter-spacing: 0.2px;
+}
+.ot-banner.ot-banner-reconocido .ot-banner-reconocido-texto p {
+  font-size: 14px;
+  color: #2c3e50;
+}
+.ot-banner.ot-banner-reconocido .ot-banner-reconocido-texto p b {
+  color: #1A242F;
+  font-weight: 700;
+}
+.ot-banner .ot-banner-check {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
   background: #005bb6;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.ot-banner .ot-visitas-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #005bb6;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  text-align: left;
+}
+.ot-banner .ot-visitas-badge strong {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+.ot-banner .ot-visitas-badge small {
+  font-size: 10px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
 }
 .ot-banner .ot-chip {
   margin-left: auto;
@@ -109,7 +160,7 @@
 }
 .ot-paso .ot-paso-titulo small {
   display: block;
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 13px;
 }
 .ot-paso .ot-paso-num {
@@ -156,7 +207,7 @@
 }
 .ot-field label small {
   font-weight: 400;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-field input, .ot-field select, .ot-field textarea {
   font-family: "Istok Web", sans-serif;
@@ -192,7 +243,7 @@
 }
 .ot-form-footer .ot-nota-obligatorios {
   font-size: 13px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-form-footer .ot-form-acciones {
   display: flex;
@@ -273,7 +324,7 @@
 
 .ot-chip-mini {
   font-size: 11px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 
 .ot-badge {
@@ -354,12 +405,12 @@
 }
 .ot-sugerencias .ot-sugerencias-titulo {
   font-size: 12px;
-  color: #7f8c8d;
+  color: #5d6b78;
   margin: 0 0 6px;
 }
 .ot-sugerencias .ot-sin-resultados {
   font-size: 14px;
-  color: #7f8c8d;
+  color: #5d6b78;
   margin: 0;
 }
 
@@ -387,7 +438,7 @@
 }
 .ot-sugerencia .ot-sugerencia-datos small {
   display: block;
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 12px;
 }
 .ot-sugerencia .ot-ver-link {
@@ -441,7 +492,7 @@
   display: block;
   font-size: 10px;
   letter-spacing: 1px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-vehiculo-datos strong {
   font-size: 14px;
@@ -507,7 +558,7 @@
   margin: 4px 0;
 }
 .ot-visita .ot-visita-detalle span {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-weight: 700;
 }
 .ot-visita .ot-visita-detalle .ot-visita-detalle-acciones {
@@ -544,7 +595,7 @@
   color: #1A242F;
 }
 .ot-contador small {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 12px;
 }
 .ot-contador .ot-contador-num {
@@ -626,7 +677,7 @@
   color: #1A242F;
 }
 .ot-trabajo-head .ot-trabajo-titulo small {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 12px;
 }
 
@@ -652,7 +703,7 @@
   margin: 0 0 8px;
   font-size: 11px;
   letter-spacing: 1px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-trabajo-col h4 .ot-chip-mini {
   color: #059669;
@@ -691,7 +742,7 @@
   display: block;
   font-size: 10px;
   letter-spacing: 1px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-totales-row strong {
   font-size: 16px;
@@ -722,7 +773,7 @@
   display: block;
   font-size: 9px;
   letter-spacing: 1px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-listo-desde strong {
   font-size: 13px;
@@ -743,7 +794,7 @@
   color: #1A242F;
 }
 .ot-modal .ot-modal-sub {
-  color: #7f8c8d;
+  color: #5d6b78;
   font-size: 13px;
   margin: 0 0 1rem;
 }
@@ -777,7 +828,7 @@
   font-size: 14px;
 }
 .ot-modal-resumen div span {
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 
 .ot-modal-acciones {
@@ -856,7 +907,7 @@
 .ot-p2-panel .ot-p2-header p {
   margin: 4px 0 0;
   font-size: 12px;
-  color: #7f8c8d;
+  color: #5d6b78;
 }
 .ot-p2-panel .ot-p2-header .ot-p2-cerrar {
   background: #f8f9fa;
@@ -914,7 +965,7 @@
 .ot-item-row .ot-item-quitar {
   background: none;
   border: none;
-  color: #7f8c8d;
+  color: #5d6b78;
   cursor: pointer;
   font-size: 13px;
 }
@@ -924,6 +975,15 @@
 
 .orden-sidebar-separador {
   margin-top: 1rem;
+}
+
+.ot-trabajo-titulo .ot-cliente-nombre {
+  color: #1A242F;
+  font-weight: 700;
+}
+
+.ot-filtros-visitas {
+  margin-bottom: 1rem;
 }
 
 /*# sourceMappingURL=orden-modulo.css.map */

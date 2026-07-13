@@ -4,6 +4,7 @@
  */
 import { escapeHtml } from '../utils/sanitize.js';
 import { showSuccess, showError, showWarning } from '../utils/notification.js';
+import { getValidToken } from '../utils/store/manager-key.js';
 import { apiOrden, API_BASE_URL, formatCLP, ESTADOS_ORDEN } from './format.js';
 
 let ordenes = [];
@@ -11,6 +12,8 @@ let filtroEstado = 'todos';
 let filtroPlaca = '';
 let serviciosCatalogo = [];
 let productosInventario = [];
+// Órdenes con un cambio de estado en curso (evita doble clic / doble envío)
+const cambiosEnCurso = new Set();
 
 export async function initPendientes(container) {
   container.innerHTML = `
@@ -119,7 +122,7 @@ function renderOrden(o) {
       <span class="ot-placa-mini">${escapeHtml(o.vehiculo?.placa || '—')}</span>
       <div class="ot-trabajo-titulo">
         <strong>${escapeHtml(o.vehiculo?.modelo || 'Modelo sin registrar')}${o.vehiculo?.anio ? ' ' + escapeHtml(o.vehiculo.anio) : ''}</strong>
-        <small>${escapeHtml(cliente)} · ${escapeHtml(mecanico)}</small>
+        <small><span class="ot-cliente-nombre">${escapeHtml(cliente)}</span> · ${escapeHtml(mecanico)}</small>
       </div>
       <span class="ot-badge ${escapeHtml(estado.clase)}">● ${escapeHtml(estado.label)}</span>
     </div>
@@ -181,21 +184,59 @@ async function cambiarEstado(orden, nuevoEstado, yaListo = false) {
   // "Validar → Revisados": la orden ya está en listo, solo confirmar
   if (yaListo && orden.estado === 'listo') {
     showSuccess(`${orden.vehiculo.placa} validado → aparece en Revisados`);
-    await recargar();
     return;
   }
+
+  // Evitar doble envío si ya hay un cambio en curso para esta orden
+  if (cambiosEnCurso.has(orden.id)) return;
+  cambiosEnCurso.add(orden.id);
+
+  // UI OPTIMISTA: el cambio se refleja al instante en tarjeta y contadores;
+  // si el backend lo rechaza, se revierte. Así los botones responden
+  // de inmediato aunque la BD remota tarde.
+  const estadoAnterior = orden.estado;
+  orden.estado = nuevoEstado;
+  renderContadores();
+  renderLista();
+
   try {
-    await apiOrden(`/${orden.id}/estado`, { method: 'PATCH', body: { estado: nuevoEstado } });
+    // La respuesta trae la orden ya actualizada: es el dato autoritativo.
+    // (Antes se recargaba toda la lista y a veces llegaba en caché el
+    //  estado viejo, revirtiendo el contador).
+    const actualizada = await apiOrden(`/${orden.id}/estado`, { method: 'PATCH', body: { estado: nuevoEstado } });
+    Object.assign(orden, actualizada);
     const mensajes = {
-      listo: `${orden.vehiculo.placa} marcado como listo · esperando recojo en Revisados`,
-      esperando_repuestos: `${orden.vehiculo.placa} en espera de repuestos`,
-      en_proceso: `${orden.vehiculo.placa} de vuelta en proceso`,
+      listo: `${orden.vehiculo.placa} marcado como listo · pásalo a Revisados para el recojo`,
+      esperando_repuestos: `${orden.vehiculo.placa} quedó en espera de repuestos`,
+      en_proceso: `${orden.vehiculo.placa} volvió a estar en proceso`,
     };
     showSuccess(mensajes[nuevoEstado] || 'Estado actualizado');
-    await recargar();
+    renderContadores();
+    renderLista();
   } catch (e) {
-    showError(e.detail || 'No se pudo cambiar el estado');
+    // Revertir el cambio mostrado
+    orden.estado = estadoAnterior;
+    renderContadores();
+    renderLista();
+    showError(traducirError(e, orden));
+  } finally {
+    cambiosEnCurso.delete(orden.id);
   }
+}
+
+/**
+ * Convierte errores técnicos del backend en mensajes que entienda quien
+ * opera el sistema (evita textos como "esperando_repuestos → listo").
+ */
+function traducirError(e, orden) {
+  const detalle = e?.detail || e?.message || '';
+  if (/transici[oó]n inv[aá]lida/i.test(detalle)) {
+    return `Ese cambio de estado ya no aplica para ${orden.vehiculo?.placa || 'la orden'}. Actualiza la vista e inténtalo de nuevo.`;
+  }
+  if (/saldo pendiente/i.test(detalle)) {
+    return 'La orden tiene saldo pendiente: cóbralo o confirma la entrega con deuda.';
+  }
+  return detalle || 'No se pudo cambiar el estado';
 }
 
 function confirmarCancelar(orden) {
@@ -219,14 +260,22 @@ function confirmarCancelar(orden) {
   document.getElementById('ot-cancelar-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'ot-cancelar-overlay') cerrar();
   });
-  document.getElementById('ot-cancelar-si').addEventListener('click', async () => {
+  document.getElementById('ot-cancelar-si').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Cancelando…';
     try {
       await apiOrden(`/${orden.id}/estado`, { method: 'PATCH', body: { estado: 'cancelado' } });
+      // Quitar de la lista al instante, sin esperar una recarga completa
+      ordenes = ordenes.filter(o => o.id !== orden.id);
+      renderContadores();
+      renderLista();
       showSuccess(`Trabajo ${orden.codigo} cancelado · stock repuesto`);
       cerrar();
-      await recargar();
-    } catch (e) {
-      showError(e.detail || 'No se pudo cancelar');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Cancelar trabajo';
+      showError(err.detail || 'No se pudo cancelar');
     }
   });
 }
@@ -234,7 +283,8 @@ function confirmarCancelar(orden) {
 // ---------- Añadir ítem (servicio del catálogo o repuesto del inventario) ----------
 
 async function cargarCatalogos() {
-  const token = localStorage.getItem('supabase_token');
+  // Token con renovación automática (el token crudo expira a la hora)
+  const token = await getValidToken();
   const headers = { 'Authorization': token ? `Bearer ${token}` : '' };
   const [servResp, prodResp] = await Promise.all([
     fetch(`${API_BASE_URL}/servicios/`, { headers }),
@@ -310,14 +360,18 @@ async function abrirModalAnadirItem(orden) {
     if (e.target.id === 'ot-item-overlay') cerrar();
   });
 
-  document.getElementById('ot-item-anadir').addEventListener('click', async () => {
+  document.getElementById('ot-item-anadir').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Añadiendo…';
     try {
+      let actualizada;
       if (tabActiva === 'servicio') {
         const select = document.getElementById('item-servicio-select');
         const precio = parseInt(document.getElementById('item-servicio-precio').value, 10) || 0;
-        if (!select.value) { showWarning('Selecciona un servicio'); return; }
+        if (!select.value) { showWarning('Selecciona un servicio'); btn.disabled = false; btn.textContent = 'Añadir a la orden'; return; }
         const servicio = serviciosCatalogo.find(s => s.id === parseInt(select.value, 10));
-        await apiOrden(`/${orden.id}/servicios`, {
+        actualizada = await apiOrden(`/${orden.id}/servicios`, {
           method: 'POST',
           body: { servicio_id: servicio.id, nombre: servicio.nombre, precio, es_extra: true },
         });
@@ -325,18 +379,23 @@ async function abrirModalAnadirItem(orden) {
       } else {
         const select = document.getElementById('item-producto-select');
         const cantidad = parseInt(document.getElementById('item-producto-cant').value, 10) || 0;
-        if (!select.value) { showWarning('Selecciona un repuesto'); return; }
-        if (cantidad <= 0) { showWarning('La cantidad debe ser mayor a 0'); return; }
-        await apiOrden(`/${orden.id}/productos`, {
+        if (!select.value) { showWarning('Selecciona un repuesto'); btn.disabled = false; btn.textContent = 'Añadir a la orden'; return; }
+        if (cantidad <= 0) { showWarning('La cantidad debe ser mayor a 0'); btn.disabled = false; btn.textContent = 'Añadir a la orden'; return; }
+        actualizada = await apiOrden(`/${orden.id}/productos`, {
           method: 'POST',
           body: { producto_id: parseInt(select.value, 10), cantidad },
         });
         showSuccess('Repuesto añadido · stock descontado');
       }
+      // El backend devuelve la orden actualizada: pintarla sin recargar todo
+      Object.assign(orden, actualizada);
+      renderContadores();
+      renderLista();
       cerrar();
-      await recargar();
-    } catch (e) {
-      showError(e.detail || 'No se pudo añadir el ítem');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Añadir a la orden';
+      showError(err.detail || 'No se pudo añadir el ítem');
     }
   });
 }
