@@ -447,7 +447,20 @@ function setupFormSubmit(form, autopartCheckbox, type = 'add', productId = null)
     // VALIDACIÓN COMPLETA DEL FORMULARIO
     // ========================================
     if (!validateFormData(form, formData, isAutopart)) {
-      showNotification('Por favor corrige los errores en el formulario', 'error');
+      // Llevar al usuario al primer campo con error y decirle exactamente
+      // qué corregir (antes solo salía "corrige los errores" sin más pista).
+      const primerError = form.querySelector('.input-error');
+      const mensajeError = form.querySelector('.error-message');
+      if (primerError) {
+        primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        primerError.focus({ preventScroll: true });
+      }
+      showNotification(
+        mensajeError?.textContent
+          ? `Corrige este dato: ${mensajeError.textContent}`
+          : 'Revisa los campos marcados en rojo del formulario.',
+        'error'
+      );
       return; // Detener el envío si hay errores de validación
     }
 
