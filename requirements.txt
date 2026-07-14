@@ -9,6 +9,9 @@ sqlalchemy==2.0.44
 python-multipart==0.0.20
 psycopg2-binary==2.9.11
 httpx==0.28.1
+# Observabilidad SRE (Semana 14): expone /metrics para Prometheus
+prometheus-fastapi-instrumentator==7.0.0
+prometheus-client==0.25.0
 # Dev / CI
 flake8==7.3.0
 pytest==9.0.3

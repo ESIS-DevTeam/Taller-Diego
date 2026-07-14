@@ -1,0 +1,30 @@
+# ========================================
+# Alertmanager — Taller de Diego (Semana 14)
+# Enruta las alertas de burn rate hacia un receptor.
+# (Para la práctica basta con verlas en la UI de Alertmanager :9093;
+#  el webhook queda listo para conectar Slack/email si se desea.)
+# ========================================
+route:
+  receiver: "equipo-taller"
+  group_by: ["alertname", "slo"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+  routes:
+    - matchers:
+        - severity = "critical"
+      receiver: "equipo-taller"
+      repeat_interval: 1h
+
+receivers:
+  - name: "equipo-taller"
+    # Receptor de ejemplo. Sustituir por slack_configs / email_configs reales.
+    webhook_configs:
+      - url: "http://localhost:5001/alertas"
+        send_resolved: true
+
+inhibit_rules:
+  # Si suena la alerta crítica de burn rate, silenciar la de warning del mismo SLO.
+  - source_matchers: [severity = "critical"]
+    target_matchers: [severity = "warning"]
+    equal: ["slo"]
