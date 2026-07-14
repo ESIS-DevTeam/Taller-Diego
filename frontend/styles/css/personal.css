@@ -1,3 +1,15 @@
+.main-content {
+  margin-top: 75px;
+  min-height: calc(100vh - 75px);
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+  .main-content {
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+  }
+}
+
 .personal-section {
   padding: 1rem;
 }
@@ -8,6 +20,12 @@
   align-items: flex-start;
   gap: 1rem;
   flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.ot-badge.per-badge-inactivo {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .per-tabla-card {

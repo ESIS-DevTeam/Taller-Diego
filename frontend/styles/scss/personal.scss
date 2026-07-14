@@ -7,6 +7,21 @@
 $verde: #10b981;
 $azul-oscuro: #16283c;
 
+// El header del sitio es fijo (75px). Sin este margen el contenido
+// quedaba tapado por el header (el título y el botón "+ Nuevo mecánico"
+// aparecían cortados arriba). Personal no carga orden.css, que es
+// donde el resto de módulos define este desplazamiento.
+.main-content {
+  margin-top: v.$header-height;
+  min-height: calc(100vh - #{v.$header-height});
+  box-sizing: border-box;
+
+  @include v.media(md) {
+    margin-top: v.$header-height-mobile;
+    min-height: calc(100vh - #{v.$header-height-mobile});
+  }
+}
+
 .personal-section {
   padding: v.spacing(md);
 }
@@ -17,6 +32,13 @@ $azul-oscuro: #16283c;
   align-items: flex-start;
   gap: v.spacing(md);
   flex-wrap: wrap;
+  margin-bottom: v.spacing(md);
+}
+
+// Badge rojo para mecánico inactivo (contraste claro con "Activo" verde)
+.ot-badge.per-badge-inactivo {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .per-tabla-card {
