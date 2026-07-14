@@ -35,15 +35,17 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 12px;
+  letter-spacing: 0.6px;
   font-weight: 700;
-  color: #5d6b78;
+  color: #1A242F;
 }
 .caja-tarjeta .caja-tarjeta-titulo small {
+  font-size: 11px;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
+  color: #5d6b78;
 }
 .caja-tarjeta .caja-tarjeta-titulo.caja-punto-verde::before, .caja-tarjeta .caja-tarjeta-titulo.caja-punto-rojo::before, .caja-tarjeta .caja-tarjeta-titulo.caja-punto-azul::before, .caja-tarjeta .caja-tarjeta-titulo.caja-punto-amarillo::before {
   content: "";
@@ -72,7 +74,7 @@
 }
 .caja-tarjeta small {
   color: #5d6b78;
-  font-size: 12px;
+  font-size: 13px;
 }
 .caja-tarjeta.caja-tarjeta-balance {
   border: 2px solid #16283c;
@@ -124,7 +126,7 @@
 }
 
 .caja-nota-pie {
-  font-size: 12px;
+  font-size: 13px;
   color: #5d6b78;
   margin: 10px 0 0;
 }
@@ -157,10 +159,10 @@
 .caja-notas-head {
   background: #f8f9fa;
   border-bottom: 1px solid #e5e7eb;
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 11.5px;
+  letter-spacing: 0.6px;
   font-weight: 700;
-  color: #5d6b78;
+  color: #2c3e50;
 }
 
 .caja-nota-fila {
@@ -179,7 +181,7 @@
 .caja-nota-fila small {
   display: block;
   color: #5d6b78;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .caja-deu-head,
@@ -194,10 +196,10 @@
 .caja-deu-head {
   background: #f8f9fa;
   border-bottom: 1px solid #e5e7eb;
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 11.5px;
+  letter-spacing: 0.6px;
   font-weight: 700;
-  color: #5d6b78;
+  color: #2c3e50;
 }
 
 .caja-deu-fila {
@@ -249,7 +251,8 @@
 .rep-leyenda {
   display: flex;
   gap: 16px;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
   color: #2c3e50;
 }
 .rep-leyenda i {
@@ -280,8 +283,8 @@
 
 .rep-eje {
   font-family: "Istok Web", sans-serif;
-  font-size: 11px;
-  fill: #5d6b78;
+  font-size: 12.5px;
+  fill: #2c3e50;
 }
 
 .rep-barra {
@@ -360,12 +363,12 @@
 }
 .rep-resumen-item strong {
   display: block;
-  font-size: 13px;
+  font-size: 14px;
   color: #1A242F;
 }
 .rep-resumen-item small {
   color: #5d6b78;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .rep-proporcion p {
@@ -405,7 +408,7 @@
   display: flex;
   gap: 18px;
   margin-top: 8px;
-  font-size: 12px;
+  font-size: 13px;
   color: #2c3e50;
   flex-wrap: wrap;
 }

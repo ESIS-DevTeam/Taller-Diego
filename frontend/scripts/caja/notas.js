@@ -7,6 +7,8 @@ import { showSuccess, showError, showWarning } from '../utils/notification.js';
 import { apiCaja, formatCLP, formatFecha, fechaISO } from './api.js';
 
 let filtro = 'todas';
+// Notas con una acción en curso (evita doble clic en eliminar)
+const accionesEnCurso = new Set();
 
 const ESTADOS_NOTA = {
   vigente: { label: 'Vigente', clase: 'ot-badge-listo' },
@@ -136,19 +138,26 @@ async function pagarNota(id) {
   document.getElementById('nota-pagar-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'nota-pagar-overlay') cerrar();
   });
-  document.getElementById('nota-pagar-si').addEventListener('click', async () => {
+  document.getElementById('nota-pagar-si').addEventListener('click', async (ev) => {
+    const btn = ev.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Procesando…';
     try {
       await apiCaja(`/notas/${id}/pagar`, { method: 'PATCH' });
       showSuccess('Nota pagada · registrada como egreso del día');
       cerrar();
       await cargar();
     } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Confirmar pago';
       showError(e.detail || 'No se pudo pagar la nota');
     }
   });
 }
 
 async function eliminarNota(id) {
+  if (accionesEnCurso.has(id)) return; // evitar doble clic
+  accionesEnCurso.add(id);
   try {
     await apiCaja(`/notas/${id}`, { method: 'DELETE' });
     showSuccess('Nota eliminada');
@@ -156,6 +165,8 @@ async function eliminarNota(id) {
   } catch (e) {
     // Caso especial: nota pagada no se elimina (ya afectó la caja)
     showError(e.detail || 'No se pudo eliminar la nota');
+  } finally {
+    accionesEnCurso.delete(id);
   }
 }
 
@@ -202,7 +213,7 @@ function abrirModalNueva() {
   document.getElementById('nota-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'nota-overlay') cerrar();
   });
-  document.getElementById('nota-guardar').addEventListener('click', async () => {
+  document.getElementById('nota-guardar').addEventListener('click', async (ev) => {
     const datos = {
       concepto: document.getElementById('nota-concepto').value.trim(),
       proveedor: document.getElementById('nota-proveedor').value.trim(),
@@ -216,12 +227,17 @@ function abrirModalNueva() {
     if (datos.monto <= 0) { showWarning('Ingresa un monto válido'); return; }
     if (!datos.fecha_limite) { showWarning('La fecha límite es obligatoria'); return; }
 
+    const btn = ev.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Registrando…';
     try {
       await apiCaja('/notas', { method: 'POST', body: datos });
       showSuccess('Nota de pago registrada');
       cerrar();
       await cargar();
     } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Registrar nota';
       showError(e.detail || 'No se pudo registrar la nota');
     }
   });

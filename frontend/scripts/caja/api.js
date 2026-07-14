@@ -8,11 +8,25 @@ export { formatCLP, formatFecha, formatHora } from '../orden/format.js';
 
 export async function apiCaja(path, options = {}) {
   const token = await getValidToken();
-  const response = await fetch(`${API_BASE_URL}/caja${path}`, {
-    method: options.method || 'GET',
+  const method = options.method || 'GET';
+
+  // Evitar que el navegador sirva datos viejos desde su caché HTTP.
+  // Sin esto, lo que cambia en otros módulos (entregas con deuda, ventas
+  // de productos, cobros) tardaba en reflejarse en cierre, deudores y
+  // reportes porque el GET devolvía la respuesta cacheada.
+  let url = `${API_BASE_URL}/caja${path}`;
+  if (method === 'GET') {
+    const sep = url.includes('?') ? '&' : '?';
+    url += `${sep}_t=${Date.now()}`;
+  }
+
+  const response = await fetch(url, {
+    method,
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': token ? `Bearer ${token}` : '',
+      'Cache-Control': 'no-cache',
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
