@@ -28,12 +28,14 @@ class SqlAlchemyVentaRepository(VentaRepository):
                 pid = item.get("producto_id")
                 cantidad = item.get("cantidad", 0)
                 if not pid or cantidad <= 0:
-                    raise ValueError("Producto o cantidad inválida")
+                    raise ValueError("Hay un producto con cantidad inválida en la venta.")
                 producto = self.db.query(Producto).filter(Producto.id == pid).with_for_update().first()
                 if not producto:
-                    raise ValueError(f"Producto con id {pid} no existe")
+                    raise ValueError("Uno de los productos ya no existe en el inventario.")
                 if producto.stock < cantidad:
-                    raise ValueError(f"Stock insuficiente para producto {pid}")
+                    raise ValueError(
+                        f"Sin stock suficiente de «{producto.nombre}»: "
+                        f"quedan {producto.stock} y se pidieron {cantidad}.")
                 vp = VentaProducto(venta_id=venta.id, producto_id=pid, cantidad=cantidad)
                 domain = DomainVenta(fecha=venta.fecha, productos=venta.productos)
                 domain.agregar_producto(vp)

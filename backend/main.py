@@ -41,11 +41,15 @@ async def add_cache_headers(request: Request, call_next):
     # Agregar header de tiempo de procesamiento
     response.headers["X-Process-Time"] = str(process_time)
     
-    # Agregar headers de caché para endpoints de API
+    # Los datos de la API son autenticados y cambian a cada rato (stock,
+    # estados de órdenes, caja). Cachearlos hacía que el navegador mostrara
+    # valores viejos (p. ej. stock desactualizado en venta de productos).
+    # Por eso se fuerza "no-store": siempre datos frescos del servidor.
     if request.url.path.startswith("/api/v1/"):
-        # Caché de 5 minutos para datos que no cambian frecuentemente
-        response.headers["Cache-Control"] = "public, max-age=300"
-    
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+
     return response
 
 app.include_router(status_routes.router,
