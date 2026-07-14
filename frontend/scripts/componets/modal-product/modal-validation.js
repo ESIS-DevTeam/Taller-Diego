@@ -169,13 +169,11 @@ function validateNumbers(form, formData) {
 }
 
 function validateDescription(input, value) {
+  // La descripción es OPCIONAL. Antes exigía 10+ caracteres, lo que
+  // bloqueaba editar productos con descripciones cortas ya guardadas
+  // (p. ej. no dejaba actualizar el stock). Ahora solo se valida que,
+  // si se escribe algo, sea texto normal (sin símbolos raros).
   if (value && value.trim()) {
-    if (value.length < 10) {
-      validateField(input, "La descripción debe tener al menos 10 caracteres si se proporciona");
-      return false;
-    }
-
-    // Permitir solo texto descriptivo normal
     if (!/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9\s\-.,()\n\r]+$/.test(value)) {
       validateField(input, "La descripción solo puede contener texto descriptivo normal");
       return false;

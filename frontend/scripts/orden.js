@@ -4,6 +4,7 @@ import { fetchForBarCode } from './data-manager.js';
 import { showSuccess, showError, showWarning } from './utils/notification.js';
 import { resetBodyDefaults } from './utils/state-manager.js';
 import { escapeHtml } from './utils/sanitize.js';
+import { getValidToken } from './utils/store/manager-key.js';
 import { initRecepcion } from './orden/recepcion.js';
 import { initHistorial } from './orden/historial.js';
 import { initPendientes } from './orden/pendientes.js';
@@ -149,9 +150,14 @@ async function initVentaProducto() {
 
 async function loadProductos() {
   try {
-    const response = await fetch(`${API_BASE_URL}/productos/`, {
+    // Token con auto-renovación + anti-caché para traer el stock REAL
+    // (antes se servía la lista vieja desde el caché del navegador).
+    const token = await getValidToken();
+    const response = await fetch(`${API_BASE_URL}/productos/?_t=${Date.now()}`, {
+      cache: 'no-store',
       headers: {
-        'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Cache-Control': 'no-cache',
       }
     });
     if (!response.ok) throw new Error('Error al cargar productos');
@@ -159,7 +165,7 @@ async function loadProductos() {
     productosDisponibles = await response.json();
     displayProductos(productosDisponibles);
   } catch (error) {
-    showError('Error al cargar productos');
+    showError('No se pudo cargar la lista de productos. Revisa la conexión con el servidor.');
   }
 }
 
@@ -231,7 +237,7 @@ async function processScannedProduct(barCode, reader) {
     }
 
     if (producto.stock === 0) {
-      showWarning(`Sin stock: ${producto.nombre}`);
+      showWarning(`«${producto.nombre}» está agotado: no hay stock para vender.`);
       return;
     }
 
@@ -279,7 +285,7 @@ function displayProductos(productos) {
 
       // Validar stock antes de seleccionar
       if (stock === 0) {
-        showWarning('Este producto no tiene stock disponible');
+        showWarning(`«${nombre}» está agotado: no hay stock para vender.`);
         dropdown.style.display = 'none';
         productoSearch.value = '';
         return;
@@ -318,7 +324,7 @@ function addProductoToVenta() {
   const cantidadInput = document.getElementById('cantidad-input');
 
   if (!productoSearch.dataset.selectedId) {
-    showWarning('Selecciona un producto');
+    showWarning('Primero selecciona un producto de la lista.');
     return;
   }
 
@@ -326,28 +332,29 @@ function addProductoToVenta() {
   const cantidad = parseInt(cantidadInput.value);
   const stock = parseInt(productoSearch.dataset.stock);
   const precio = parseInt(productoSearch.dataset.precio);
+  const nombre = productoSearch.value || 'Este producto';
 
-  if (cantidad <= 0) {
-    showWarning('La cantidad debe ser mayor a 0');
+  if (isNaN(cantidad) || cantidad <= 0) {
+    showWarning('Escribe una cantidad válida (mayor a 0).');
     return;
   }
 
   if (stock === 0) {
-    showWarning('Este producto no tiene stock disponible');
+    showWarning(`«${nombre}» está agotado: no hay stock para vender.`);
     return;
   }
 
   if (cantidad > stock) {
-    showWarning(`Stock insuficiente. Disponible: ${stock}`);
+    showWarning(`Solo quedan ${stock} unidad${stock === 1 ? '' : 'es'} de «${nombre}».`);
     return;
   }
 
-  // Verificar si el producto ya está en la venta
+  // Verificar si el producto ya está en la venta (evita pedir más del stock)
   const existingIndex = productosVenta.findIndex(p => p.producto_id === productoId);
   if (existingIndex >= 0) {
     const nuevaCantidadTotal = productosVenta[existingIndex].cantidad + cantidad;
     if (nuevaCantidadTotal > stock) {
-      showWarning(`Stock insuficiente. Disponible: ${stock}`);
+      showWarning(`Ya tienes ${productosVenta[existingIndex].cantidad} en la venta y solo quedan ${stock} de «${nombre}».`);
       return;
     }
     productosVenta[existingIndex].cantidad += cantidad;
@@ -611,31 +618,45 @@ async function registrarVenta() {
   };
 
   try {
+    const token = await getValidToken();
     const response = await fetch(`${API_BASE_URL}/ventas/`, {
       method: 'POST',
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': localStorage.getItem('supabase_token') ? `Bearer ${localStorage.getItem('supabase_token')}` : ''
+        'Authorization': token ? `Bearer ${token}` : ''
       },
       body: JSON.stringify(ventaData)
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Error al registrar venta');
+      // El backend explica el motivo (ej: "Sin stock suficiente de «X»…")
+      let detalle = `Error del servidor (${response.status})`;
+      try { detalle = (await response.json())?.detail || detalle; } catch (e) { /* sin json */ }
+
+      // Si fue por stock, refrescar la lista para mostrar el stock real
+      if (response.status === 409) {
+        await loadProductos();
+      }
+      showError(detalle);
+      return;
     }
 
-    showSuccess('Venta registrada exitosamente');
+    showSuccess('Venta registrada · stock actualizado');
 
     // Limpiar la venta
     productosVenta = [];
     updateVentaTable();
 
-    // Recargar productos para actualizar stock
+    // Recargar productos para reflejar el nuevo stock de inmediato
     await loadProductos();
 
   } catch (error) {
-    showError('Error al registrar venta: ' + error.message);
+    // TypeError "Failed to fetch" = no hubo conexión con el servidor
+    const esRed = error instanceof TypeError;
+    showError(esRed
+      ? 'No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.'
+      : `No se pudo registrar la venta: ${error.message}`);
   } finally {
     ventaRegistrandose = false;
     if (registrarBtn) {

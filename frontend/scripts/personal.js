@@ -19,6 +19,8 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
 let mecanicos = [];
 let filtroEstado = 'todos';
 let filtroTexto = '';
+// Mecánicos con un cambio en curso (evita doble clic en el switch)
+const cambiosEnCurso = new Set();
 
 document.addEventListener('DOMContentLoaded', async () => {
   resetBodyDefaults();
@@ -28,11 +30,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function api(path, options = {}) {
   const token = await getValidToken();
-  const response = await fetch(`${API_BASE_URL}/empleados${path}`, {
-    method: options.method || 'GET',
+  const method = options.method || 'GET';
+
+  // Evitar que el navegador sirva la lista vieja desde su caché HTTP.
+  // Sin esto, tras editar o cambiar el estado la recarga mostraba el
+  // valor anterior (el switch "se reactivaba solo", el cambio no se veía).
+  let url = `${API_BASE_URL}/empleados${path}`;
+  if (method === 'GET') {
+    const sep = url.includes('?') ? '&' : '?';
+    url += `${sep}_t=${Date.now()}`;
+  }
+
+  const response = await fetch(url, {
+    method,
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': token ? `Bearer ${token}` : '',
+      'Cache-Control': 'no-cache',
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
@@ -134,7 +149,7 @@ function renderTabla() {
       <span>${escapeHtml(m.especialidad || '—')}</span>
       <span>${escapeHtml(m.telefono || '—')}</span>
       <span class="per-correo">${escapeHtml(m.correo || '—')}</span>
-      <span><span class="ot-badge ${activo ? 'ot-badge-listo' : 'estado-entregado'}">● ${activo ? 'Activo' : 'Inactivo'}</span></span>
+      <span><span class="ot-badge ${activo ? 'ot-badge-listo' : 'per-badge-inactivo'}">● ${activo ? 'Activo' : 'Inactivo'}</span></span>
       <div class="per-acciones">
         <button class="per-btn-icono" data-accion="editar" title="Editar">✎</button>
         <button class="per-btn-icono per-btn-eliminar" data-accion="eliminar" title="Eliminar">🗑</button>
@@ -162,14 +177,31 @@ function renderTabla() {
 // ---------- Activar / desactivar ----------
 
 async function toggleEstado(m) {
+  // Evitar doble envío mientras el cambio está en curso
+  if (cambiosEnCurso.has(m.id)) return;
+  cambiosEnCurso.add(m.id);
+
+  const anterior = m.estado;
   const nuevo = (m.estado || '').toLowerCase() === 'activo' ? 'inactivo' : 'activo';
+
+  // OPTIMISTA: el badge (verde↔rojo) y el switch cambian al instante;
+  // si el backend falla, se revierte.
+  m.estado = nuevo;
+  renderTabla();
+
   try {
-    await api(`/${m.id}`, { method: 'PUT', body: { ...m, estado: nuevo } });
-    showSuccess(`${m.nombres} ${m.apellidos} ahora está ${nuevo}${nuevo === 'inactivo' ? ' · no recibirá nuevas órdenes' : ''}`);
-    await recargar();
+    const actualizado = await api(`/${m.id}`, { method: 'PUT', body: { ...m } });
+    Object.assign(m, actualizado); // dato autoritativo del servidor
+    renderTabla();
+    showSuccess(nuevo === 'inactivo'
+      ? `${m.nombres} ${m.apellidos} quedó inactivo · no recibirá nuevas órdenes`
+      : `${m.nombres} ${m.apellidos} quedó activo`);
   } catch (e) {
+    m.estado = anterior; // revertir el switch y el badge
+    renderTabla();
     showError(e.detail || 'No se pudo cambiar el estado');
-    renderTabla(); // revertir el switch visual
+  } finally {
+    cambiosEnCurso.delete(m.id);
   }
 }
 
@@ -240,17 +272,25 @@ function abrirModal(m = null) {
       showWarning('El correo no tiene un formato válido'); return;
     }
 
+    const btnGuardar = document.getElementById('per-guardar');
+    btnGuardar.disabled = true;
+    btnGuardar.textContent = esEdicion ? 'Guardando…' : 'Registrando…';
     try {
       if (esEdicion) {
-        await api(`/${m.id}`, { method: 'PUT', body: datos });
+        const actualizado = await api(`/${m.id}`, { method: 'PUT', body: datos });
+        // Reflejar el cambio en memoria y en la tabla al instante
+        Object.assign(m, actualizado);
         showSuccess('Mecánico actualizado');
       } else {
-        await api('/', { method: 'POST', body: datos });
+        const nuevo = await api('/', { method: 'POST', body: datos });
+        mecanicos.push(nuevo);
         showSuccess(`${datos.nombres} ${datos.apellidos} registrado`);
       }
       cerrar();
-      await recargar();
+      renderTabla();
     } catch (e) {
+      btnGuardar.disabled = false;
+      btnGuardar.textContent = esEdicion ? 'Guardar cambios' : 'Registrar mecánico';
       showError(e.detail || 'No se pudo guardar');
     }
   });
@@ -279,12 +319,17 @@ function confirmarEliminar(m) {
   document.getElementById('per-del-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'per-del-overlay') cerrar();
   });
-  document.getElementById('per-del-si').addEventListener('click', async () => {
+  document.getElementById('per-del-si').addEventListener('click', async (ev) => {
+    const btn = ev.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Eliminando…';
     try {
       await api(`/${m.id}`, { method: 'DELETE' });
+      // Quitar de la lista local al instante
+      mecanicos = mecanicos.filter(x => x.id !== m.id);
       showSuccess(`${m.nombres} ${m.apellidos} eliminado`);
       cerrar();
-      await recargar();
+      renderTabla();
     } catch (e) {
       cerrar();
       if (e.status === 409) {

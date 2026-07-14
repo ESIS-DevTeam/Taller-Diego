@@ -142,7 +142,7 @@ function abrirModalCobro(d) {
     if (e.target.id === 'deu-overlay') cerrar();
   });
 
-  document.getElementById('deu-cobrar').addEventListener('click', async () => {
+  document.getElementById('deu-cobrar').addEventListener('click', async (ev) => {
     const monto = parseInt(document.getElementById('deu-monto').value, 10) || 0;
     const metodo = document.getElementById('deu-metodo').value;
     if (monto <= 0) { showWarning('Ingresa el monto a cobrar'); return; }
@@ -150,6 +150,9 @@ function abrirModalCobro(d) {
       showWarning(`El monto excede la deuda (${formatCLP(d.monto_adeudado)})`); return;
     }
 
+    const btn = ev.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Procesando…';
     try {
       const orden = await apiOrden(`/${d.orden_id}/pagos`, {
         method: 'POST',
@@ -161,6 +164,8 @@ function abrirModalCobro(d) {
       cerrar();
       await cargar();
     } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Registrar pago';
       showError(e.detail || 'No se pudo registrar el pago');
     }
   });

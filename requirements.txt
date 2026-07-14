@@ -14,3 +14,4 @@ flake8==7.3.0
 pytest==9.0.3
 pytest-bdd==8.1.0
 coverage==7.14.0
+PyJWT==2.13.0

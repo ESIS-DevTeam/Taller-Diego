@@ -61,9 +61,12 @@ class OrdenTrabajoService:
 
     def buscar_vehiculos(self, q: str) -> list[dict]:
         q = (q or "").strip()
+        # Sin texto de búsqueda: últimos vehículos registrados
+        # (listado por defecto del historial)
         if len(q) < 1:
-            return []
-        pares = self.repo.buscar_vehiculos(q)
+            pares = self.repo.vehiculos_recientes()
+        else:
+            pares = self.repo.buscar_vehiculos(q)
         return [
             {
                 "placa": v.placa,
@@ -174,8 +177,11 @@ class OrdenTrabajoService:
         nuevo = EstadoOrdenTrabajo(nuevo_estado)
 
         if not actual.puede_transicionar_a(nuevo):
+            if actual.value == nuevo.value:
+                raise ValueError(
+                    f"El trabajo ya está en «{actual.label}».")
             raise ValueError(
-                f"Transición inválida: {actual.value} → {nuevo.value}")
+                f"No se puede pasar de «{actual.label}» a «{nuevo.label}».")
 
         ahora = datetime.now(timezone.utc)
 

@@ -173,6 +173,15 @@ class EstadoOrdenTrabajo:
     ESTADOS_VALIDOS = {"en_proceso", "esperando_repuestos",
                        "listo", "entregado", "cancelado"}
 
+    # Nombres legibles para mensajes al usuario (no exponer las claves internas)
+    ETIQUETAS = {
+        "en_proceso": "En proceso",
+        "esperando_repuestos": "Esperando repuestos",
+        "listo": "Listo",
+        "entregado": "Entregado",
+        "cancelado": "Cancelado",
+    }
+
     # Transiciones permitidas desde cada estado
     TRANSICIONES = {
         "en_proceso": {"esperando_repuestos", "listo", "cancelado"},
@@ -191,6 +200,11 @@ class EstadoOrdenTrabajo:
     @property
     def value(self) -> str:
         return self._value
+
+    @property
+    def label(self) -> str:
+        """Nombre legible para mostrar al usuario."""
+        return self.ETIQUETAS.get(self._value, self._value)
 
     def puede_transicionar_a(self, nuevo: "EstadoOrdenTrabajo") -> bool:
         return nuevo.value in self.TRANSICIONES[self._value]

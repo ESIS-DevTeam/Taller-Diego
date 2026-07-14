@@ -25,7 +25,13 @@ def get_venta_usecase(db: Session = Depends(get_db)) -> VentaUseCase:
 
 @router.post("/", response_model=VentaResponse, dependencies=[Depends(require_supabase_user)])
 def create_venta(data: VentaCreate, usecase: VentaUseCase = Depends(get_venta_usecase)):
-    return usecase.create_venta(data)
+    try:
+        return usecase.create_venta(data)
+    except ValueError as exc:
+        # Stock insuficiente, producto inexistente o cantidad inválida.
+        # Sin este manejo, el ValueError se volvía un 500 sin cabeceras CORS
+        # y el navegador solo mostraba "Failed to fetch".
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
 
 @router.get("/", response_model=list[VentaResponse])

@@ -84,11 +84,24 @@ import { getValidToken } from '../utils/store/manager-key.js';
  */
 export async function apiOrden(path, options = {}) {
   const token = await getValidToken();
-  const response = await fetch(`${API_BASE_URL}/ordenes-trabajo${path}`, {
-    method: options.method || 'GET',
+  const method = options.method || 'GET';
+
+  // Evitar que el navegador sirva listas viejas desde su caché HTTP.
+  // Sin esto, tras cambiar un estado la lista recargada mostraba el
+  // valor anterior (contador que "se revierte" y errores "X → X").
+  let url = `${API_BASE_URL}/ordenes-trabajo${path}`;
+  if (method === 'GET') {
+    const sep = url.includes('?') ? '&' : '?';
+    url += `${sep}_t=${Date.now()}`;
+  }
+
+  const response = await fetch(url, {
+    method,
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': token ? `Bearer ${token}` : '',
+      'Cache-Control': 'no-cache',
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });

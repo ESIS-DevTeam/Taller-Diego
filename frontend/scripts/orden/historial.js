@@ -5,9 +5,11 @@
 import { escapeHtml } from '../utils/sanitize.js';
 import { showSuccess, showError, showWarning } from '../utils/notification.js';
 import { debounce } from '../utils/debounce.js';
+import { getValidToken } from '../utils/store/manager-key.js';
 import { apiOrden, API_BASE_URL, formatCLP, formatFecha, ESTADOS_ORDEN } from './format.js';
 
 let historialActual = null;
+let filtroVisitas = 'todas';
 let serviciosCatalogo = [];
 let productosInventario = [];
 
@@ -44,6 +46,54 @@ export function initHistorial(container) {
       if (q) buscarYSeleccionarPrimero(q);
     }
   });
+
+  // Al entrar, mostrar los últimos vehículos registrados
+  cargarRecientes();
+}
+
+// ---------- Últimos vehículos registrados (listado por defecto) ----------
+
+async function cargarRecientes() {
+  const cont = document.getElementById('hist-resultado');
+  cont.innerHTML = `<div class="ot-card ot-vacio"><p>Cargando últimos vehículos…</p></div>`;
+
+  try {
+    const recientes = await apiOrden('/vehiculos/buscar?q=');
+
+    if (!recientes || recientes.length === 0) {
+      cont.innerHTML = `<div class="ot-card ot-vacio">
+        <p>Aún no hay vehículos registrados.</p>
+        <small>Registra la primera recepción desde <em>Servicios</em> y aparecerá aquí.</small>
+      </div>`;
+      return;
+    }
+
+    cont.innerHTML = `
+      <div class="ot-card">
+        <div class="ot-seccion-titulo">
+          <h3>Últimos vehículos registrados</h3>
+          <span class="ot-chip">${escapeHtml(recientes.length)} vehículo${recientes.length === 1 ? '' : 's'}</span>
+        </div>
+        ${recientes.map(s => `
+          <div class="ot-sugerencia" data-placa="${escapeHtml(s.placa)}">
+            <div class="ot-sugerencia-icono"></div>
+            <div class="ot-sugerencia-datos">
+              <strong>${escapeHtml(s.placa)}</strong> · ${escapeHtml(s.cliente_nombre)}
+              <small>${escapeHtml(s.modelo || 'Modelo sin registrar')}${s.anio ? ' ' + escapeHtml(s.anio) : ''} · ${escapeHtml(s.visitas)} visita${s.visitas === 1 ? '' : 's'}</small>
+            </div>
+            <span class="ot-ver-link">Ver ›</span>
+          </div>`).join('')}
+      </div>`;
+
+    cont.querySelectorAll('.ot-sugerencia').forEach(el => {
+      el.addEventListener('click', () => cargarHistorial(el.dataset.placa));
+    });
+  } catch (e) {
+    cont.innerHTML = `<div class="ot-card ot-vacio">
+      <p>No se pudieron cargar los últimos vehículos.</p>
+      <small>Revisa la conexión con el servidor y recarga la página.</small>
+    </div>`;
+  }
 }
 
 // ---------- Búsqueda en vivo ----------
@@ -115,10 +165,40 @@ async function cargarHistorial(placa) {
 
   try {
     historialActual = await apiOrden(`/historial/${encodeURIComponent(placa)}`);
+    filtroVisitas = 'todas';
     renderHistorial(cont);
   } catch (e) {
     showError(e.detail || 'Error al cargar el historial');
   }
+}
+
+/** Filtra las visitas según el chip elegido (similar a Trabajos pendientes). */
+function filtrarVisitas(visitas) {
+  const enTaller = ['en_proceso', 'esperando_repuestos', 'listo'];
+  if (filtroVisitas === 'taller') return visitas.filter(v => enTaller.includes(v.estado));
+  if (filtroVisitas === 'entregado') return visitas.filter(v => v.estado === 'entregado');
+  if (filtroVisitas === 'con_saldo') return visitas.filter(v => v.saldo > 0);
+  return visitas;
+}
+
+/** Re-pinta solo la lista de visitas (al cambiar de chip). */
+function renderListaVisitas() {
+  const lista = document.getElementById('hist-visitas-lista');
+  if (!lista || !historialActual) return;
+  const filtradas = filtrarVisitas(historialActual.visitas);
+
+  lista.innerHTML = filtradas.length === 0
+    ? `<p class="ot-vacio-texto">No hay visitas ${filtroVisitas === 'todas' ? 'registradas' : 'en este filtro'}.</p>`
+    : filtradas.map(v => renderVisita(v)).join('');
+
+  lista.querySelectorAll('.ot-visita-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const detalle = document.getElementById(`visita-detalle-${btn.dataset.id}`);
+      const visible = !detalle.hidden;
+      detalle.hidden = visible;
+      btn.textContent = visible ? 'Ver detalle' : 'Ocultar';
+    });
+  });
 }
 
 function ordenPendienteDeProforma() {
@@ -149,7 +229,8 @@ function renderHistorial(cont) {
         ${pendiente
           ? `<button class="ot-btn ot-btn-primario" id="hist-completar-p2">Completar Proforma 2</button>
              <span class="ot-badge ot-badge-warning">PROFORMA INCOMPLETA</span>`
-          : `<button class="ot-btn ot-btn-secundario" id="hist-ver-p2" ${visitas.length === 0 ? 'disabled' : ''}>Proforma completa</button>`}
+          : `<button class="ot-btn ot-btn-secundario" id="hist-ver-p2" ${visitas.length === 0 ? 'disabled' : ''}>Proforma completa</button>
+             <button class="ot-btn ot-btn-neutro" id="hist-editar-p2" ${visitas.length === 0 ? 'disabled' : ''}>Editar Proforma 2</button>`}
       </div>
     </div>
 
@@ -158,9 +239,13 @@ function renderHistorial(cont) {
         <h3>Historial de visitas al taller</h3>
         <span class="ot-chip">${escapeHtml(visitas.length)} registro${visitas.length === 1 ? '' : 's'}</span>
       </div>
-      ${visitas.length === 0
-        ? '<p class="ot-vacio-texto">Este vehículo no tiene visitas registradas.</p>'
-        : visitas.map(v => renderVisita(v)).join('')}
+      <div class="ot-filtros-botones ot-filtros-visitas">
+        <button class="ot-filtro ${filtroVisitas === 'todas' ? 'activo' : ''}" data-vfiltro="todas">Todas</button>
+        <button class="ot-filtro ${filtroVisitas === 'taller' ? 'activo' : ''}" data-vfiltro="taller">En taller</button>
+        <button class="ot-filtro ${filtroVisitas === 'entregado' ? 'activo' : ''}" data-vfiltro="entregado">Entregadas</button>
+        <button class="ot-filtro ${filtroVisitas === 'con_saldo' ? 'activo' : ''}" data-vfiltro="con_saldo">Con saldo</button>
+      </div>
+      <div id="hist-visitas-lista"></div>
     </div>`;
 
   if (pendiente) {
@@ -168,16 +253,22 @@ function renderHistorial(cont) {
   } else if (visitas.length > 0) {
     const btn = document.getElementById('hist-ver-p2');
     if (btn) btn.addEventListener('click', () => window.open(`proforma.html?id=${visitas[0].id}&tipo=2`, '_blank'));
+    // Reabrir la Proforma 2 para corregir datos aunque ya esté completa
+    const btnEditar = document.getElementById('hist-editar-p2');
+    if (btnEditar) btnEditar.addEventListener('click', () => abrirModalProforma2(visitas[0]));
   }
 
-  cont.querySelectorAll('.ot-visita-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const detalle = document.getElementById(`visita-detalle-${btn.dataset.id}`);
-      const visible = !detalle.hidden;
-      detalle.hidden = visible;
-      btn.textContent = visible ? 'Ver detalle' : 'Ocultar';
+  // Chips de filtro de visitas
+  cont.querySelectorAll('.ot-filtros-visitas .ot-filtro').forEach(chip => {
+    chip.addEventListener('click', () => {
+      cont.querySelectorAll('.ot-filtros-visitas .ot-filtro').forEach(c => c.classList.remove('activo'));
+      chip.classList.add('activo');
+      filtroVisitas = chip.dataset.vfiltro;
+      renderListaVisitas();
     });
   });
+
+  renderListaVisitas();
 }
 
 function renderVisita(v) {
@@ -216,7 +307,8 @@ function renderVisita(v) {
 // ---------- Modal Proforma 2 ----------
 
 async function cargarCatalogos() {
-  const token = localStorage.getItem('supabase_token');
+  // Token con renovación automática (el token crudo expira a la hora)
+  const token = await getValidToken();
   const headers = { 'Authorization': token ? `Bearer ${token}` : '' };
   try {
     const [servResp, prodResp] = await Promise.all([
