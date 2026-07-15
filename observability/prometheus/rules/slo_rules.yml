@@ -1,0 +1,96 @@
+# ========================================
+# Reglas SLO — Taller de Diego (Semana 14)
+#
+# SLOs acordados por el equipo:
+#   - Availability SLO: 99.0%   (error budget = 1.0% ≈ 432 min/30 días)
+#   - Latency SLO:      p99 < 1s
+#
+# Se eligió 99.0% (no 99.99%) porque es un taller mecánico pyme sin
+# tráfico crítico 24/7: un margen del 1% permite desplegar seguido
+# sin sobre-ingeniería, coherente con la tabla de error budget de la guía.
+# ========================================
+groups:
+  # ----------------------------------------
+  # SLIs como reglas de grabación (recording rules)
+  # Precalculan las fracciones para que los paneles y alertas
+  # consulten un solo valor limpio.
+  # ----------------------------------------
+  - name: taller_diego_slis
+    interval: 30s
+    rules:
+      # SLI Availability — fracción de peticiones NO-5xx sobre el total (5m)
+      - record: sli:availability:ratio_5m
+        expr: |
+          sum(rate(http_requests_total{status!~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total[5m]))
+
+      # SLI Latency p99 — percentil 99 de la duración (5m), en segundos
+      - record: sli:latency_p99:seconds_5m
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+          )
+
+      # SLI Latency p95 — percentil 95 (1m), STEADY STATE del experimento
+      # de caos (S15): en operación normal debe mantenerse < 200ms.
+      - record: sli:latency_p95:seconds_1m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[1m])) by (le)
+          )
+
+      # Error budget consumido (orientativo): 1 - (SLI_real / SLO)
+      # SLO de disponibilidad = 0.99
+      - record: slo:error_budget_consumed:ratio
+        expr: |
+          1 - ( sli:availability:ratio_5m / 0.99 )
+
+      # Burn rate — velocidad de consumo del presupuesto de error.
+      # tasa_de_error_real / tasa_de_error_presupuestada(1%).
+      # Burn rate = 1 significa "consumes el budget mensual en exactamente 30 días".
+      - record: slo:burn_rate:ratio_5m
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+          ) / 0.01
+
+  # ----------------------------------------
+  # Alertas (Fase 5) — Burn Rate
+  # ----------------------------------------
+  - name: taller_diego_burn_rate
+    rules:
+      # Burn rate rápido: a esta velocidad agotas el budget mensual en ~1 día.
+      # Umbral 14.4 es el valor estándar SRE para ventana corta (Google SRE Workbook).
+      - alert: ErrorBudgetBurnRateFast
+        expr: slo:burn_rate:ratio_5m > 14.4
+        for: 2m
+        labels:
+          severity: critical
+          slo: availability
+        annotations:
+          summary: "Burn rate ALTO en Taller de Diego"
+          description: "El presupuesto de error se consume a {{ $value | printf \"%.1f\" }}x. A este ritmo se agota el budget mensual en pocas horas. Considerar congelar releases."
+
+      # Burn rate lento: agotarías el budget mensual en ~3 días.
+      - alert: ErrorBudgetBurnRateSlow
+        expr: slo:burn_rate:ratio_5m > 6
+        for: 15m
+        labels:
+          severity: warning
+          slo: availability
+        annotations:
+          summary: "Burn rate elevado en Taller de Diego"
+          description: "Consumo del error budget a {{ $value | printf \"%.1f\" }}x durante 15m. Revisar antes de continuar desplegando."
+
+      # El servicio dejó de responder al scraping (Fase 1: up == 0)
+      - alert: BackendCaido
+        expr: up{job="taller-diego-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend del Taller de Diego no responde"
+          description: "Prometheus no puede hacer scraping de /metrics desde hace 1 minuto."

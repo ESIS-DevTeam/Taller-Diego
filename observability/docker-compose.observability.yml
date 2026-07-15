@@ -1,0 +1,83 @@
+# ========================================
+# Stack de observabilidad SRE — Taller de Diego (Semanas 14 y 15)
+# Levanta: backend instrumentado + Prometheus + Grafana + Alertmanager
+#          + Jaeger (trazas distribuidas, S15)
+#
+# Uso:
+#   docker compose -f observability/docker-compose.observability.yml up -d
+#
+# Accesos:
+#   Backend /metrics  → http://localhost:8000/metrics
+#   Prometheus        → http://localhost:9090
+#   Grafana           → http://localhost:3000  (admin / admin)
+#   Alertmanager      → http://localhost:9093
+#   Jaeger (trazas)   → http://localhost:16686
+# ========================================
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: taller-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../backend/.env
+    environment:
+      # Trazas OpenTelemetry → Jaeger (OTLP/gRPC). S15
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=taller-diego-backend
+      # Habilita el arnés de caos (inyección de latencia). S15
+      - CHAOS_ENABLED=1
+    depends_on:
+      - jaeger
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    container_name: taller-jaeger
+    ports:
+      - "16686:16686"   # UI web de Jaeger
+      - "4317:4317"     # OTLP gRPC (recibe las trazas del backend)
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: taller-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: taller-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: taller-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped

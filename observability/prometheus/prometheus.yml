@@ -1,0 +1,31 @@
+# ========================================
+# Prometheus — configuración de scraping del Taller de Diego
+# (Semana 14 · SLIs/SLOs/Error Budget)
+# ========================================
+global:
+  scrape_interval: 15s        # cada cuánto Prometheus consulta /metrics
+  evaluation_interval: 15s    # cada cuánto evalúa las reglas de alerta
+
+# Reglas de grabación (SLIs) y de alerta (burn rate)
+rule_files:
+  - "rules/slo_rules.yml"
+
+# Conexión con Alertmanager (Fase 5)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  # El propio Prometheus
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Backend del Taller de Diego (Fase 1: up{job="taller-diego-backend"} == 1)
+  - job_name: "taller-diego-backend"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend:8000"]
+        labels:
+          service: "taller-diego"

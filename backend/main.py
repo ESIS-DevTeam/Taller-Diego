@@ -5,6 +5,9 @@ from fastapi.responses import Response, HTMLResponse
 from fastapi.openapi.docs import get_swagger_ui_html
 from api.v1.routes import producto_routes, autoparte_routes, orden_routes, servicio_routes, empleado_routes, status_routes, auth_routes, orden_trabajo_routes, caja_routes
 from hexagonal.venta.adapters.primary.venta_api_adapter import router as venta_hex_router
+from prometheus_fastapi_instrumentator import Instrumentator, metrics
+from telemetry import setup_telemetry
+from chaos import register_chaos
 import time
 
 app = FastAPI(
@@ -15,6 +18,39 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json"
 )
+
+# ========================================
+# CHAOS ENGINEERING (Semana 15) — inyección de latencia controlada.
+# Se registra PRIMERO para que quede como el middleware más interno:
+# así el retardo inyectado queda DENTRO de la medición de Prometheus y
+# del span de OpenTelemetry (de lo contrario el 1500ms no se mediría).
+# Desactivado salvo que CHAOS_ENABLED=1 (solo en el experimento).
+# ========================================
+register_chaos(app)
+
+# ========================================
+# OBSERVABILIDAD SRE (Semana 14)
+# Expone métricas en /metrics para Prometheus:
+#   - http_requests_total{status=...}        → SLI de Availability
+#   - http_request_duration_seconds_bucket   → SLI de Latency p99
+# El scraping se define en observability/prometheus/prometheus.yml
+# ========================================
+instrumentator = Instrumentator(
+    should_group_status_codes=True,      # agrupa en 2xx/4xx/5xx (compatible con status!~"5..")
+    excluded_handlers=["/metrics"],      # no medir el propio endpoint de métricas
+)
+instrumentator.add(metrics.requests())   # contador http_requests_total
+instrumentator.add(metrics.latency(      # histograma http_request_duration_seconds
+    buckets=(0.05, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 10)
+))
+instrumentator.instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
+
+# ========================================
+# TRAZAS DISTRIBUIDAS (Semana 15) — OpenTelemetry → Jaeger
+# Emite spans de cada petición y consulta a BD. Se activa si
+# OTEL_EXPORTER_OTLP_ENDPOINT está definido (docker-compose).
+# ========================================
+setup_telemetry(app)
 
 # Middleware de compresión gzip (reduce tamaño de respuestas)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
