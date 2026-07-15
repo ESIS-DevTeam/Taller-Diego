@@ -204,6 +204,34 @@
       "targets": [
         { "refId": "A", "expr": "slo:burn_rate:ratio_5m", "legendFormat": "burn rate" }
       ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "S15 · Chaos — Latencia p95 vs Steady State (línea 200ms)",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 22 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "spanNulls": true,
+            "thresholdsStyle": { "mode": "line+area" }
+          },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "green" },
+            { "value": 0.2, "color": "red" }
+          ] }
+        }
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "refId": "A", "expr": "sli:latency_p95:seconds_1m", "legendFormat": "p95 latencia (steady state < 0.2s)" }
+      ]
     }
   ]
 }

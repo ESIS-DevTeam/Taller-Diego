@@ -1,0 +1,36 @@
+# ========================================
+# Experimento de Chaos Engineering (Semana 15)
+# NetworkChaos: inyecta 1500ms de latencia de red en el servicio de
+# inventario para validar la resiliencia del flujo de órdenes.
+#
+# Requiere un clúster Kubernetes con el operador Chaos Mesh instalado:
+#   helm repo add chaos-mesh https://charts.chaos-mesh.org
+#   helm install chaos-mesh chaos-mesh/chaos-mesh -n chaos-mesh --create-namespace
+#
+# Aplicar:   kubectl apply -f deploy/chaos/network-latency-inventory.yaml
+# Ver:       kubectl get networkchaos -n taller-diego
+# Borrar:    kubectl delete -f deploy/chaos/network-latency-inventory.yaml
+#
+# NOTA: en este proyecto el experimento se EJECUTÓ con el arnés de caos a
+# nivel de aplicación (backend/chaos.py) por no disponer de un clúster K8s;
+# este manifiesto es el artefacto equivalente para Chaos Mesh.
+# ========================================
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: latency-injection-inventory
+  namespace: taller-diego
+spec:
+  action: delay              # inyección de retraso de red
+  mode: one                  # afecta solo a un pod → blast radius mínimo
+  selector:                  # selector preciso para acotar el experimento
+    namespaces:
+      - taller-diego
+    labelSelectors:
+      app: taller-diego-backend
+  delay:
+    latency: "1500ms"        # latencia inyectada (hipótesis del experimento)
+    jitter: "10ms"
+    correlation: "0"
+  direction: to              # aplica el retardo a las peticiones salientes
+  duration: "5m"             # duración acotada para proteger el error budget

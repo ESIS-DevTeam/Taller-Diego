@@ -32,6 +32,14 @@ groups:
             sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
           )
 
+      # SLI Latency p95 — percentil 95 (1m), STEADY STATE del experimento
+      # de caos (S15): en operación normal debe mantenerse < 200ms.
+      - record: sli:latency_p95:seconds_1m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[1m])) by (le)
+          )
+
       # Error budget consumido (orientativo): 1 - (SLI_real / SLO)
       # SLO de disponibilidad = 0.99
       - record: slo:error_budget_consumed:ratio

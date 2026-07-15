@@ -12,6 +12,11 @@ httpx==0.28.1
 # Observabilidad SRE (Semana 14): expone /metrics para Prometheus
 prometheus-fastapi-instrumentator==7.0.0
 prometheus-client==0.25.0
+# Trazas distribuidas (Semana 15): OpenTelemetry → Jaeger
+opentelemetry-sdk==1.29.0
+opentelemetry-exporter-otlp-proto-grpc==1.29.0
+opentelemetry-instrumentation-fastapi==0.50b0
+opentelemetry-instrumentation-sqlalchemy==0.50b0
 # Dev / CI
 flake8==7.3.0
 pytest==9.0.3
