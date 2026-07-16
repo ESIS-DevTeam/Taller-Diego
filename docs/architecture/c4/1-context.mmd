@@ -1,0 +1,19 @@
+C4Context
+    title Diagrama de Contexto (Nivel 1) - Taller Diego
+
+    Person(empleado, "Empleado del taller", "Registra ventas, ordenes de servicio, inventario y caja")
+    Person(cliente, "Cliente", "Consulta servicios y recibe atencion")
+
+    System(tallerDiego, "Taller Diego", "Sistema de gestion para taller mecanico: inventario, ordenes de servicio, ventas, caja")
+
+    System_Ext(supabase, "Supabase / PostgreSQL", "Almacena los datos transaccionales del negocio")
+    System_Ext(github, "GitHub", "Repositorio Git, Pull Requests, GitHub Actions CI/CD")
+    System_Ext(k8s, "Cluster Kubernetes + ArgoCD", "Ejecuta y reconcilia el despliegue declarativo (GitOps)")
+    System_Ext(obs, "Stack de Observabilidad", "Prometheus, Grafana, Alertmanager, Jaeger")
+
+    Rel(empleado, tallerDiego, "Usa", "HTTPS")
+    Rel(cliente, tallerDiego, "Consulta / es atendido por", "HTTPS")
+    Rel(tallerDiego, supabase, "Lee y escribe datos", "PostgreSQL/TCP")
+    Rel(github, tallerDiego, "Construye y valida cambios", "GitHub Actions CI")
+    Rel(k8s, tallerDiego, "Despliega y reconcilia", "GitOps / ArgoCD")
+    Rel(tallerDiego, obs, "Expone metricas y trazas", "Prometheus scrape / OTLP")

@@ -1,0 +1,30 @@
+C4Container
+    title Diagrama de Contenedores (Nivel 2) - Taller Diego
+
+    Person(empleado, "Empleado")
+    Person(cliente, "Cliente")
+
+    System_Boundary(td, "Taller Diego") {
+        Container(frontend, "Frontend Web", "HTML/CSS/JS, TailwindCSS", "Interfaz servida como estatico (Nginx)")
+        Container(backend, "Backend API", "FastAPI (Python)", "API REST /api/v1, logica de negocio DDD + Hexagonal")
+        ContainerDb(db, "Base de datos", "PostgreSQL (Supabase)", "Productos, ventas, ordenes, empleados, caja")
+    }
+
+    System_Boundary(obsb, "Observabilidad") {
+        Container(prom, "Prometheus", "Prometheus", "Recolecta metricas desde /metrics")
+        Container(grafana, "Grafana", "Grafana", "Dashboards SLI/SLO y error budget")
+        Container(alertmgr, "Alertmanager", "Alertmanager", "Enrutamiento de alertas de burn rate")
+        Container(jaeger, "Jaeger", "Jaeger", "Trazas distribuidas OpenTelemetry")
+    }
+
+    System_Ext(argocd, "ArgoCD + Kubernetes", "Reconciliacion GitOps del despliegue")
+
+    Rel(empleado, frontend, "Usa", "HTTPS")
+    Rel(cliente, frontend, "Usa", "HTTPS")
+    Rel(frontend, backend, "Llama", "JSON/HTTPS REST")
+    Rel(backend, db, "Lee y escribe", "SQLAlchemy/TCP")
+    Rel(backend, prom, "Expone metricas", "/metrics")
+    Rel(backend, jaeger, "Envia trazas", "OTLP/gRPC")
+    Rel(prom, grafana, "Alimenta dashboards", "PromQL")
+    Rel(prom, alertmgr, "Dispara alertas", "burn rate")
+    Rel(argocd, backend, "Despliega y reconcilia", "kubectl apply declarativo")

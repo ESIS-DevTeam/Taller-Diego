@@ -1,0 +1,24 @@
+C4Component
+    title Diagrama de Componentes (Nivel 3) - Backend API
+
+    Container_Boundary(backend, "Backend API - FastAPI") {
+        Component(routes, "API Routes", "FastAPI Routers", "Endpoints REST v1: productos, ventas, ordenes, empleados, caja, auth")
+        Component(services, "Services", "Python", "Logica de aplicacion: VentaService, ProductoService, CajaService, etc")
+        Component(repos, "Repositories", "SQLAlchemy", "Acceso a datos, patron Repository")
+        Component(domain, "Domain (DDD)", "Python puro", "Aggregate Roots, Value Objects e invariantes (Venta, Orden)")
+        Component(hex, "Hexagonal Adapters", "Puertos y Adaptadores", "Modulos Venta y Empleado: ports + adapters primary/secondary")
+        Component(telemetry, "Telemetry", "OpenTelemetry SDK", "Instrumentacion de trazas hacia Jaeger")
+        Component(chaos, "Chaos Harness", "Middleware FastAPI", "Inyeccion controlada de latencia (experimento S15)")
+    }
+
+    ContainerDb_Ext(db, "PostgreSQL", "Supabase")
+    System_Ext(jaeger, "Jaeger")
+
+    Rel(routes, services, "Invoca")
+    Rel(services, repos, "Usa")
+    Rel(services, domain, "Aplica reglas de")
+    Rel(repos, db, "Consulta y persiste", "SQL")
+    Rel(hex, domain, "Orquesta via casos de uso")
+    Rel(routes, hex, "Delega (Venta / Empleado)")
+    Rel(telemetry, jaeger, "Exporta spans", "OTLP/gRPC")
+    Rel(chaos, routes, "Intercepta peticiones (middleware)")
