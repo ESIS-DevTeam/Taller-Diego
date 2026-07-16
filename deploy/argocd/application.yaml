@@ -24,7 +24,15 @@ spec:
     server: https://kubernetes.default.svc
     namespace: taller-diego
   syncPolicy:
+    # Reconciliación automática (S15/S16): el clúster converge SIEMPRE al
+    # estado declarado en Git. Cualquier cambio manual en caliente
+    # (kubectl edit/scale) es detectado como drift y revertido de inmediato.
+    automated:
+      selfHeal: true   # autocuración: revierte drift sin intervención humana
+      prune: true      # elimina recursos que ya no están declarados en Git
     syncOptions:
       - CreateNamespace=true
-    # Sin automated: la promoción del release es una decisión explícita
-    # (argocd app sync) que queda registrada para auditoría (IEEE 828-2012)
+    # La promoción de un release sigue siendo una decisión explícita y
+    # auditable (IEEE 828-2012): requiere un commit que cambie targetRevision
+    # a una nueva etiqueta firmada. selfHeal no promueve versiones, solo
+    # garantiza la inmutabilidad del estado declarado.
